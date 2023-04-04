@@ -3,3 +3,7 @@ obj/
 log/
 
 .vs/
+
+# Cake
+tools/
+artifacts/
