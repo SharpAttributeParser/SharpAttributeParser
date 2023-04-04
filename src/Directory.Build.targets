@@ -1,0 +1,38 @@
+<Project>
+
+	<ItemGroup>
+        <PackageReference Update="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4" />
+		<PackageReference Update="Microsoft.CodeAnalysis.Common" Version="4.4.0" />
+        <PackageReference Update="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
+		<PackageReference Update="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
+		<PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+		<PackageReference Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+		<PackageReference Update="Microsoft.Extensions.Hosting" Version="7.0.0" />
+		<PackageReference Update="Microsoft.Extensions.Http" Version="7.0.0" />
+		<PackageReference Update="Microsoft.Extensions.Options" Version="7.0.0" />
+		<PackageReference Update="Microsoft.Extensions.Options.ConfigurationExtensions" Version="7.0.0" />
+		<PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.4.1" />
+	</ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Update="Moq" Version="4.18.4" />
+    </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Update="NodaTime" Version="3.1.5" />
+	</ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Update="SonarAnalyzer.CSharp" Version="8.52.0.60960" />
+    </ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Update="System.Configuration.ConfigurationManager" Version="7.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Update="xunit" Version="2.4.2" />
+		<PackageReference Update="xunit.runner.visualstudio" Version="2.4.5" />
+	</ItemGroup>
+
+</Project>
