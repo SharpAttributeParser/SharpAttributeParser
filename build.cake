@@ -88,7 +88,7 @@ Task("Test")
 
         DotNetTestSettings settings = new()
         {
-            Framework = parameters.Framework,
+            Framework = parameters.TestFramework,
             Configuration = parameters.Configuration,
             NoRestore = true,
             NoBuild = true

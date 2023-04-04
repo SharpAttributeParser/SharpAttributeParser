@@ -12,6 +12,7 @@ public class BuildParameters
     public string Target { get; }
     public string Configuration { get; }
     public string Framework { get; } = "netstandard2.0";
+    public string TestFramework { get; } = "net7.0";
 
     public string SolutionPath { get; } = "./src/";
 
