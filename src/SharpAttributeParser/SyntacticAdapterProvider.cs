@@ -17,7 +17,7 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         SemanticAdapters = semanticAdapters;
     }
 
-    Func<ITypeSymbol, Location, bool> ISyntacticAdapterProvider.For(Action<ITypeSymbol, Location> recorder)
+    DSyntacticGenericRecorder ISyntacticAdapterProvider.For(Action<ITypeSymbol, Location> recorder)
     {
         return wrapper;
 
@@ -29,7 +29,7 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    Func<object?, Location, bool> ISyntacticAdapterProvider.For<T>(Func<T, Location, bool> recorder)
+    DSyntacticSingleRecorder ISyntacticAdapterProvider.For<T>(Func<T, Location, bool> recorder)
     {
         return wrapper;
 
@@ -41,7 +41,7 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    Func<IReadOnlyList<object?>?, Location, IReadOnlyList<Location>, bool> ISyntacticAdapterProvider.For<T>(Func<IReadOnlyList<T>, Location, IReadOnlyList<Location>, bool> recorder)
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.For<T>(Func<IReadOnlyList<T>, Location, IReadOnlyList<Location>, bool> recorder)
     {
         return wrapper;
 
@@ -53,7 +53,7 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    Func<object?, Location, bool> ISyntacticAdapterProvider.For<T>(Action<T, Location> recorder)
+    DSyntacticSingleRecorder ISyntacticAdapterProvider.For<T>(Action<T, Location> recorder)
     {
         return wrapper;
 
@@ -65,7 +65,7 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    Func<IReadOnlyList<object?>?, Location, IReadOnlyList<Location>, bool> ISyntacticAdapterProvider.For<T>(Action<IReadOnlyList<T>, Location, IReadOnlyList<Location>> recorder)
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.For<T>(Action<IReadOnlyList<T>, Location, IReadOnlyList<Location>> recorder)
     {
         return wrapper;
 
@@ -77,7 +77,7 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    Func<object?, Location, bool> ISyntacticAdapterProvider.ForNullable<T>(Func<T?, Location, bool> recorder) where T : class
+    DSyntacticSingleRecorder ISyntacticAdapterProvider.ForNullable<T>(Func<T?, Location, bool> recorder) where T : class
     {
         return wrapper;
 
@@ -89,7 +89,7 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    Func<object?, Location, bool> ISyntacticAdapterProvider.ForNullable<T>(Func<T?, Location, bool> recorder) where T : struct
+    DSyntacticSingleRecorder ISyntacticAdapterProvider.ForNullable<T>(Func<T?, Location, bool> recorder) where T : struct
     {
         return wrapper;
 
@@ -101,7 +101,7 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    Func<IReadOnlyList<object?>?, Location, IReadOnlyList<Location>, bool> ISyntacticAdapterProvider.ForNullable<T>(Func<IReadOnlyList<T?>?, Location, IReadOnlyList<Location>, bool> recorder) where T : class
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullable<T>(Func<IReadOnlyList<T?>?, Location, IReadOnlyList<Location>, bool> recorder) where T : class
     {
         return wrapper;
 
@@ -113,7 +113,7 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    Func<IReadOnlyList<object?>?, Location, IReadOnlyList<Location>, bool> ISyntacticAdapterProvider.ForNullable<T>(Func<IReadOnlyList<T?>?, Location, IReadOnlyList<Location>, bool> recorder) where T : struct
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullable<T>(Func<IReadOnlyList<T?>?, Location, IReadOnlyList<Location>, bool> recorder) where T : struct
     {
         return wrapper;
 
@@ -125,7 +125,7 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    Func<object?, Location, bool> ISyntacticAdapterProvider.ForNullable<T>(Action<T?, Location> recorder) where T : class
+    DSyntacticSingleRecorder ISyntacticAdapterProvider.ForNullable<T>(Action<T?, Location> recorder) where T : class
     {
         return wrapper;
 
@@ -137,7 +137,7 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    Func<object?, Location, bool> ISyntacticAdapterProvider.ForNullable<T>(Action<T?, Location> recorder) where T : struct
+    DSyntacticSingleRecorder ISyntacticAdapterProvider.ForNullable<T>(Action<T?, Location> recorder) where T : struct
     {
         return wrapper;
 
@@ -149,7 +149,7 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    Func<IReadOnlyList<object?>?, Location, IReadOnlyList<Location>, bool> ISyntacticAdapterProvider.ForNullable<T>(Action<IReadOnlyList<T?>?, Location, IReadOnlyList<Location>> recorder) where T : class
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullable<T>(Action<IReadOnlyList<T?>?, Location, IReadOnlyList<Location>> recorder) where T : class
     {
         return wrapper;
 
@@ -161,7 +161,7 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    Func<IReadOnlyList<object?>?, Location, IReadOnlyList<Location>, bool> ISyntacticAdapterProvider.ForNullable<T>(Action<IReadOnlyList<T?>?, Location, IReadOnlyList<Location>> recorder) where T : struct
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullable<T>(Action<IReadOnlyList<T?>?, Location, IReadOnlyList<Location>> recorder) where T : struct
     {
         return wrapper;
 
@@ -173,7 +173,7 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    Func<IReadOnlyList<object?>?, Location, IReadOnlyList<Location>, bool> ISyntacticAdapterProvider.ForNullableElements<T>(Func<IReadOnlyList<T?>, Location, IReadOnlyList<Location>, bool> recorder) where T : class
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullableElements<T>(Func<IReadOnlyList<T?>, Location, IReadOnlyList<Location>, bool> recorder) where T : class
     {
         return wrapper;
 
@@ -185,7 +185,7 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    Func<IReadOnlyList<object?>?, Location, IReadOnlyList<Location>, bool> ISyntacticAdapterProvider.ForNullableElements<T>(Func<IReadOnlyList<T?>, Location, IReadOnlyList<Location>, bool> recorder) where T : struct
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullableElements<T>(Func<IReadOnlyList<T?>, Location, IReadOnlyList<Location>, bool> recorder) where T : struct
     {
         return wrapper;
 
@@ -197,7 +197,7 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    Func<IReadOnlyList<object?>?, Location, IReadOnlyList<Location>, bool> ISyntacticAdapterProvider.ForNullableElements<T>(Action<IReadOnlyList<T?>, Location, IReadOnlyList<Location>> recorder) where T : class
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullableElements<T>(Action<IReadOnlyList<T?>, Location, IReadOnlyList<Location>> recorder) where T : class
     {
         return wrapper;
 
@@ -209,7 +209,7 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    Func<IReadOnlyList<object?>?, Location, IReadOnlyList<Location>, bool> ISyntacticAdapterProvider.ForNullableElements<T>(Action<IReadOnlyList<T?>, Location, IReadOnlyList<Location>> recorder) where T : struct
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullableElements<T>(Action<IReadOnlyList<T?>, Location, IReadOnlyList<Location>> recorder) where T : struct
     {
         return wrapper;
 
@@ -221,7 +221,7 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    Func<IReadOnlyList<object?>?, Location, IReadOnlyList<Location>, bool> ISyntacticAdapterProvider.ForNullableCollection<T>(Func<IReadOnlyList<T>?, Location, IReadOnlyList<Location>, bool> recorder)
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullableCollection<T>(Func<IReadOnlyList<T>?, Location, IReadOnlyList<Location>, bool> recorder)
     {
         return wrapper;
 
@@ -233,7 +233,7 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    Func<IReadOnlyList<object?>?, Location, IReadOnlyList<Location>, bool> ISyntacticAdapterProvider.ForNullableCollection<T>(Action<IReadOnlyList<T>?, Location, IReadOnlyList<Location>> recorder)
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullableCollection<T>(Action<IReadOnlyList<T>?, Location, IReadOnlyList<Location>> recorder)
     {
         return wrapper;
 
