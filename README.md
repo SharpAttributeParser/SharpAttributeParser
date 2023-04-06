@@ -32,7 +32,7 @@ Attributes can be parsed *semantically* or *syntactically*. Semantic parsing is 
 
 All parsers require a user-implemented `Recorder`, responsible for recording the parsed arguments. Typically, each distinct attribute-type will require a separate implementation. Recorders will receive the values of the parsed arguments, together with the symbol of the associated parameter.
 
-In most cases, `Recorders` may extend one of the abstract classes `ASemanticArgumentRecorder` and `ASyntacticArgumentRecorder`.
+In most cases, `Recorders` may extend one of the abstract classes `ASemanticArgumentRecorder`, `ASyntacticArgumentRecorder`, and `AArgumentRecorder`. The last of these, `AArgumentRecorder`, handles both semantic and syntactic parsing - using `Location.None` when parsing semantically.
 
 #### Recorder Example
 
