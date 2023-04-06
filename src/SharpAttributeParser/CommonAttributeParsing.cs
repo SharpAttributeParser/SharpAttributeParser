@@ -6,7 +6,7 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 
 /// <summary>Provides common functionality related to parsing attribute arguments.</summary>
-internal static class CommonAttributeArgumentParsing
+internal static class CommonAttributeParsing
 {
     /// <summary>Parses the value of a single-valued argument.</summary>
     /// <param name="value">The raw value of the argument.</param>

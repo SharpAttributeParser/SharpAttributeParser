@@ -88,7 +88,7 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
 
             if (i == attributeConstructor.Parameters.Count() - 1 && attributeConstructor.Parameters.Count() < attributeData.ConstructorArguments.Length)
             {
-                if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i].Name, CommonAttributeArgumentParsing.ArrayArguments(attributeData.ConstructorArguments[i])) is false)
+                if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i].Name, CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[i])) is false)
                 {
                     return false;
                 }
@@ -98,7 +98,7 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
 
             if (attributeData.ConstructorArguments[i].Kind is TypedConstantKind.Array)
             {
-                if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i].Name, CommonAttributeArgumentParsing.ArrayArguments(attributeData.ConstructorArguments[i])) is false)
+                if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i].Name, CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[i])) is false)
                 {
                     return false;
                 }
@@ -106,7 +106,7 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
                 continue;
             }
 
-            if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i].Name, CommonAttributeArgumentParsing.SingleArgument(attributeData.ConstructorArguments[i])) is false)
+            if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i].Name, CommonAttributeParsing.SingleArgument(attributeData.ConstructorArguments[i])) is false)
             {
                 return false;
             }
@@ -131,7 +131,7 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
 
             if (attributeData.NamedArguments[i].Value.Kind is TypedConstantKind.Array)
             {
-                if (recorder.TryRecordNamedArgument(attributeData.NamedArguments[i].Key, CommonAttributeArgumentParsing.ArrayArguments(attributeData.NamedArguments[i].Value)) is false)
+                if (recorder.TryRecordNamedArgument(attributeData.NamedArguments[i].Key, CommonAttributeParsing.ArrayArguments(attributeData.NamedArguments[i].Value)) is false)
                 {
                     return false;
                 }
@@ -139,7 +139,7 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
                 continue;
             }
 
-            if (recorder.TryRecordNamedArgument(attributeData.NamedArguments[i].Key, CommonAttributeArgumentParsing.SingleArgument(attributeData.NamedArguments[i].Value)) is false)
+            if (recorder.TryRecordNamedArgument(attributeData.NamedArguments[i].Key, CommonAttributeParsing.SingleArgument(attributeData.NamedArguments[i].Value)) is false)
             {
                 return false;
             }
