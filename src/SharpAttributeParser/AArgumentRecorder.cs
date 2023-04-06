@@ -15,13 +15,13 @@ using System.Collections.Generic;
 public abstract class AArgumentRecorder : ASyntacticArgumentRecorder, ISemanticArgumentRecorder
 {
     /// <inheritdoc/>
-    public bool TryRecordGenericArgument(string parameterName, ITypeSymbol value) => TryRecordGenericArgument(parameterName, value, Location.None);
+    public bool TryRecordGenericArgument(ITypeParameterSymbol parameter, ITypeSymbol value) => TryRecordGenericArgument(parameter, value, Location.None);
 
     /// <inheritdoc/>
-    public bool TryRecordConstructorArgument(string parameterName, object? value) => TryRecordConstructorArgument(parameterName, value, Location.None);
+    public bool TryRecordConstructorArgument(IParameterSymbol parameter, object? value) => TryRecordConstructorArgument(parameter, value, Location.None);
 
     /// <inheritdoc/>
-    public bool TryRecordConstructorArgument(string parameterName, IReadOnlyList<object?>? value) => TryRecordConstructorArgument(parameterName, value, Location.None, Array.Empty<Location>());
+    public bool TryRecordConstructorArgument(IParameterSymbol parameter, IReadOnlyList<object?>? value) => TryRecordConstructorArgument(parameter, value, Location.None, Array.Empty<Location>());
 
     /// <inheritdoc/>
     public bool TryRecordNamedArgument(string parameterName, object? value) => TryRecordNamedArgument(parameterName, value, Location.None);

@@ -95,16 +95,16 @@ public abstract class ASyntacticArgumentRecorder : ISyntacticArgumentRecorder
     protected virtual IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders() => Array.Empty<(string, DSyntacticArrayRecorder)>();
 
     /// <inheritdoc/>
-    public bool TryRecordGenericArgument(string parameterName, ITypeSymbol value, Location location)
+    public bool TryRecordGenericArgument(ITypeParameterSymbol parameter, ITypeSymbol value, Location location)
     {
         if (IsInitialized is false)
         {
             InitializeRecorder();
         }
 
-        if (parameterName is null)
+        if (parameter is null)
         {
-            throw new ArgumentNullException(nameof(parameterName));
+            throw new ArgumentNullException(nameof(parameter));
         }
 
         if (value is null)
@@ -119,7 +119,7 @@ public abstract class ASyntacticArgumentRecorder : ISyntacticArgumentRecorder
 
         var recorders = GenericRecorders;
 
-        if (recorders is null || recorders.TryGetValue(parameterName, out var recorder) is false || recorder is null)
+        if (recorders is null || recorders.TryGetValue(parameter.Name, out var recorder) is false || recorder is null)
         {
             return false;
         }
@@ -128,7 +128,29 @@ public abstract class ASyntacticArgumentRecorder : ISyntacticArgumentRecorder
     }
 
     /// <inheritdoc/>
-    public bool TryRecordConstructorArgument(string parameterName, object? value, Location location)
+    public bool TryRecordConstructorArgument(IParameterSymbol parameter, object? value, Location location)
+    {
+        if (parameter is null)
+        {
+            throw new ArgumentNullException(nameof(parameter));
+        }
+
+        return TryRecordNamedArgument(parameter.Name, value, location);
+    }
+
+    /// <inheritdoc/>
+    public bool TryRecordConstructorArgument(IParameterSymbol parameter, IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
+    {
+        if (parameter is null)
+        {
+            throw new ArgumentNullException(nameof(parameter));
+        }
+
+        return TryRecordNamedArgument(parameter.Name, value, collectionLocation, elementLocations);
+    }
+
+    /// <inheritdoc/>
+    public bool TryRecordNamedArgument(string parameterName, object? value, Location location)
     {
         if (IsInitialized is false)
         {
@@ -156,7 +178,7 @@ public abstract class ASyntacticArgumentRecorder : ISyntacticArgumentRecorder
     }
 
     /// <inheritdoc/>
-    public bool TryRecordConstructorArgument(string parameterName, IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
+    public bool TryRecordNamedArgument(string parameterName, IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
     {
         if (IsInitialized is false)
         {
@@ -187,10 +209,4 @@ public abstract class ASyntacticArgumentRecorder : ISyntacticArgumentRecorder
 
         return recorder(value, collectionLocation, elementLocations);
     }
-
-    /// <inheritdoc/>
-    public bool TryRecordNamedArgument(string parameterName, object? value, Location location) => TryRecordConstructorArgument(parameterName, value, location);
-
-    /// <inheritdoc/>
-    public bool TryRecordNamedArgument(string parameterName, IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations) => TryRecordConstructorArgument(parameterName, value, collectionLocation, elementLocations);
 }

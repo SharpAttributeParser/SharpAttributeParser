@@ -92,16 +92,16 @@ public abstract class ASemanticArgumentRecorder : ISemanticArgumentRecorder
     protected virtual IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders() => Array.Empty<(string, DSemanticArrayRecorder)>();
 
     /// <inheritdoc/>
-    public bool TryRecordGenericArgument(string parameterName, ITypeSymbol value)
+    public bool TryRecordGenericArgument(ITypeParameterSymbol parameter, ITypeSymbol value)
     {
         if (IsInitialized is false)
         {
             InitializeRecorder();
         }
 
-        if (parameterName is null)
+        if (parameter is null)
         {
-            throw new ArgumentNullException(nameof(parameterName));
+            throw new ArgumentNullException(nameof(parameter));
         }
 
         if (value is null)
@@ -109,7 +109,7 @@ public abstract class ASemanticArgumentRecorder : ISemanticArgumentRecorder
             throw new ArgumentNullException(nameof(value));
         }
 
-        if (GenericRecorders.TryGetValue(parameterName, out var recorder) is false || recorder is null)
+        if (GenericRecorders.TryGetValue(parameter.Name, out var recorder) is false || recorder is null)
         {
             return false;
         }
@@ -118,7 +118,29 @@ public abstract class ASemanticArgumentRecorder : ISemanticArgumentRecorder
     }
 
     /// <inheritdoc/>
-    public bool TryRecordConstructorArgument(string parameterName, object? value)
+    public bool TryRecordConstructorArgument(IParameterSymbol parameter, object? value)
+    {
+        if (parameter is null)
+        {
+            throw new ArgumentNullException(nameof(parameter));
+        }
+
+        return TryRecordNamedArgument(parameter.Name, value);
+    }
+
+    /// <inheritdoc/>
+    public bool TryRecordConstructorArgument(IParameterSymbol parameter, IReadOnlyList<object?>? value)
+    {
+        if (parameter is null)
+        {
+            throw new ArgumentNullException(nameof(parameter));
+        }
+
+        return TryRecordNamedArgument(parameter.Name, value);
+    }
+
+    /// <inheritdoc/>
+    public bool TryRecordNamedArgument(string parameterName, object? value)
     {
         if (IsInitialized is false)
         {
@@ -141,7 +163,7 @@ public abstract class ASemanticArgumentRecorder : ISemanticArgumentRecorder
     }
 
     /// <inheritdoc/>
-    public bool TryRecordConstructorArgument(string parameterName, IReadOnlyList<object?>? value)
+    public bool TryRecordNamedArgument(string parameterName, IReadOnlyList<object?>? value)
     {
         if (IsInitialized is false)
         {
@@ -162,10 +184,4 @@ public abstract class ASemanticArgumentRecorder : ISemanticArgumentRecorder
 
         return recorder(value);
     }
-
-    /// <inheritdoc/>
-    public bool TryRecordNamedArgument(string parameterName, object? value) => TryRecordConstructorArgument(parameterName, value);
-
-    /// <inheritdoc/>
-    public bool TryRecordNamedArgument(string parameterName, IReadOnlyList<object?>? value) => TryRecordConstructorArgument(parameterName, value);
 }
