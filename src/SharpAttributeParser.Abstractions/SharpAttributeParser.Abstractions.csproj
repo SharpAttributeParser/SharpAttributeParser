@@ -14,7 +14,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="..\README.nupkg.md" Pack="true" PackagePath="\" />
+        <None Include="README.nupkg.md" Pack="true" PackagePath="\" />
     </ItemGroup>
 
     <ItemGroup>
