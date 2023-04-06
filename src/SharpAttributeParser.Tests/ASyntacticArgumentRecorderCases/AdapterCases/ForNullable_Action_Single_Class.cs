@@ -9,7 +9,7 @@ using Xunit;
 
 public class ForNullable_Action_Single_Class
 {
-    private static bool TryRecordConstructorArgument(ASyntacticArgumentRecorder recorder, string parameterName, object? value) => recorder.TryRecordConstructorArgument(parameterName, value, Location.None);
+    private static bool TryRecordConstructorArgument(ASyntacticArgumentRecorder recorder, string parameterName, object? value) => recorder.TryRecordNamedArgument(parameterName, value, Location.None);
 
     [Fact]
     public void IntArray_IntArray_True_RecorderPopulated()

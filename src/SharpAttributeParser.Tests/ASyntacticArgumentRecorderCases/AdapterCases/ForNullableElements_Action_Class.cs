@@ -9,7 +9,7 @@ using Xunit;
 
 public class ForNullableElements_Action_Class
 {
-    private static bool TryRecordConstructorArgument(ASyntacticArgumentRecorder recorder, string parameterName, IReadOnlyList<object?>? value) => recorder.TryRecordConstructorArgument(parameterName, value, Location.None, Array.Empty<Location>());
+    private static bool TryRecordConstructorArgument(ASyntacticArgumentRecorder recorder, string parameterName, IReadOnlyList<object?>? value) => recorder.TryRecordNamedArgument(parameterName, value, Location.None, Array.Empty<Location>());
 
     [Fact]
     public void String_String_True_RecorderPopulated()

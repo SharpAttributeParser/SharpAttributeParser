@@ -9,9 +9,9 @@ using Xunit;
 
 public class Comparer
 {
-    private static void TryRecordGenericArgument(ASyntacticArgumentRecorder recorder, string parameterName, ITypeSymbol value, Location location) => recorder.TryRecordGenericArgument(parameterName, value, location);
-    private static void TryRecordConstructorArgument(ASyntacticArgumentRecorder recorder, string parameterName, object? value, Location location) => recorder.TryRecordConstructorArgument(parameterName, value, location);
-    private static void TryRecordConstructorArgument(ASyntacticArgumentRecorder recorder, string parameterName, IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations) => recorder.TryRecordConstructorArgument(parameterName, value, collectionLocation, elementLocations);
+    private static void TryRecordGenericArgument(ASyntacticArgumentRecorder recorder, ITypeParameterSymbol parameter, ITypeSymbol value, Location location) => recorder.TryRecordGenericArgument(parameter, value, location);
+    private static void TryRecordConstructorArgument(ASyntacticArgumentRecorder recorder, IParameterSymbol parameter, object? value, Location location) => recorder.TryRecordConstructorArgument(parameter, value, location);
+    private static void TryRecordConstructorArgument(ASyntacticArgumentRecorder recorder, IParameterSymbol parameter, IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations) => recorder.TryRecordConstructorArgument(parameter, value, collectionLocation, elementLocations);
     private static void TryRecordNamedArgument(ASyntacticArgumentRecorder recorder, string parameterName, object? value, Location location) => recorder.TryRecordNamedArgument(parameterName, value, location);
     private static void TryRecordNamedArgument(ASyntacticArgumentRecorder recorder, string parameterName, IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations) => recorder.TryRecordNamedArgument(parameterName, value, collectionLocation, elementLocations);
 
@@ -22,11 +22,11 @@ public class Comparer
 
         SyntacticArgumentRecorder recorder = new(comparer);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedTypeParameter();
         var value = Datasets.GetValidTypeSymbol();
         var location = Datasets.GetValidLocation();
 
-        var exception = Record.Exception(() => TryRecordGenericArgument(recorder, parameterName, value, location));
+        var exception = Record.Exception(() => TryRecordGenericArgument(recorder, parameter, value, location));
 
         Assert.IsType<InvalidOperationException>(exception);
     }
@@ -38,11 +38,11 @@ public class Comparer
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedTypeParameter();
         var value = Datasets.GetValidTypeSymbol();
         var location = Datasets.GetValidLocation();
 
-        TryRecordGenericArgument(recorder, parameterName, value, location);
+        TryRecordGenericArgument(recorder, parameter, value, location);
 
         ComparerMock.VerifyInvoked(comparerMock);
     }
@@ -54,11 +54,11 @@ public class Comparer
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedParameter();
         var value = Datasets.GetValidTypeSymbol();
         var location = Datasets.GetValidLocation();
 
-        TryRecordConstructorArgument(recorder, parameterName, value, location);
+        TryRecordConstructorArgument(recorder, parameter, value, location);
 
         ComparerMock.VerifyInvoked(comparerMock);
     }
@@ -70,12 +70,12 @@ public class Comparer
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedParameter();
         var value = new[] { Datasets.GetValidTypeSymbol() };
         var collectionLocation = Datasets.GetValidLocation();
         var elementLocations = Datasets.GetValidElementLocations();
 
-        TryRecordConstructorArgument(recorder, parameterName, value, collectionLocation, elementLocations);
+        TryRecordConstructorArgument(recorder, parameter, value, collectionLocation, elementLocations);
 
         ComparerMock.VerifyInvoked(comparerMock);
     }

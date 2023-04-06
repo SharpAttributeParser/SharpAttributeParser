@@ -7,7 +7,7 @@ using Xunit;
 
 public class ForNullable_Func_Single_Struct
 {
-    private static bool TryRecordConstructorArgument(ASemanticArgumentRecorder recorder, string parameterName, object? value) => recorder.TryRecordConstructorArgument(parameterName, value);
+    private static bool TryRecordConstructorArgument(ASemanticArgumentRecorder recorder, string parameterName, object? value) => recorder.TryRecordNamedArgument(parameterName, value);
 
     [Fact]
     public void Enum_SameType_True_RecorderPopulated()

@@ -12,6 +12,28 @@ internal static class Datasets
     public static string GetValidParameterName() => "Bar";
     public static string GetNullParameterName() => null!;
 
+    public static ITypeParameterSymbol GetMockedTypeParameter()
+    {
+        Mock<ITypeParameterSymbol> mock = new();
+
+        mock.SetupGet(static (parameter) => parameter.Name).Returns("Bar");
+
+        return mock.Object;
+    }
+
+    public static ITypeParameterSymbol GetNullTypeParameter() => null!;
+
+    public static IParameterSymbol GetMockedParameter()
+    {
+        Mock<IParameterSymbol> mock = new();
+
+        mock.SetupGet(static (parameter) => parameter.Name).Returns("Bar");
+
+        return mock.Object;
+    }
+
+    public static IParameterSymbol GetNullParameter() => null!;
+
     public static Location GetValidLocation() => Location.None;
     public static Location GetNullLocation() => null!;
 
