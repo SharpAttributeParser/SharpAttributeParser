@@ -8,18 +8,18 @@ using Xunit;
 
 public class TryRecordGenericArgument
 {
-    private static bool Target(ASyntacticArgumentRecorder recorder, string parameterName, ITypeSymbol value, Location location) => recorder.TryRecordGenericArgument(parameterName, value, location);
+    private static bool Target(ASyntacticArgumentRecorder recorder, ITypeParameterSymbol parameter, ITypeSymbol value, Location location) => recorder.TryRecordGenericArgument(parameter, value, location);
 
     [Fact]
     public void NullParameterName_ArgumentNullException()
     {
         SyntacticArgumentRecorder recorder = new(StringComparer.OrdinalIgnoreCase);
 
-        var parameterName = Datasets.GetNullParameterName();
+        var parameter = Datasets.GetNullTypeParameter();
         var value = Datasets.GetValidTypeSymbol();
         var location = Datasets.GetValidLocation();
 
-        var exception = Record.Exception(() => Target(recorder, parameterName, value, location));
+        var exception = Record.Exception(() => Target(recorder, parameter, value, location));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -29,11 +29,11 @@ public class TryRecordGenericArgument
     {
         SyntacticArgumentRecorder recorder = new(StringComparer.OrdinalIgnoreCase);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedTypeParameter();
         var value = Datasets.GetNullTypeSymbol();
         var location = Datasets.GetValidLocation();
 
-        var exception = Record.Exception(() => Target(recorder, parameterName, value, location));
+        var exception = Record.Exception(() => Target(recorder, parameter, value, location));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -43,11 +43,11 @@ public class TryRecordGenericArgument
     {
         SyntacticArgumentRecorder recorder = new(StringComparer.OrdinalIgnoreCase);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedTypeParameter();
         var value = Datasets.GetValidTypeSymbol();
         var location = Datasets.GetNullLocation();
 
-        var exception = Record.Exception(() => Target(recorder, parameterName, value, location));
+        var exception = Record.Exception(() => Target(recorder, parameter, value, location));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -59,11 +59,11 @@ public class TryRecordGenericArgument
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedTypeParameter();
         var value = Datasets.GetValidTypeSymbol();
         var location = Datasets.GetValidLocation();
 
-        var actual = Target(recorder, parameterName, value, location);
+        var actual = Target(recorder, parameter, value, location);
 
         Assert.True(actual);
 
@@ -78,11 +78,11 @@ public class TryRecordGenericArgument
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedTypeParameter();
         var value = Datasets.GetValidTypeSymbol();
         var location = Datasets.GetValidLocation();
 
-        var actual = Target(recorder, parameterName, value, location);
+        var actual = Target(recorder, parameter, value, location);
 
         Assert.False(actual);
 

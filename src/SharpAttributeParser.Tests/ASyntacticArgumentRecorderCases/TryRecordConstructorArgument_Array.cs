@@ -9,19 +9,19 @@ using Xunit;
 
 public class TryRecordConstructorArgument_Array
 {
-    private static bool Target(ASyntacticArgumentRecorder recorder, string parameterName, IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations) => recorder.TryRecordConstructorArgument(parameterName, value, collectionLocation, elementLocations);
+    private static bool Target(ASyntacticArgumentRecorder recorder, IParameterSymbol parameter, IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations) => recorder.TryRecordConstructorArgument(parameter, value, collectionLocation, elementLocations);
 
     [Fact]
     public void NullParameterName_ArgumentNullException()
     {
         SyntacticArgumentRecorder recorder = new(StringComparer.OrdinalIgnoreCase);
 
-        var parameterName = Datasets.GetNullParameterName();
+        var parameter = Datasets.GetNullParameter();
         var value = Datasets.GetValidArrayArgument();
         var collectionLocation = Datasets.GetValidLocation();
         var elementLocations = Datasets.GetValidElementLocations();
 
-        var exception = Record.Exception(() => Target(recorder, parameterName, value, collectionLocation, elementLocations));
+        var exception = Record.Exception(() => Target(recorder, parameter, value, collectionLocation, elementLocations));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -33,12 +33,12 @@ public class TryRecordConstructorArgument_Array
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedParameter();
         var value = Datasets.GetValidArrayArgument();
         var collectionLocation = Datasets.GetNullLocation();
         var elementLocations = Datasets.GetValidElementLocations();
 
-        var exception = Record.Exception(() => Target(recorder, parameterName, value, collectionLocation, elementLocations));
+        var exception = Record.Exception(() => Target(recorder, parameter, value, collectionLocation, elementLocations));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -50,12 +50,12 @@ public class TryRecordConstructorArgument_Array
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedParameter();
         var value = Datasets.GetValidArrayArgument();
         var collectionLocation = Datasets.GetValidLocation();
         var elementLocations = Datasets.GetNullElementLocations();
 
-        var exception = Record.Exception(() => Target(recorder, parameterName, value, collectionLocation, elementLocations));
+        var exception = Record.Exception(() => Target(recorder, parameter, value, collectionLocation, elementLocations));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -67,12 +67,12 @@ public class TryRecordConstructorArgument_Array
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedParameter();
         var value = Datasets.GetNullArrayArgument();
         var collectionLocation = Datasets.GetValidLocation();
         var elementLocations = Datasets.GetValidElementLocations();
 
-        var actual = Target(recorder, parameterName, value, collectionLocation, elementLocations);
+        var actual = Target(recorder, parameter, value, collectionLocation, elementLocations);
 
         Assert.True(actual);
 
@@ -88,12 +88,12 @@ public class TryRecordConstructorArgument_Array
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedParameter();
         var value = Datasets.GetValidArrayArgument();
         var collectionLocation = Datasets.GetValidLocation();
         var elementLocations = Datasets.GetValidElementLocations();
 
-        var actual = Target(recorder, parameterName, value, collectionLocation, elementLocations);
+        var actual = Target(recorder, parameter, value, collectionLocation, elementLocations);
 
         Assert.True(actual);
 
@@ -109,12 +109,12 @@ public class TryRecordConstructorArgument_Array
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedParameter();
         var value = Datasets.GetValidArrayArgument();
         var collectionLocation = Datasets.GetValidLocation();
         var elementLocations = Datasets.GetValidElementLocations();
 
-        var actual = Target(recorder, parameterName, value, collectionLocation, elementLocations);
+        var actual = Target(recorder, parameter, value, collectionLocation, elementLocations);
 
         Assert.False(actual);
 

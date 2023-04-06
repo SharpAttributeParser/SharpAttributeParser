@@ -9,7 +9,7 @@ using Xunit;
 
 public class For_Func_Single
 {
-    private static bool TryRecordConstructorArgument(ASyntacticArgumentRecorder recorder, string parameterName, object? value) => recorder.TryRecordConstructorArgument(parameterName, value, Location.None);
+    private static bool TryRecordConstructorArgument(ASyntacticArgumentRecorder recorder, string parameterName, object? value) => recorder.TryRecordNamedArgument(parameterName, value, Location.None);
 
     [Fact]
     public void Enum_SameType_True_RecorderPopulated()

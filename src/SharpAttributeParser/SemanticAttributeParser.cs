@@ -53,7 +53,7 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
 
         for (var i = 0; i < attributeType.TypeArguments.Length; i++)
         {
-            if (recorder.TryRecordGenericArgument(attributeType.TypeParameters[i].Name, attributeType.TypeArguments[i]) is false)
+            if (recorder.TryRecordGenericArgument(attributeType.TypeParameters[i], attributeType.TypeArguments[i]) is false)
             {
                 return false;
             }
@@ -88,7 +88,7 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
 
             if (i == attributeConstructor.Parameters.Count() - 1 && attributeConstructor.Parameters.Count() < attributeData.ConstructorArguments.Length)
             {
-                if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i].Name, CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[i])) is false)
+                if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[i])) is false)
                 {
                     return false;
                 }
@@ -98,7 +98,7 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
 
             if (attributeData.ConstructorArguments[i].Kind is TypedConstantKind.Array)
             {
-                if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i].Name, CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[i])) is false)
+                if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[i])) is false)
                 {
                     return false;
                 }
@@ -106,7 +106,7 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
                 continue;
             }
 
-            if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i].Name, CommonAttributeParsing.SingleArgument(attributeData.ConstructorArguments[i])) is false)
+            if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i], CommonAttributeParsing.SingleArgument(attributeData.ConstructorArguments[i])) is false)
             {
                 return false;
             }

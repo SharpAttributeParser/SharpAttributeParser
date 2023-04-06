@@ -12,7 +12,14 @@ using Xunit;
 
 public class For_Generic
 {
-    private static bool TryRecordGenericArgument(ASemanticArgumentRecorder recorder, string parameterName, ITypeSymbol value) => recorder.TryRecordGenericArgument(parameterName, value);
+    private static bool TryRecordGenericArgument(ASemanticArgumentRecorder recorder, string parameterName, ITypeSymbol value)
+    {
+        Mock<ITypeParameterSymbol> parameterMock = new();
+
+        parameterMock.SetupGet(static (parameter) => parameter.Name).Returns(parameterName);
+
+        return recorder.TryRecordGenericArgument(parameterMock.Object, value);
+    }
 
     [Fact]
     public void True_RecordedPopulated()

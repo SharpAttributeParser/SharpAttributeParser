@@ -81,7 +81,7 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
         {
             var location = ArgumentLocator.TypeArgument(genericNameSyntax.TypeArgumentList.Arguments[i]);
 
-            if (recorder.TryRecordGenericArgument(attributeType.TypeParameters[i].Name, attributeType.TypeArguments[i], location) is false)
+            if (recorder.TryRecordGenericArgument(attributeType.TypeParameters[i], attributeType.TypeArguments[i], location) is false)
             {
                 return false;
             }
@@ -133,7 +133,7 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
 
                 var (collectionLocation, elementLocations) = ArgumentLocator.ArrayArgument(attributeSyntax.ArgumentList.Arguments[i].Expression);
 
-                if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i].Name, CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[i]), collectionLocation, elementLocations) is false)
+                if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[i]), collectionLocation, elementLocations) is false)
                 {
                     return false;
                 }
@@ -143,7 +143,7 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
 
             var location = ArgumentLocator.SingleArgument(attributeSyntax.ArgumentList.Arguments[i].Expression);
 
-            if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i].Name, CommonAttributeParsing.SingleArgument(attributeData.ConstructorArguments[i]), location) is false)
+            if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i], CommonAttributeParsing.SingleArgument(attributeData.ConstructorArguments[i]), location) is false)
             {
                 return false;
             }
@@ -168,7 +168,7 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
 
         var (paramsCollectionLocation, paramsElementLocations) = ArgumentLocator.ParamsArguments(attributeSyntax.ArgumentList.Arguments.Skip(index).Take(attributeSyntax.ArgumentList.Arguments.Count - (attributeData.ConstructorArguments.Length + attributeData.NamedArguments.Length) + 1).Select(static (argument) => argument.Expression).ToArray());
 
-        return recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[index].Name, CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[index]), paramsCollectionLocation, paramsElementLocations);
+        return recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[index], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[index]), paramsCollectionLocation, paramsElementLocations);
     }
 
     private bool TryParseNamedArguments(ISyntacticArgumentRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax)

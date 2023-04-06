@@ -8,17 +8,17 @@ using Xunit;
 
 public class TryRecordGenericArgument
 {
-    private static bool Target(ASemanticArgumentRecorder recorder, string parameterName, ITypeSymbol value) => recorder.TryRecordGenericArgument(parameterName, value);
+    private static bool Target(ASemanticArgumentRecorder recorder, ITypeParameterSymbol parameter, ITypeSymbol value) => recorder.TryRecordGenericArgument(parameter, value);
 
     [Fact]
-    public void NullParameterName_ArgumentNullException()
+    public void NullParameter_ArgumentNullException()
     {
         SemanticArgumentRecorder recorder = new(StringComparer.OrdinalIgnoreCase);
 
-        var parameterName = Datasets.GetNullParameterName();
+        var parameter = Datasets.GetNullTypeParameter();
         var value = Datasets.GetValidTypeSymbol();
 
-        var exception = Record.Exception(() => Target(recorder, parameterName, value));
+        var exception = Record.Exception(() => Target(recorder, parameter, value));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -28,10 +28,10 @@ public class TryRecordGenericArgument
     {
         SemanticArgumentRecorder recorder = new(StringComparer.OrdinalIgnoreCase);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedTypeParameter();
         var value = Datasets.GetNullTypeSymbol();
 
-        var exception = Record.Exception(() => Target(recorder, parameterName, value));
+        var exception = Record.Exception(() => Target(recorder, parameter, value));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -43,10 +43,10 @@ public class TryRecordGenericArgument
 
         SemanticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedTypeParameter();
         var value = Datasets.GetValidTypeSymbol();
 
-        var actual = Target(recorder, parameterName, value);
+        var actual = Target(recorder, parameter, value);
 
         Assert.True(actual);
 
@@ -60,10 +60,10 @@ public class TryRecordGenericArgument
 
         SemanticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedTypeParameter();
         var value = Datasets.GetValidTypeSymbol();
 
-        var actual = Target(recorder, parameterName, value);
+        var actual = Target(recorder, parameter, value);
 
         Assert.False(actual);
 

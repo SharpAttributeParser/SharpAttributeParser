@@ -7,7 +7,7 @@ using Xunit;
 
 public class ForNullable_Action_Array_Class
 {
-    private static bool TryRecordConstructorArgument(ASemanticArgumentRecorder recorder, string parameterName, IReadOnlyList<object?>? value) => recorder.TryRecordConstructorArgument(parameterName, value);
+    private static bool TryRecordConstructorArgument(ASemanticArgumentRecorder recorder, string parameterName, IReadOnlyList<object?>? value) => recorder.TryRecordNamedArgument(parameterName, value);
 
     [Fact]
     public void String_String_True_RecorderPopulated()

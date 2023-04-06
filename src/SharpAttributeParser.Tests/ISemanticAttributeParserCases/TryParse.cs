@@ -103,7 +103,7 @@ public class TryParse
     {
         Mock<ISemanticArgumentRecorder> recorderMock = new();
 
-        recorderMock.Setup(static (recorder) => recorder.TryRecordGenericArgument(It.IsAny<string>(), It.IsAny<ITypeSymbol>())).Returns(false);
+        recorderMock.Setup(static (recorder) => recorder.TryRecordGenericArgument(It.IsAny<ITypeParameterSymbol>(), It.IsAny<ITypeSymbol>())).Returns(false);
 
         var source = """
             [Generic<string>]
@@ -196,7 +196,7 @@ public class TryParse
     {
         Mock<ISemanticArgumentRecorder> recorderMock = new();
 
-        recorderMock.Setup(static (recorder) => recorder.TryRecordConstructorArgument(It.IsAny<string>(), It.IsAny<object?>())).Returns(false);
+        recorderMock.Setup(static (recorder) => recorder.TryRecordConstructorArgument(It.IsAny<IParameterSymbol>(), It.IsAny<object?>())).Returns(false);
 
         var source = """
             [SingleConstructor(null)]
@@ -257,7 +257,7 @@ public class TryParse
     {
         Mock<ISemanticArgumentRecorder> recorderMock = new();
 
-        recorderMock.Setup(static (recorder) => recorder.TryRecordConstructorArgument(It.IsAny<string>(), It.IsAny<IReadOnlyList<object?>?>())).Returns(false);
+        recorderMock.Setup(static (recorder) => recorder.TryRecordConstructorArgument(It.IsAny<IParameterSymbol>(), It.IsAny<IReadOnlyList<object?>?>())).Returns(false);
 
         var source = """
             [ArrayConstructor(null)]

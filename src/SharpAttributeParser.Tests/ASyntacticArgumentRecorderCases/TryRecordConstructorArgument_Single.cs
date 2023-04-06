@@ -8,18 +8,18 @@ using Xunit;
 
 public class TryRecordConstructorArgument_Single
 {
-    private static bool Target(ASyntacticArgumentRecorder recorder, string parameterName, object? value, Location location) => recorder.TryRecordConstructorArgument(parameterName, value, location);
+    private static bool Target(ASyntacticArgumentRecorder recorder, IParameterSymbol parameter, object? value, Location location) => recorder.TryRecordConstructorArgument(parameter, value, location);
 
     [Fact]
     public void NullParameterName_ArgumentNullException()
     {
         SyntacticArgumentRecorder recorder = new(StringComparer.OrdinalIgnoreCase);
 
-        var parameterName = Datasets.GetNullParameterName();
+        var parameter = Datasets.GetNullParameter();
         var value = Datasets.GetValidTypeSymbol();
         var location = Datasets.GetValidLocation();
 
-        var exception = Record.Exception(() => Target(recorder, parameterName, value, location));
+        var exception = Record.Exception(() => Target(recorder, parameter, value, location));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -31,11 +31,11 @@ public class TryRecordConstructorArgument_Single
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedParameter();
         var value = Datasets.GetValidTypeSymbol();
         var location = Datasets.GetNullLocation();
 
-        var exception = Record.Exception(() => Target(recorder, parameterName, value, location));
+        var exception = Record.Exception(() => Target(recorder, parameter, value, location));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -47,11 +47,11 @@ public class TryRecordConstructorArgument_Single
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedParameter();
         var value = Datasets.GetNullTypeSymbol();
         var location = Datasets.GetValidLocation();
 
-        var actual = Target(recorder, parameterName, value, location);
+        var actual = Target(recorder, parameter, value, location);
 
         Assert.True(actual);
 
@@ -66,11 +66,11 @@ public class TryRecordConstructorArgument_Single
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedParameter();
         var value = Datasets.GetValidTypeSymbol();
         var location = Datasets.GetValidLocation();
 
-        var actual = Target(recorder, parameterName, value, location);
+        var actual = Target(recorder, parameter, value, location);
 
         Assert.True(actual);
 
@@ -85,11 +85,11 @@ public class TryRecordConstructorArgument_Single
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedParameter();
         var value = Datasets.GetValidTypeSymbol();
         var location = Datasets.GetValidLocation();
 
-        var actual = Target(recorder, parameterName, value, location);
+        var actual = Target(recorder, parameter, value, location);
 
         Assert.False(actual);
 

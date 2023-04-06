@@ -9,9 +9,9 @@ using Xunit;
 
 public class Comparer
 {
-    private static void TryRecordGenericArgument(ASemanticArgumentRecorder recorder, string parameterName, ITypeSymbol value) => recorder.TryRecordGenericArgument(parameterName, value);
-    private static void TryRecordConstructorArgument(ASemanticArgumentRecorder recorder, string parameterName, object? value) => recorder.TryRecordConstructorArgument(parameterName, value);
-    private static void TryRecordConstructorArgument(ASemanticArgumentRecorder recorder, string parameterName, IReadOnlyList<object?>? value) => recorder.TryRecordConstructorArgument(parameterName, value);
+    private static void TryRecordGenericArgument(ASemanticArgumentRecorder recorder, ITypeParameterSymbol parameter, ITypeSymbol value) => recorder.TryRecordGenericArgument(parameter, value);
+    private static void TryRecordConstructorArgument(ASemanticArgumentRecorder recorder, IParameterSymbol parameter, object? value) => recorder.TryRecordConstructorArgument(parameter, value);
+    private static void TryRecordConstructorArgument(ASemanticArgumentRecorder recorder, IParameterSymbol parameter, IReadOnlyList<object?>? value) => recorder.TryRecordConstructorArgument(parameter, value);
     private static void TryRecordNamedArgument(ASemanticArgumentRecorder recorder, string parameterName, object? value) => recorder.TryRecordNamedArgument(parameterName, value);
     private static void TryRecordNamedArgument(ASemanticArgumentRecorder recorder, string parameterName, IReadOnlyList<object?>? value) => recorder.TryRecordNamedArgument(parameterName, value);
 
@@ -22,10 +22,10 @@ public class Comparer
 
         SemanticArgumentRecorder recorder = new(comparer);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedTypeParameter();
         var value = Datasets.GetValidTypeSymbol();
 
-        var exception = Record.Exception(() => TryRecordGenericArgument(recorder, parameterName, value));
+        var exception = Record.Exception(() => TryRecordGenericArgument(recorder, parameter, value));
 
         Assert.IsType<InvalidOperationException>(exception);
     }
@@ -37,10 +37,10 @@ public class Comparer
 
         SemanticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedTypeParameter();
         var value = Datasets.GetValidTypeSymbol();
 
-        TryRecordGenericArgument(recorder, parameterName, value);
+        TryRecordGenericArgument(recorder, parameter, value);
 
         ComparerMock.VerifyInvoked(comparerMock);
     }
@@ -52,10 +52,10 @@ public class Comparer
 
         SemanticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedParameter();
         var value = Datasets.GetValidTypeSymbol();
 
-        TryRecordConstructorArgument(recorder, parameterName, value);
+        TryRecordConstructorArgument(recorder, parameter, value);
 
         ComparerMock.VerifyInvoked(comparerMock);
     }
@@ -67,10 +67,10 @@ public class Comparer
 
         SemanticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
+        var parameter = Datasets.GetMockedParameter();
         var value = new[] { Datasets.GetValidTypeSymbol() };
 
-        TryRecordConstructorArgument(recorder, parameterName, value);
+        TryRecordConstructorArgument(recorder, parameter, value);
 
         ComparerMock.VerifyInvoked(comparerMock);
     }

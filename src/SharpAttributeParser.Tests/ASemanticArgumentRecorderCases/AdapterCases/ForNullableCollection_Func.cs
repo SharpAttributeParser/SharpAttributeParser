@@ -7,7 +7,7 @@ using Xunit;
 
 public class ForNullableCollection_Func
 {
-    private static bool TryRecordConstructorArgument(ASemanticArgumentRecorder recorder, string parameterName, IReadOnlyList<object?>? value) => recorder.TryRecordConstructorArgument(parameterName, value);
+    private static bool TryRecordConstructorArgument(ASemanticArgumentRecorder recorder, string parameterName, IReadOnlyList<object?>? value) => recorder.TryRecordNamedArgument(parameterName, value);
 
     [Fact]
     public void Enum_SameType_True_RecorderPopulated()
