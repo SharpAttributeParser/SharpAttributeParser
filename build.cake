@@ -100,7 +100,6 @@ Task("Test")
 
 Task("Pack")
     .IsDependentOn("Test")
-    .WithCriteria<BuildParameters>((context, parameters) => parameters.IsRunningOnGitHubActions, "Build is not running on GitHub Actions.")
     .Does<BuildParameters>((context, parameters) =>
     {
         DotNetMSBuildSettings msBuildSettings = new()
@@ -129,7 +128,7 @@ Task("Pack")
 
 Task("Publish-GitHub-Release")
     .IsDependentOn("Pack")
-    .WithCriteria<BuildParameters>((context, parameters) => parameters.IsRunningOnGitHubActions)
+    .WithCriteria<BuildParameters>((context, parameters) => parameters.IsRunningOnGitHubActions, "Build is not running on GitHub Actions.")
     .Does<BuildParameters>((context, parameters) =>
     {
         GitReleaseManagerCreateSettings createSettings = new()
@@ -170,7 +169,7 @@ Task("Publish-GitHub-Release")
 
 Task("Publish-GitHub-Packages")
     .IsDependentOn("Publish-GitHub-Release")
-    .WithCriteria<BuildParameters>((context, parameters) => parameters.IsRunningOnGitHubActions)
+    .WithCriteria<BuildParameters>((context, parameters) => parameters.IsRunningOnGitHubActions, "Build is not running on GitHub Actions.")
     .Does<BuildParameters>((context, parameters) =>
     {
         DotNetNuGetPushSettings settings = new()
@@ -189,7 +188,7 @@ Task("Publish-GitHub-Packages")
 
 Task("Publish-NuGet")
     .IsDependentOn("Publish-GitHub-Release")
-    .WithCriteria<BuildParameters>((context, parameters) => parameters.IsRunningOnGitHubActions)
+    .WithCriteria<BuildParameters>((context, parameters) => parameters.IsRunningOnGitHubActions, "Build is not running on GitHub Actions.")
     .Does<BuildParameters>((context, parameters) =>
     {
         DotNetNuGetPushSettings settings = new()

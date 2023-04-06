@@ -16,7 +16,6 @@
     <PropertyGroup>
         <Owners>ErikWe</Owners>
         <Authors>ErikWe</Authors>
-        <Version>0.1.0</Version>
         <PackageProjectUrl>https://github.com/ErikWe/sharp-attribute-parser</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ErikWe/sharp-attribute-parser</RepositoryUrl>
     </PropertyGroup>
