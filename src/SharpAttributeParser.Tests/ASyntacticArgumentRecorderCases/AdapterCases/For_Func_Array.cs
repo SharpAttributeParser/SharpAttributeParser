@@ -331,9 +331,9 @@ public class For_Func_Array
         public IReadOnlyList<StringComparison>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.For<StringComparison>(RecordStringComparisonArray).Invoke);
+            yield return ("Value", Adapters.For<StringComparison>(RecordStringComparisonArray));
         }
 
         private bool RecordStringComparisonArray(IReadOnlyList<StringComparison> value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
@@ -350,9 +350,9 @@ public class For_Func_Array
         public IReadOnlyList<int>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.For<int>(RecordIntArray).Invoke);
+            yield return ("Value", Adapters.For<int>(RecordIntArray));
         }
 
         private bool RecordIntArray(IReadOnlyList<int> value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
@@ -369,9 +369,9 @@ public class For_Func_Array
         public IReadOnlyList<string>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.For<string>(RecordStringArray).Invoke);
+            yield return ("Value", Adapters.For<string>(RecordStringArray));
         }
 
         private bool RecordStringArray(IReadOnlyList<string> value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
@@ -388,9 +388,9 @@ public class For_Func_Array
         public IReadOnlyList<int>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.For<int>(RecordInt).Invoke);
+            yield return ("Value", Adapters.For<int>(RecordInt));
         }
 
         private bool RecordInt(IReadOnlyList<int> value, Location collectionLocation, IReadOnlyList<Location> elementLocations)

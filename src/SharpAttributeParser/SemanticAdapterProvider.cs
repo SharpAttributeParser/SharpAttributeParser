@@ -8,7 +8,7 @@ using System.Collections.Generic;
 /// <inheritdoc cref="ISemanticAdapterProvider"/>
 internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
 {
-    Func<ITypeSymbol, bool> ISemanticAdapterProvider.For(Action<ITypeSymbol> recorder)
+    DSemanticGenericRecorder ISemanticAdapterProvider.For(Action<ITypeSymbol> recorder)
     {
         return wrapper;
 
@@ -20,10 +20,10 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    Func<object?, bool> ISemanticAdapterProvider.For<T>(Func<T, bool> recorder) => For(recorder);
-    Func<IReadOnlyList<object?>?, bool> ISemanticAdapterProvider.For<T>(Func<IReadOnlyList<T>, bool> recorder) => For(recorder);
+    DSemanticSingleRecorder ISemanticAdapterProvider.For<T>(Func<T, bool> recorder) => For(recorder);
+    DSemanticArrayRecorder ISemanticAdapterProvider.For<T>(Func<IReadOnlyList<T>, bool> recorder) => For(recorder);
 
-    Func<object?, bool> ISemanticAdapterProvider.For<T>(Action<T> recorder)
+    DSemanticSingleRecorder ISemanticAdapterProvider.For<T>(Action<T> recorder)
     {
         return For<T>(wrapper);
 
@@ -35,7 +35,7 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    Func<IReadOnlyList<object?>?, bool> ISemanticAdapterProvider.For<T>(Action<IReadOnlyList<T>> recorder)
+    DSemanticArrayRecorder ISemanticAdapterProvider.For<T>(Action<IReadOnlyList<T>> recorder)
     {
         return For<T>(wrapper);
 
@@ -47,13 +47,13 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    Func<object?, bool> ISemanticAdapterProvider.ForNullable<T>(Func<T?, bool> recorder) where T : class => ForNullable(recorder);
-    Func<object?, bool> ISemanticAdapterProvider.ForNullable<T>(Func<T?, bool> recorder) where T : struct => ForNullable(recorder);
+    DSemanticSingleRecorder ISemanticAdapterProvider.ForNullable<T>(Func<T?, bool> recorder) where T : class => ForNullable(recorder);
+    DSemanticSingleRecorder ISemanticAdapterProvider.ForNullable<T>(Func<T?, bool> recorder) where T : struct => ForNullable(recorder);
 
-    Func<IReadOnlyList<object?>?, bool> ISemanticAdapterProvider.ForNullable<T>(Func<IReadOnlyList<T?>?, bool> recorder) where T : class => ForNullable(recorder);
-    Func<IReadOnlyList<object?>?, bool> ISemanticAdapterProvider.ForNullable<T>(Func<IReadOnlyList<T?>?, bool> recorder) where T : struct => ForNullable(recorder);
+    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullable<T>(Func<IReadOnlyList<T?>?, bool> recorder) where T : class => ForNullable(recorder);
+    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullable<T>(Func<IReadOnlyList<T?>?, bool> recorder) where T : struct => ForNullable(recorder);
 
-    Func<object?, bool> ISemanticAdapterProvider.ForNullable<T>(Action<T?> recorder) where T : class
+    DSemanticSingleRecorder ISemanticAdapterProvider.ForNullable<T>(Action<T?> recorder) where T : class
     {
         return ForNullable<T>(wrapper);
 
@@ -65,7 +65,7 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    Func<object?, bool> ISemanticAdapterProvider.ForNullable<T>(Action<T?> recorder) where T : struct
+    DSemanticSingleRecorder ISemanticAdapterProvider.ForNullable<T>(Action<T?> recorder) where T : struct
     {
         return ForNullable<T>(wrapper);
 
@@ -77,7 +77,7 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    Func<IReadOnlyList<object?>?, bool> ISemanticAdapterProvider.ForNullable<T>(Action<IReadOnlyList<T?>?> recorder) where T : class
+    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullable<T>(Action<IReadOnlyList<T?>?> recorder) where T : class
     {
         return ForNullable<T>(wrapper);
 
@@ -89,7 +89,7 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    Func<IReadOnlyList<object?>?, bool> ISemanticAdapterProvider.ForNullable<T>(Action<IReadOnlyList<T?>?> recorder) where T : struct
+    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullable<T>(Action<IReadOnlyList<T?>?> recorder) where T : struct
     {
         return ForNullable<T>(wrapper);
 
@@ -101,10 +101,10 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    Func<IReadOnlyList<object?>?, bool> ISemanticAdapterProvider.ForNullableElements<T>(Func<IReadOnlyList<T?>, bool> recorder) where T : class => ForNullableElements(recorder);
-    Func<IReadOnlyList<object?>?, bool> ISemanticAdapterProvider.ForNullableElements<T>(Func<IReadOnlyList<T?>, bool> recorder) where T : struct => ForNullableElements(recorder);
+    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullableElements<T>(Func<IReadOnlyList<T?>, bool> recorder) where T : class => ForNullableElements(recorder);
+    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullableElements<T>(Func<IReadOnlyList<T?>, bool> recorder) where T : struct => ForNullableElements(recorder);
 
-    Func<IReadOnlyList<object?>?, bool> ISemanticAdapterProvider.ForNullableElements<T>(Action<IReadOnlyList<T?>> recorder) where T : class
+    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullableElements<T>(Action<IReadOnlyList<T?>> recorder) where T : class
     {
         return ForNullableElements<T>(wrapper);
 
@@ -116,7 +116,7 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    Func<IReadOnlyList<object?>?, bool> ISemanticAdapterProvider.ForNullableElements<T>(Action<IReadOnlyList<T?>> recorder) where T : struct
+    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullableElements<T>(Action<IReadOnlyList<T?>> recorder) where T : struct
     {
         return ForNullableElements<T>(wrapper);
 
@@ -128,9 +128,9 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    Func<IReadOnlyList<object?>?, bool> ISemanticAdapterProvider.ForNullableCollection<T>(Func<IReadOnlyList<T>?, bool> recorder) => ForNullableCollection(recorder);
+    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullableCollection<T>(Func<IReadOnlyList<T>?, bool> recorder) => ForNullableCollection(recorder);
 
-    Func<IReadOnlyList<object?>?, bool> ISemanticAdapterProvider.ForNullableCollection<T>(Action<IReadOnlyList<T>?> recorder)
+    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullableCollection<T>(Action<IReadOnlyList<T>?> recorder)
     {
         return ForNullableCollection<T>(wrapper);
 
@@ -142,7 +142,7 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    private static Func<object?, bool> For<T>(Func<T, bool> recorder)
+    private static DSemanticSingleRecorder For<T>(Func<T, bool> recorder)
     {
         return wrapper;
 
@@ -164,7 +164,7 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    private static Func<IReadOnlyList<object?>?, bool> For<T>(Func<IReadOnlyList<T>, bool> recorder)
+    private static DSemanticArrayRecorder For<T>(Func<IReadOnlyList<T>, bool> recorder)
     {
         return wrapper;
 
@@ -198,7 +198,7 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    private static Func<object?, bool> ForNullable<T>(Func<T?, bool> recorder) where T : class
+    private static DSemanticSingleRecorder ForNullable<T>(Func<T?, bool> recorder) where T : class
     {
         return wrapper;
 
@@ -215,7 +215,7 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    private static Func<object?, bool> ForNullable<T>(Func<T?, bool> recorder) where T : struct
+    private static DSemanticSingleRecorder ForNullable<T>(Func<T?, bool> recorder) where T : struct
     {
         return wrapper;
 
@@ -232,7 +232,7 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    private static Func<IReadOnlyList<object?>?, bool> ForNullable<T>(Func<IReadOnlyList<T?>?, bool> recorder) where T : class
+    private static DSemanticArrayRecorder ForNullable<T>(Func<IReadOnlyList<T?>?, bool> recorder) where T : class
     {
         return wrapper;
 
@@ -261,7 +261,7 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    private static Func<IReadOnlyList<object?>?, bool> ForNullable<T>(Func<IReadOnlyList<T?>?, bool> recorder) where T : struct
+    private static DSemanticArrayRecorder ForNullable<T>(Func<IReadOnlyList<T?>?, bool> recorder) where T : struct
     {
         return wrapper;
 
@@ -290,7 +290,7 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    private static Func<IReadOnlyList<object?>?, bool> ForNullableElements<T>(Func<IReadOnlyList<T?>, bool> recorder) where T : class
+    private static DSemanticArrayRecorder ForNullableElements<T>(Func<IReadOnlyList<T?>, bool> recorder) where T : class
     {
         return ForNullable<T>(wrapper);
 
@@ -305,7 +305,7 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    private static Func<IReadOnlyList<object?>?, bool> ForNullableElements<T>(Func<IReadOnlyList<T?>, bool> recorder) where T : struct
+    private static DSemanticArrayRecorder ForNullableElements<T>(Func<IReadOnlyList<T?>, bool> recorder) where T : struct
     {
         return ForNullable<T>(wrapper);
 
@@ -320,7 +320,7 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    private static Func<IReadOnlyList<object?>?, bool> ForNullableCollection<T>(Func<IReadOnlyList<T>?, bool> recorder)
+    private static DSemanticArrayRecorder ForNullableCollection<T>(Func<IReadOnlyList<T>?, bool> recorder)
     {
         return wrapper;
 

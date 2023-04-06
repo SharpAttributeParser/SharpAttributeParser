@@ -24,19 +24,19 @@ public sealed class SemanticCombinedAttributeRecorder : ASemanticArgumentRecorde
     public IReadOnlyList<object?>? NamedValues { get; private set; }
     public bool NamedValuesRecorded { get; private set; }
 
-    protected override IEnumerable<(string, DGenericRecorder)> AddGenericRecorders()
+    protected override IEnumerable<(string, DSemanticGenericRecorder)> AddGenericRecorders()
     {
         yield return ("T1", RecordT1);
         yield return ("T2", RecordT2);
     }
 
-    protected override IEnumerable<(string, DSingleRecorder)> AddSingleRecorders()
+    protected override IEnumerable<(string, DSemanticSingleRecorder)> AddSingleRecorders()
     {
         yield return ("Value", RecordValue);
         yield return ("NamedValue", RecordNamedValue);
     }
 
-    protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+    protected override IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders()
     {
         yield return ("ArrayValues", RecordArrayValues);
         yield return ("ParamsValues", RecordParamsValues);

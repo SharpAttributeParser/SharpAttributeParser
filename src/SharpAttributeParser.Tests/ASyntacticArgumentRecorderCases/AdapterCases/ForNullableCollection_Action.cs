@@ -319,9 +319,9 @@ public class ForNullableCollection_Action
         public IReadOnlyList<StringComparison>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullableCollection<StringComparison>(RecordStringComparisonArray).Invoke);
+            yield return ("Value", Adapters.ForNullableCollection<StringComparison>(RecordStringComparisonArray));
         }
 
         private void RecordStringComparisonArray(IReadOnlyList<StringComparison>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
@@ -336,9 +336,9 @@ public class ForNullableCollection_Action
         public IReadOnlyList<int>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullableCollection<int>(RecordIntArray).Invoke);
+            yield return ("Value", Adapters.ForNullableCollection<int>(RecordIntArray));
         }
 
         private void RecordIntArray(IReadOnlyList<int>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
@@ -353,9 +353,9 @@ public class ForNullableCollection_Action
         public IReadOnlyList<string>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullableCollection<string>(RecordStringArray).Invoke);
+            yield return ("Value", Adapters.ForNullableCollection<string>(RecordStringArray));
         }
 
         private void RecordStringArray(IReadOnlyList<string>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)

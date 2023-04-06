@@ -271,9 +271,9 @@ public class ForNullableElements_Func_Struct
         public IReadOnlyList<StringComparison?>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullableElements<StringComparison>(RecordStringComparisonArray).Invoke);
+            yield return ("Value", Adapters.ForNullableElements<StringComparison>(RecordStringComparisonArray));
         }
 
         private bool RecordStringComparisonArray(IReadOnlyList<StringComparison?> value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
@@ -290,9 +290,9 @@ public class ForNullableElements_Func_Struct
         public IReadOnlyList<int?>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullableElements<int>(RecordIntArray).Invoke);
+            yield return ("Value", Adapters.ForNullableElements<int>(RecordIntArray));
         }
 
         private bool RecordIntArray(IReadOnlyList<int?> value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
@@ -309,9 +309,9 @@ public class ForNullableElements_Func_Struct
         public IReadOnlyList<int?>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullableElements<int>(RecordIntArray).Invoke);
+            yield return ("Value", Adapters.ForNullableElements<int>(RecordIntArray));
         }
 
         private bool RecordIntArray(IReadOnlyList<int?> value, Location collectionLocation, IReadOnlyList<Location> elementLocations)

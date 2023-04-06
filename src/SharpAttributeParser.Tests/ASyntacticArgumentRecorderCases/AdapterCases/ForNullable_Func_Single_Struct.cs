@@ -243,9 +243,9 @@ public class ForNullable_Func_Single_Struct
         public StringComparison? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DSingleRecorder)> AddSingleRecorders()
+        protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.ForNullable<StringComparison>(RecordStringComparison).Invoke);
+            yield return ("Value", Adapters.ForNullable<StringComparison>(RecordStringComparison));
         }
 
         private bool RecordStringComparison(StringComparison? value, Location location)
@@ -262,9 +262,9 @@ public class ForNullable_Func_Single_Struct
         public int? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DSingleRecorder)> AddSingleRecorders()
+        protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.ForNullable<int>(RecordInt).Invoke);
+            yield return ("Value", Adapters.ForNullable<int>(RecordInt));
         }
 
         private bool RecordInt(int? value, Location location)
@@ -281,9 +281,9 @@ public class ForNullable_Func_Single_Struct
         public int? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DSingleRecorder)> AddSingleRecorders()
+        protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.ForNullable<int>(RecordInt).Invoke);
+            yield return ("Value", Adapters.ForNullable<int>(RecordInt));
         }
 
         private bool RecordInt(int? value, Location location)

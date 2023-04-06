@@ -9,7 +9,7 @@ public sealed class SyntacticGenericAttributeRecorder : ASyntacticArgumentRecord
     public ITypeSymbol? T { get; private set; }
     public Location? TLocation { get; private set; }
 
-    protected override IEnumerable<(string, DGenericRecorder)> AddGenericRecorders()
+    protected override IEnumerable<(string, DSyntacticGenericRecorder)> AddGenericRecorders()
     {
         yield return ("T", RecordT);
     }

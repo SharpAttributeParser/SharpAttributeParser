@@ -329,9 +329,9 @@ public class For_Func_Single
         public StringComparison? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DSingleRecorder)> AddSingleRecorders()
+        protected override IEnumerable<(string, DSemanticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.For<StringComparison>(RecordStringComparison).Invoke);
+            yield return ("Value", Adapters.For<StringComparison>(RecordStringComparison));
         }
 
         private bool RecordStringComparison(StringComparison value)
@@ -348,9 +348,9 @@ public class For_Func_Single
         public int? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DSingleRecorder)> AddSingleRecorders()
+        protected override IEnumerable<(string, DSemanticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.For<int>(RecordInt).Invoke);
+            yield return ("Value", Adapters.For<int>(RecordInt));
         }
 
         private bool RecordInt(int value)
@@ -367,9 +367,9 @@ public class For_Func_Single
         public IReadOnlyList<int>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DSingleRecorder)> AddSingleRecorders()
+        protected override IEnumerable<(string, DSemanticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.For<IReadOnlyList<int>>(RecordIntArray).Invoke);
+            yield return ("Value", Adapters.For<IReadOnlyList<int>>(RecordIntArray));
         }
 
         private bool RecordIntArray(IReadOnlyList<int> value)
@@ -386,9 +386,9 @@ public class For_Func_Single
         public string? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DSingleRecorder)> AddSingleRecorders()
+        protected override IEnumerable<(string, DSemanticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.For<string>(RecordString).Invoke);
+            yield return ("Value", Adapters.For<string>(RecordString));
         }
 
         private bool RecordString(string value)
@@ -405,9 +405,9 @@ public class For_Func_Single
         public int? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DSingleRecorder)> AddSingleRecorders()
+        protected override IEnumerable<(string, DSemanticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.For<int>(RecordInt).Invoke);
+            yield return ("Value", Adapters.For<int>(RecordInt));
         }
 
         private bool RecordInt(int value)

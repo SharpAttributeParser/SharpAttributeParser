@@ -271,9 +271,9 @@ public class ForNullable_Func_Array_Struct
         public IReadOnlyList<StringComparison?>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullable<StringComparison>(RecordStringComparisonArray).Invoke);
+            yield return ("Value", Adapters.ForNullable<StringComparison>(RecordStringComparisonArray));
         }
 
         private bool RecordStringComparisonArray(IReadOnlyList<StringComparison?>? value)
@@ -290,9 +290,9 @@ public class ForNullable_Func_Array_Struct
         public IReadOnlyList<int?>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullable<int>(RecordIntArray).Invoke);
+            yield return ("Value", Adapters.ForNullable<int>(RecordIntArray));
         }
 
         private bool RecordIntArray(IReadOnlyList<int?>? value)
@@ -309,9 +309,9 @@ public class ForNullable_Func_Array_Struct
         public IReadOnlyList<int?>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullable<int>(RecordIntArray).Invoke);
+            yield return ("Value", Adapters.ForNullable<int>(RecordIntArray));
         }
 
         private bool RecordIntArray(IReadOnlyList<int?>? value)

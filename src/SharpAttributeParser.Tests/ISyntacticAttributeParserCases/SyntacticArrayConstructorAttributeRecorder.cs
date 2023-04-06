@@ -13,7 +13,7 @@ public sealed class SyntacticArrayConstructorAttributeRecorder : ASyntacticArgum
     public IReadOnlyList<Location>? ValueElementLocations { get; private set; }
     public bool ValueRecorded { get; private set; }
 
-    protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+    protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
     {
         yield return ("Value", RecordValue);
     }

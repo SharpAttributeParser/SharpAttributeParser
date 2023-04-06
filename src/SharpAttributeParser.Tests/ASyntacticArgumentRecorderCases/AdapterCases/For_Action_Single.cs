@@ -316,9 +316,9 @@ public class For_Action_Single
         public StringComparison? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DSingleRecorder)> AddSingleRecorders()
+        protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.For<StringComparison>(RecordStringComparison).Invoke);
+            yield return ("Value", Adapters.For<StringComparison>(RecordStringComparison));
         }
 
         private void RecordStringComparison(StringComparison value, Location location)
@@ -333,9 +333,9 @@ public class For_Action_Single
         public int? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DSingleRecorder)> AddSingleRecorders()
+        protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.For<int>(RecordInt).Invoke);
+            yield return ("Value", Adapters.For<int>(RecordInt));
         }
 
         private void RecordInt(int value, Location location)
@@ -350,9 +350,9 @@ public class For_Action_Single
         public IReadOnlyList<int>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DSingleRecorder)> AddSingleRecorders()
+        protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.For<IReadOnlyList<int>>(RecordIntArray).Invoke);
+            yield return ("Value", Adapters.For<IReadOnlyList<int>>(RecordIntArray));
         }
 
         private void RecordIntArray(IReadOnlyList<int> value, Location location)
@@ -367,9 +367,9 @@ public class For_Action_Single
         public string? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DSingleRecorder)> AddSingleRecorders()
+        protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.For<string>(RecordString).Invoke);
+            yield return ("Value", Adapters.For<string>(RecordString));
         }
 
         private void RecordString(string value, Location location)
