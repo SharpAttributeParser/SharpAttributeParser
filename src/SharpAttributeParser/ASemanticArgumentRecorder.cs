@@ -14,30 +14,14 @@ using System.Collections.Generic;
 /// </list></remarks>
 public abstract class ASemanticArgumentRecorder : ISemanticArgumentRecorder
 {
-    /// <summary>Responsible for recording the argument of a type parameter.</summary>
-    /// <param name="value">The value of the argument.</param>
-    /// <returns>A <see cref="bool"/> indicating whether the argument was successfully recorded.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    protected delegate bool DGenericRecorder(ITypeSymbol value);
-
-    /// <summary>Responsible for recording the argument of a constructor or named parameter.</summary>
-    /// <param name="value">The value of the argument.</param>
-    /// <returns>A <see cref="bool"/> indicating whether the argument was successfully recorded.</returns>
-    protected delegate bool DSingleRecorder(object? value);
-
-    /// <summary>Responsible for recording the array-valued argument of a constructor or named parameter.</summary>
-    /// <param name="value">The value of the argument.</param>
-    /// <returns>A <see cref="bool"/> indicating whether the argument was successfully recorded.</returns>
-    protected delegate bool DArrayRecorder(IReadOnlyList<object?>? value);
-
     /// <summary>Provides adapters that may be applied to parsed arguments before they are recorded.</summary>
     protected static ISemanticAdapterProvider Adapters { get; } = new SemanticAdapterProvider();
 
     private bool IsInitialized { get; set; }
 
-    private IReadOnlyDictionary<string, DGenericRecorder> GenericRecorders { get; set; } = null!;
-    private IReadOnlyDictionary<string, DSingleRecorder> SingleRecorders { get; set; } = null!;
-    private IReadOnlyDictionary<string, DArrayRecorder> ArrayRecorders { get; set; } = null!;
+    private IReadOnlyDictionary<string, DSemanticGenericRecorder> GenericRecorders { get; set; } = null!;
+    private IReadOnlyDictionary<string, DSemanticSingleRecorder> SingleRecorders { get; set; } = null!;
+    private IReadOnlyDictionary<string, DSemanticArrayRecorder> ArrayRecorders { get; set; } = null!;
 
     private void InitializeRecorder()
     {
@@ -47,9 +31,9 @@ public abstract class ASemanticArgumentRecorder : ISemanticArgumentRecorder
         var singleRecorderMappings = AddSingleRecorders() ?? throw new InvalidOperationException($"The provided collection of non-array-valued parameter mappings was null.");
         var arrayRecorderMappings = AddArrayRecorders() ?? throw new InvalidOperationException($"The provided collection of array-valued parameter mappings was null.");
 
-        Dictionary<string, DGenericRecorder> genericRecorderDictionary = new(comparer);
-        Dictionary<string, DSingleRecorder> singleRecorderDictionary = new(comparer);
-        Dictionary<string, DArrayRecorder> arrayRecorderDictionary = new(comparer);
+        Dictionary<string, DSemanticGenericRecorder> genericRecorderDictionary = new(comparer);
+        Dictionary<string, DSemanticSingleRecorder> singleRecorderDictionary = new(comparer);
+        Dictionary<string, DSemanticArrayRecorder> arrayRecorderDictionary = new(comparer);
 
         PopulateDictionary(genericRecorderDictionary, genericRecorderMappings);
         PopulateDictionary(singleRecorderDictionary, singleRecorderMappings);
@@ -97,15 +81,15 @@ public abstract class ASemanticArgumentRecorder : ISemanticArgumentRecorder
 
     /// <summary>Maps the names of type-parameters to recorders, responsible for recording the argument of the parameter.</summary>
     /// <returns>The mappings from parameter names to recorders.</returns>
-    protected virtual IEnumerable<(string, DGenericRecorder)> AddGenericRecorders() => Array.Empty<(string, DGenericRecorder)>();
+    protected virtual IEnumerable<(string, DSemanticGenericRecorder)> AddGenericRecorders() => Array.Empty<(string, DSemanticGenericRecorder)>();
 
     /// <summary>Maps the names of non-array-valued parameters to recorders, responsible for recording the argument of the parameter.</summary>
     /// <returns>The mappings from parameter names to recorders.</returns>
-    protected virtual IEnumerable<(string, DSingleRecorder)> AddSingleRecorders() => Array.Empty<(string, DSingleRecorder)>();
+    protected virtual IEnumerable<(string, DSemanticSingleRecorder)> AddSingleRecorders() => Array.Empty<(string, DSemanticSingleRecorder)>();
 
     /// <summary>Maps the names of array-valued parameters to recorders, responsible for recording the argument of the parameter.</summary>
     /// <returns>The mappings from parameter names to recorders.</returns>
-    protected virtual IEnumerable<(string, DArrayRecorder)> AddArrayRecorders() => Array.Empty<(string, DArrayRecorder)>();
+    protected virtual IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders() => Array.Empty<(string, DSemanticArrayRecorder)>();
 
     /// <inheritdoc/>
     public bool TryRecordGenericArgument(string parameterName, ITypeSymbol value)
