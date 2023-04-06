@@ -22,17 +22,17 @@ internal sealed class SyntacticArgumentRecorder : ASyntacticArgumentRecorder
         Comparer = comparer;
     }
 
-    protected override IEnumerable<(string, DGenericRecorder)> AddGenericRecorders()
+    protected override IEnumerable<(string, DSyntacticGenericRecorder)> AddGenericRecorders()
     {
         yield return ("TGeneric", RecordTGeneric);
     }
 
-    protected override IEnumerable<(string, DSingleRecorder)> AddSingleRecorders()
+    protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
     {
         yield return ("Value", RecordValue);
     }
 
-    protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+    protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
     {
         yield return ("Values", RecordValues);
     }

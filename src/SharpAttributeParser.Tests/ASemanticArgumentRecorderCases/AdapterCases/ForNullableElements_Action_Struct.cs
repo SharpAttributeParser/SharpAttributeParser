@@ -254,7 +254,7 @@ public class ForNullableElements_Action_Struct
         public IReadOnlyList<StringComparison?>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders()
         {
             yield return ("Value", Adapters.ForNullableElements<StringComparison>(RecordStringComparisonArray).Invoke);
         }
@@ -271,7 +271,7 @@ public class ForNullableElements_Action_Struct
         public IReadOnlyList<int?>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders()
         {
             yield return ("Value", Adapters.ForNullableElements<int>(RecordIntArray).Invoke);
         }

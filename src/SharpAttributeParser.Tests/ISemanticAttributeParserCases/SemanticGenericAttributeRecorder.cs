@@ -8,7 +8,7 @@ public sealed class SemanticGenericAttributeRecorder : ASemanticArgumentRecorder
 {
     public ITypeSymbol? T { get; private set; }
 
-    protected override IEnumerable<(string, DGenericRecorder)> AddGenericRecorders()
+    protected override IEnumerable<(string, DSemanticGenericRecorder)> AddGenericRecorders()
     {
         yield return ("T", RecordT);
     }

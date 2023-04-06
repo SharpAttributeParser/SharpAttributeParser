@@ -9,7 +9,7 @@ public sealed class SemanticArrayConstructorAttributeRecorder : ASemanticArgumen
     public IReadOnlyList<object?>? Value { get; private set; }
     public bool ValueRecorded { get; private set; }
 
-    protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+    protected override IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders()
     {
         yield return ("Value", RecordValue);
     }

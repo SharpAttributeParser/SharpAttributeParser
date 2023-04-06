@@ -35,19 +35,19 @@ public sealed class SyntacticCombinedAttributeRecorder : ASyntacticArgumentRecor
     public IReadOnlyList<Location>? NamedValuesElementLocations { get; private set; }
     public bool NamedValuesRecorded { get; private set; }
 
-    protected override IEnumerable<(string, DGenericRecorder)> AddGenericRecorders()
+    protected override IEnumerable<(string, DSyntacticGenericRecorder)> AddGenericRecorders()
     {
         yield return ("T1", RecordT1);
         yield return ("T2", RecordT2);
     }
 
-    protected override IEnumerable<(string, DSingleRecorder)> AddSingleRecorders()
+    protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
     {
         yield return ("Value", RecordValue);
         yield return ("NamedValue", RecordNamedValue);
     }
 
-    protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+    protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
     {
         yield return ("ArrayValues", RecordArrayValues);
         yield return ("ParamsValues", RecordParamsValues);

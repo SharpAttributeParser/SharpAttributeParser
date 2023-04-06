@@ -10,12 +10,12 @@ public sealed class SemanticNamedAttributeRecorder : ASemanticArgumentRecorder
     public IReadOnlyList<object?>? Values { get; private set; }
     public bool ValuesRecorded { get; private set; }
 
-    protected override IEnumerable<(string, DSingleRecorder)> AddSingleRecorders()
+    protected override IEnumerable<(string, DSemanticSingleRecorder)> AddSingleRecorders()
     {
         yield return ("Value", RecordValue);
     }
 
-    protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+    protected override IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders()
     {
         yield return ("Values", RecordValues);
     }

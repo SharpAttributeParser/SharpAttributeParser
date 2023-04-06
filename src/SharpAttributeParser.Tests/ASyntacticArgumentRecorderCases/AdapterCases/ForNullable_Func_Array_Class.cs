@@ -92,7 +92,7 @@ public class ForNullable_Func_Array_Class
         public IReadOnlyList<string?>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
             yield return ("Value", Adapters.ForNullable<string>(RecordStringArray).Invoke);
         }
@@ -111,7 +111,7 @@ public class ForNullable_Func_Array_Class
         public IReadOnlyList<string?>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
             yield return ("Value", Adapters.ForNullable<string>(RecordStringArray).Invoke);
         }

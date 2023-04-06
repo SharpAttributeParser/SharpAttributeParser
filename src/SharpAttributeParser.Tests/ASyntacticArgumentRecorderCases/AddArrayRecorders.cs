@@ -69,12 +69,12 @@ public class AddArrayRecorders
 
     private sealed class NullGenericRecorder : ASyntacticArgumentRecorder
     {
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders() => null!;
+        protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders() => null!;
     }
 
     private sealed class NullNameRecorder : ASyntacticArgumentRecorder
     {
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
             yield return (null!, RecordValue);
         }
@@ -84,7 +84,7 @@ public class AddArrayRecorders
 
     private sealed class NullDelegateRecorder : ASyntacticArgumentRecorder
     {
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
             yield return ("A", null!);
         }
@@ -92,7 +92,7 @@ public class AddArrayRecorders
 
     private sealed class DuplicateGenericRecorder : ASyntacticArgumentRecorder
     {
-        protected override IEnumerable<(string, DArrayRecorder)> AddArrayRecorders()
+        protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
             yield return ("A", RecordValue);
             yield return ("A", RecordValue);

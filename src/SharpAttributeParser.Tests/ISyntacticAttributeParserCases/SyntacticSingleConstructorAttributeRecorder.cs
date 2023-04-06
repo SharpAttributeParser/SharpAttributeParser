@@ -10,7 +10,7 @@ public sealed class SyntacticSingleConstructorAttributeRecorder : ASyntacticArgu
     public Location? ValueLocation { get; private set; }
     public bool ValueRecorded { get; private set; }
 
-    protected override IEnumerable<(string, DSingleRecorder)> AddSingleRecorders()
+    protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
     {
         yield return ("Value", RecordValue);
     }

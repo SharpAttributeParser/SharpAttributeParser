@@ -105,7 +105,7 @@ public class ForNullable_Action_Single_Class
         public IReadOnlyList<int>? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DSingleRecorder)> AddSingleRecorders()
+        protected override IEnumerable<(string, DSemanticSingleRecorder)> AddSingleRecorders()
         {
             yield return ("Value", Adapters.ForNullable<IReadOnlyList<int>>(RecordIntArray).Invoke);
         }
@@ -122,7 +122,7 @@ public class ForNullable_Action_Single_Class
         public string? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
 
-        protected override IEnumerable<(string, DSingleRecorder)> AddSingleRecorders()
+        protected override IEnumerable<(string, DSemanticSingleRecorder)> AddSingleRecorders()
         {
             yield return ("Value", Adapters.ForNullable<string>(RecordString).Invoke);
         }

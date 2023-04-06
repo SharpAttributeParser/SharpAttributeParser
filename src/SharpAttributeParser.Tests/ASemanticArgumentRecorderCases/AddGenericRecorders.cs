@@ -65,12 +65,12 @@ public class AddGenericRecorders
 
     private sealed class NullGenericRecorder : ASemanticArgumentRecorder
     {
-        protected override IEnumerable<(string, DGenericRecorder)> AddGenericRecorders() => null!;
+        protected override IEnumerable<(string, DSemanticGenericRecorder)> AddGenericRecorders() => null!;
     }
 
     private sealed class NullNameRecorder : ASemanticArgumentRecorder
     {
-        protected override IEnumerable<(string, DGenericRecorder)> AddGenericRecorders()
+        protected override IEnumerable<(string, DSemanticGenericRecorder)> AddGenericRecorders()
         {
             yield return (null!, RecordValue);
         }
@@ -80,7 +80,7 @@ public class AddGenericRecorders
 
     private sealed class NullDelegateRecorder : ASemanticArgumentRecorder
     {
-        protected override IEnumerable<(string, DGenericRecorder)> AddGenericRecorders()
+        protected override IEnumerable<(string, DSemanticGenericRecorder)> AddGenericRecorders()
         {
             yield return ("A", null!);
         }
@@ -88,7 +88,7 @@ public class AddGenericRecorders
 
     private sealed class DuplicateGenericRecorder : ASemanticArgumentRecorder
     {
-        protected override IEnumerable<(string, DGenericRecorder)> AddGenericRecorders()
+        protected override IEnumerable<(string, DSemanticGenericRecorder)> AddGenericRecorders()
         {
             yield return ("A", RecordValue);
             yield return ("A", RecordValue);
