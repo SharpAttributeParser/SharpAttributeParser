@@ -336,7 +336,7 @@ public class ForNullableCollection_Func
 
         protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullableCollection<StringComparison>(RecordStringComparisonArray).Invoke);
+            yield return ("Value", Adapters.ForNullableCollection<StringComparison>(RecordStringComparisonArray));
         }
 
         private bool RecordStringComparisonArray(IReadOnlyList<StringComparison>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
@@ -355,7 +355,7 @@ public class ForNullableCollection_Func
 
         protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullableCollection<int>(RecordIntArray).Invoke);
+            yield return ("Value", Adapters.ForNullableCollection<int>(RecordIntArray));
         }
 
         private bool RecordIntArray(IReadOnlyList<int>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
@@ -374,7 +374,7 @@ public class ForNullableCollection_Func
 
         protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullableCollection<string>(RecordStringArray).Invoke);
+            yield return ("Value", Adapters.ForNullableCollection<string>(RecordStringArray));
         }
 
         private bool RecordStringArray(IReadOnlyList<string>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
@@ -393,7 +393,7 @@ public class ForNullableCollection_Func
 
         protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullableCollection<int>(RecordIntArray).Invoke);
+            yield return ("Value", Adapters.ForNullableCollection<int>(RecordIntArray));
         }
 
         private bool RecordIntArray(IReadOnlyList<int>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)

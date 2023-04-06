@@ -107,7 +107,7 @@ public class ForNullable_Action_Single_Class
 
         protected override IEnumerable<(string, DSemanticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.ForNullable<IReadOnlyList<int>>(RecordIntArray).Invoke);
+            yield return ("Value", Adapters.ForNullable<IReadOnlyList<int>>(RecordIntArray));
         }
 
         private void RecordIntArray(IReadOnlyList<int>? value)
@@ -124,7 +124,7 @@ public class ForNullable_Action_Single_Class
 
         protected override IEnumerable<(string, DSemanticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.ForNullable<string>(RecordString).Invoke);
+            yield return ("Value", Adapters.ForNullable<string>(RecordString));
         }
 
         private void RecordString(string? value)

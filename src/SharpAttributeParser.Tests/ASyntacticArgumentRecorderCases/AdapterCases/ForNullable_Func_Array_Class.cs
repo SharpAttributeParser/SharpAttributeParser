@@ -94,7 +94,7 @@ public class ForNullable_Func_Array_Class
 
         protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullable<string>(RecordStringArray).Invoke);
+            yield return ("Value", Adapters.ForNullable<string>(RecordStringArray));
         }
 
         private bool RecordStringArray(IReadOnlyList<string?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
@@ -113,7 +113,7 @@ public class ForNullable_Func_Array_Class
 
         protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullable<string>(RecordStringArray).Invoke);
+            yield return ("Value", Adapters.ForNullable<string>(RecordStringArray));
         }
 
         private bool RecordStringArray(IReadOnlyList<string?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)

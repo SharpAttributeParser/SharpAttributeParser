@@ -319,7 +319,7 @@ public class ForNullableCollection_Action
 
         protected override IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullableCollection<StringComparison>(RecordStringComparisonArray).Invoke);
+            yield return ("Value", Adapters.ForNullableCollection<StringComparison>(RecordStringComparisonArray));
         }
 
         private void RecordStringComparisonArray(IReadOnlyList<StringComparison>? value)
@@ -336,7 +336,7 @@ public class ForNullableCollection_Action
 
         protected override IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullableCollection<int>(RecordIntArray).Invoke);
+            yield return ("Value", Adapters.ForNullableCollection<int>(RecordIntArray));
         }
 
         private void RecordIntArray(IReadOnlyList<int>? value)
@@ -353,7 +353,7 @@ public class ForNullableCollection_Action
 
         protected override IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullableCollection<string>(RecordStringArray).Invoke);
+            yield return ("Value", Adapters.ForNullableCollection<string>(RecordStringArray));
         }
 
         private void RecordStringArray(IReadOnlyList<string>? value)

@@ -76,7 +76,7 @@ public class ForNullableElements_Action_Class
 
         protected override IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullableElements<string>(RecordStringArray).Invoke);
+            yield return ("Value", Adapters.ForNullableElements<string>(RecordStringArray));
         }
 
         private void RecordStringArray(IReadOnlyList<string?> value)

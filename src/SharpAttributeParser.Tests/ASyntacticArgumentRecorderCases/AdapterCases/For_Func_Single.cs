@@ -333,7 +333,7 @@ public class For_Func_Single
 
         protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.For<StringComparison>(RecordStringComparison).Invoke);
+            yield return ("Value", Adapters.For<StringComparison>(RecordStringComparison));
         }
 
         private bool RecordStringComparison(StringComparison value, Location location)
@@ -352,7 +352,7 @@ public class For_Func_Single
 
         protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.For<int>(RecordInt).Invoke);
+            yield return ("Value", Adapters.For<int>(RecordInt));
         }
 
         private bool RecordInt(int value, Location location)
@@ -371,7 +371,7 @@ public class For_Func_Single
 
         protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.For<IReadOnlyList<int>>(RecordIntArray).Invoke);
+            yield return ("Value", Adapters.For<IReadOnlyList<int>>(RecordIntArray));
         }
 
         private bool RecordIntArray(IReadOnlyList<int> value, Location location)
@@ -390,7 +390,7 @@ public class For_Func_Single
 
         protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.For<string>(RecordString).Invoke);
+            yield return ("Value", Adapters.For<string>(RecordString));
         }
 
         private bool RecordString(string value, Location location)
@@ -409,7 +409,7 @@ public class For_Func_Single
 
         protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.For<int>(RecordInt).Invoke);
+            yield return ("Value", Adapters.For<int>(RecordInt));
         }
 
         private bool RecordInt(int value, Location location)

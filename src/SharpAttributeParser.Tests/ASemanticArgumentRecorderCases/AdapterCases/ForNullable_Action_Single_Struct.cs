@@ -228,7 +228,7 @@ public class ForNullable_Action_Single_Struct
 
         protected override IEnumerable<(string, DSemanticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.ForNullable<StringComparison>(RecordStringComparison).Invoke);
+            yield return ("Value", Adapters.ForNullable<StringComparison>(RecordStringComparison));
         }
 
         private void RecordStringComparison(StringComparison? value)
@@ -245,7 +245,7 @@ public class ForNullable_Action_Single_Struct
 
         protected override IEnumerable<(string, DSemanticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.ForNullable<int>(RecordInt).Invoke);
+            yield return ("Value", Adapters.ForNullable<int>(RecordInt));
         }
 
         private void RecordInt(int? value)

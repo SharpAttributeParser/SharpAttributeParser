@@ -258,7 +258,7 @@ public class ForNullableElements_Action_Struct
 
         protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullableElements<StringComparison>(RecordStringComparisonArray).Invoke);
+            yield return ("Value", Adapters.ForNullableElements<StringComparison>(RecordStringComparisonArray));
         }
 
         private void RecordStringComparisonArray(IReadOnlyList<StringComparison?> value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
@@ -275,7 +275,7 @@ public class ForNullableElements_Action_Struct
 
         protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.ForNullableElements<int>(RecordIntArray).Invoke);
+            yield return ("Value", Adapters.ForNullableElements<int>(RecordIntArray));
         }
 
         private void RecordIntArray(IReadOnlyList<int?> value, Location collectionLocation, IReadOnlyList<Location> elementLocations)

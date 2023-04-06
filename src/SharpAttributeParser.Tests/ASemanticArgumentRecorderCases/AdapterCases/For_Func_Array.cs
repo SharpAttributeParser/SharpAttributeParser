@@ -331,7 +331,7 @@ public class For_Func_Array
 
         protected override IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.For<StringComparison>(RecordStringComparisonArray).Invoke);
+            yield return ("Value", Adapters.For<StringComparison>(RecordStringComparisonArray));
         }
 
         private bool RecordStringComparisonArray(IReadOnlyList<StringComparison> value)
@@ -350,7 +350,7 @@ public class For_Func_Array
 
         protected override IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.For<int>(RecordIntArray).Invoke);
+            yield return ("Value", Adapters.For<int>(RecordIntArray));
         }
 
         private bool RecordIntArray(IReadOnlyList<int> value)
@@ -369,7 +369,7 @@ public class For_Func_Array
 
         protected override IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.For<string>(RecordStringArray).Invoke);
+            yield return ("Value", Adapters.For<string>(RecordStringArray));
         }
 
         private bool RecordStringArray(IReadOnlyList<string> value)
@@ -388,7 +388,7 @@ public class For_Func_Array
 
         protected override IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Value", Adapters.For<int>(RecordInt).Invoke);
+            yield return ("Value", Adapters.For<int>(RecordInt));
         }
 
         private bool RecordInt(IReadOnlyList<int> value)
