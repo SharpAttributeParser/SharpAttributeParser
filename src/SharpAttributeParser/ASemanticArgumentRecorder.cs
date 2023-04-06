@@ -30,6 +30,9 @@ public abstract class ASemanticArgumentRecorder : ISemanticArgumentRecorder
     /// <returns>A <see cref="bool"/> indicating whether the argument was successfully recorded.</returns>
     protected delegate bool DArrayRecorder(IReadOnlyList<object?>? value);
 
+    /// <summary>Provides adapters that may be applied to parsed arguments before they are recorded.</summary>
+    protected static ISemanticAdapterProvider Adapters { get; } = new SemanticAdapterProvider();
+
     private bool IsInitialized { get; set; }
 
     private IReadOnlyDictionary<string, DGenericRecorder> GenericRecorders { get; set; } = null!;
@@ -40,9 +43,9 @@ public abstract class ASemanticArgumentRecorder : ISemanticArgumentRecorder
     {
         var comparer = Comparer ?? throw new InvalidOperationException($"The provided {nameof(IEqualityComparer<string>)} was null.");
 
-        var genericRecorderMappings = AddGenericRecorders() ?? throw new InvalidOperationException($"The provided collection of {nameof(String)}-{nameof(DGenericRecorder)} mappings was null.");
-        var singleRecorderMappings = AddSingleRecorders() ?? throw new InvalidOperationException($"The provided collection of {nameof(String)}-{nameof(DSingleRecorder)} mappings was null.");
-        var arrayRecorderMappings = AddArrayRecorders() ?? throw new InvalidOperationException($"The provided collection of {nameof(String)}-{nameof(DArrayRecorder)} mappings was null.");
+        var genericRecorderMappings = AddGenericRecorders() ?? throw new InvalidOperationException($"The provided collection of type-parameter mappings was null.");
+        var singleRecorderMappings = AddSingleRecorders() ?? throw new InvalidOperationException($"The provided collection of non-array-valued parameter mappings was null.");
+        var arrayRecorderMappings = AddArrayRecorders() ?? throw new InvalidOperationException($"The provided collection of array-valued parameter mappings was null.");
 
         Dictionary<string, DGenericRecorder> genericRecorderDictionary = new(comparer);
         Dictionary<string, DSingleRecorder> singleRecorderDictionary = new(comparer);
@@ -65,17 +68,17 @@ public abstract class ASemanticArgumentRecorder : ISemanticArgumentRecorder
         {
             if (parameterName is null)
             {
-                throw new InvalidOperationException($"A {nameof(String)} in the provided collection of {nameof(String)}-{typeof(T).Name} mappings was null.");
+                throw new InvalidOperationException($"A {nameof(String)} in the provided collection of mappings was null.");
             }
 
             if (parameterName is "")
             {
-                throw new InvalidOperationException($"A {nameof(String)} in the provided collection of {nameof(String)}-{typeof(T).Name} mappings was null.");
+                throw new InvalidOperationException($"A {nameof(String)} in the provided collection of mappings was empty.");
             }
 
             if (recorder is null)
             {
-                throw new InvalidOperationException($"A {typeof(T).Name} in the provided collection of mappings was null.");
+                throw new InvalidOperationException($"A recorder in the provided collection of mappings was null.");
             }
 
             try
@@ -92,19 +95,16 @@ public abstract class ASemanticArgumentRecorder : ISemanticArgumentRecorder
     /// <summary>Determines how equality will be determined when comparing parameter names. The default value is <see cref="StringComparer.OrdinalIgnoreCase"/>.</summary>
     protected virtual IEqualityComparer<string> Comparer => StringComparer.OrdinalIgnoreCase;
 
-    /// <summary>Adds mappings from the names of type parameters to <see cref="DGenericRecorder"/>, responsible for recording the argument of the parameter.</summary>
-    /// <returns>The mappings from parameter names to <see cref="DGenericRecorder"/>.</returns>
-    /// <exception cref="ArgumentNullException"/>
+    /// <summary>Maps the names of type-parameters to recorders, responsible for recording the argument of the parameter.</summary>
+    /// <returns>The mappings from parameter names to recorders.</returns>
     protected virtual IEnumerable<(string, DGenericRecorder)> AddGenericRecorders() => Array.Empty<(string, DGenericRecorder)>();
 
-    /// <summary>Adds mappings from the names of non-array-valued parameters to <see cref="DSingleRecorder"/>, responsible for recording the argument of the parameter.</summary>
-    /// <returns>The mappings from parameter names to <see cref="DSingleRecorder"/>.</returns>
-    /// <exception cref="ArgumentNullException"/>
+    /// <summary>Maps the names of non-array-valued parameters to recorders, responsible for recording the argument of the parameter.</summary>
+    /// <returns>The mappings from parameter names to recorders.</returns>
     protected virtual IEnumerable<(string, DSingleRecorder)> AddSingleRecorders() => Array.Empty<(string, DSingleRecorder)>();
 
-    /// <summary>Adds mappings from the names of array-valued parameters to <see cref="DArrayRecorder"/>, responsible for recording the argument of the parameter.</summary>
-    /// <returns>The mappings from parameter names to <see cref="DArrayRecorder"/>.</returns>
-    /// <exception cref="ArgumentNullException"/>
+    /// <summary>Maps the names of array-valued parameters to recorders, responsible for recording the argument of the parameter.</summary>
+    /// <returns>The mappings from parameter names to recorders.</returns>
     protected virtual IEnumerable<(string, DArrayRecorder)> AddArrayRecorders() => Array.Empty<(string, DArrayRecorder)>();
 
     /// <inheritdoc/>
