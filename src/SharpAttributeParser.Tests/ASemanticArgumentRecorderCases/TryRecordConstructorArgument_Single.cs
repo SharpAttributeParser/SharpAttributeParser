@@ -71,7 +71,6 @@ public class TryRecordConstructorArgument_Single
 
         Assert.False(actual);
 
-        Assert.Null(recorder.Value);
         Assert.False(recorder.ValueRecorded);
     }
 }

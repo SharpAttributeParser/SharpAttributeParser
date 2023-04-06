@@ -37,6 +37,9 @@ public abstract class ASyntacticArgumentRecorder : ISyntacticArgumentRecorder
     /// <exception cref="ArgumentNullException"/>
     protected delegate bool DArrayRecorder(IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations);
 
+    /// <summary>Provides adapters that may be applied to parsed arguments before they are recorded.</summary>
+    protected static ISyntacticAdapterProvider Adapters { get; } = new SyntacticAdapterProvider(new SemanticAdapterProvider());
+
     private bool IsInitialized { get; set; }
 
     private IReadOnlyDictionary<string, DGenericRecorder> GenericRecorders { get; set; } = null!;
