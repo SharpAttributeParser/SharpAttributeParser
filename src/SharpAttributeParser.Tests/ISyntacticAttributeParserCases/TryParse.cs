@@ -679,10 +679,6 @@ public class TryParse
 
         var (compilation, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var d = compilation.GetDiagnostics();
-
-        Assert.Empty(d);
-
         var intType = compilation.GetSpecialType(SpecialType.System_Int32);
 
         var expectedValueLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);

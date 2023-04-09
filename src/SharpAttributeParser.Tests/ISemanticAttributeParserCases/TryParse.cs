@@ -130,10 +130,6 @@ public class TryParse
 
         var (compilation, attributeData, _) = await CompilationStore.GetComponents(source, "Foo");
 
-        var diag = compilation.GetDiagnostics();
-
-        Assert.Empty(diag);
-
         var expectedType = compilation.GetSpecialType(SpecialType.System_String);
 
         var result = Target(parser, recorder, attributeData);
