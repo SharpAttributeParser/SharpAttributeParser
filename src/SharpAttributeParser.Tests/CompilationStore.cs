@@ -13,10 +13,19 @@ using System.Threading.Tasks;
 
 internal static class CompilationStore
 {
+    private static Compilation? EmptyCompilation { get; set; }
+
     private static CSharpParseOptions ParseOptions { get; } = new(languageVersion: LanguageVersion.CSharp11);
     private static CSharpCompilationOptions CompilationOptions { get; } = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
 
-    public static Compilation GetCompilation(string source) => CreateCompilation(source);
+    public static Compilation GetCompilation(string source)
+    {
+        var emptyCompilation = EmptyCompilation ??= CreateEmptyCompilation();
+
+        var syntaxTree = CSharpSyntaxTree.ParseText(source, ParseOptions);
+
+        return emptyCompilation.AddSyntaxTrees(syntaxTree);
+    }
 
     public static async Task<(Compilation, AttributeData, AttributeSyntax)> GetComponents(string source, string typeName)
     {
@@ -31,16 +40,14 @@ internal static class CompilationStore
         return (compilation, attributeData, syntax);
     }
 
-    public static Compilation CreateCompilation(string source)
+    private static Compilation CreateEmptyCompilation()
     {
-        var syntaxTree = CSharpSyntaxTree.ParseText(source, ParseOptions);
-
         var references = ListAssemblies()
             .Where(static (assembly) => assembly.IsDynamic is false)
             .Select(static (assembly) => MetadataReference.CreateFromFile(assembly.Location))
             .Cast<MetadataReference>();
 
-        return CSharpCompilation.Create("FakeAssembly", new[] { syntaxTree }, references, CompilationOptions);
+        return CSharpCompilation.Create("FakeAssembly", references: references, options: CompilationOptions);
     }
 
     public static IEnumerable<Assembly> ListAssemblies()
