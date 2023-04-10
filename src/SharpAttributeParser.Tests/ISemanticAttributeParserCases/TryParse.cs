@@ -6,6 +6,7 @@ using Moq;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 
 using Xunit;
@@ -99,11 +100,10 @@ public class TryParse
 
     [Theory]
     [ClassData(typeof(Datasets.ParserSources))]
+    [SuppressMessage("Minor Code Smell", "S1125: Boolean literals should not be redundant", Justification = "Prefer equality check over negation.")]
     public async Task Generic_FalseReturningRecorder_False(ISemanticAttributeParser parser)
     {
-        Mock<ISemanticArgumentRecorder> recorderMock = new();
-
-        recorderMock.Setup(static (recorder) => recorder.TryRecordGenericArgument(It.IsAny<ITypeParameterSymbol>(), It.IsAny<ITypeSymbol>())).Returns(false);
+        var recorder = Mock.Of<ISemanticArgumentRecorder>(static (recorder) => recorder.TryRecordGenericArgument(It.IsAny<ITypeParameterSymbol>(), It.IsAny<ITypeSymbol>()) == false);
 
         var source = """
             [Generic<string>]
@@ -112,7 +112,7 @@ public class TryParse
 
         var (_, attributeData, _) = await CompilationStore.GetComponents(source, "Foo");
 
-        var result = Target(parser, recorderMock.Object, attributeData);
+        var result = Target(parser, recorder, attributeData);
 
         Assert.False(result);
     }
@@ -188,11 +188,10 @@ public class TryParse
 
     [Theory]
     [ClassData(typeof(Datasets.ParserSources))]
+    [SuppressMessage("Minor Code Smell", "S1125: Boolean literals should not be redundant", Justification = "Prefer equality check over negation.")]
     public async Task ConstructorSingle_FalseReturningRecorder_False(ISemanticAttributeParser parser)
     {
-        Mock<ISemanticArgumentRecorder> recorderMock = new();
-
-        recorderMock.Setup(static (recorder) => recorder.TryRecordConstructorArgument(It.IsAny<IParameterSymbol>(), It.IsAny<object?>())).Returns(false);
+        var recorder = Mock.Of<ISemanticArgumentRecorder>(static (recorder) => recorder.TryRecordConstructorArgument(It.IsAny<IParameterSymbol>(), It.IsAny<object?>()) == false);
 
         var source = """
             [SingleConstructor(null)]
@@ -201,7 +200,7 @@ public class TryParse
 
         var (_, attributeData, _) = await CompilationStore.GetComponents(source, "Foo");
 
-        var result = Target(parser, recorderMock.Object, attributeData);
+        var result = Target(parser, recorder, attributeData);
 
         Assert.False(result);
     }
@@ -249,11 +248,10 @@ public class TryParse
 
     [Theory]
     [ClassData(typeof(Datasets.ParserSources))]
+    [SuppressMessage("Minor Code Smell", "S1125: Boolean literals should not be redundant", Justification = "Prefer equality check over negation.")]
     public async Task ConstructorArray_FalseReturningRecorder_False(ISemanticAttributeParser parser)
     {
-        Mock<ISemanticArgumentRecorder> recorderMock = new();
-
-        recorderMock.Setup(static (recorder) => recorder.TryRecordConstructorArgument(It.IsAny<IParameterSymbol>(), It.IsAny<IReadOnlyList<object?>?>())).Returns(false);
+        var recorder = Mock.Of<ISemanticArgumentRecorder>(static (recorder) => recorder.TryRecordConstructorArgument(It.IsAny<IParameterSymbol>(), It.IsAny<IReadOnlyList<object?>?>()) == false);
 
         var source = """
             [ArrayConstructor(null)]
@@ -262,7 +260,7 @@ public class TryParse
 
         var (_, attributeData, _) = await CompilationStore.GetComponents(source, "Foo");
 
-        var result = Target(parser, recorderMock.Object, attributeData);
+        var result = Target(parser, recorder, attributeData);
 
         Assert.False(result);
     }
@@ -319,11 +317,10 @@ public class TryParse
 
     [Theory]
     [ClassData(typeof(Datasets.ParserSources))]
+    [SuppressMessage("Minor Code Smell", "S1125: Boolean literals should not be redundant", Justification = "Prefer equality check over negation.")]
     public async Task NamedSingle_FalseReturningRecorder_False(ISemanticAttributeParser parser)
     {
-        Mock<ISemanticArgumentRecorder> recorderMock = new();
-
-        recorderMock.Setup(static (recorder) => recorder.TryRecordNamedArgument(It.IsAny<string>(), It.IsAny<object?>())).Returns(false);
+        var recorder = Mock.Of<ISemanticArgumentRecorder>(static (recorder) => recorder.TryRecordNamedArgument(It.IsAny<string>(), It.IsAny<object?>()) == false);
 
         var source = """
             [Named(Value = null)]
@@ -332,7 +329,7 @@ public class TryParse
 
         var (_, attributeData, _) = await CompilationStore.GetComponents(source, "Foo");
 
-        var result = Target(parser, recorderMock.Object, attributeData);
+        var result = Target(parser, recorder, attributeData);
 
         Assert.False(result);
     }
@@ -400,11 +397,10 @@ public class TryParse
 
     [Theory]
     [ClassData(typeof(Datasets.ParserSources))]
+    [SuppressMessage("Minor Code Smell", "S1125: Boolean literals should not be redundant", Justification = "Prefer equality check over negation.")]
     public async Task NamedArray_FalseReturningRecorder_False(ISemanticAttributeParser parser)
     {
-        Mock<ISemanticArgumentRecorder> recorderMock = new();
-
-        recorderMock.Setup(static (recorder) => recorder.TryRecordNamedArgument(It.IsAny<string>(), It.IsAny<IReadOnlyList<object?>?>())).Returns(false);
+        var recorder = Mock.Of<ISemanticArgumentRecorder>(static (recorder) => recorder.TryRecordNamedArgument(It.IsAny<string>(), It.IsAny<IReadOnlyList<object?>?>()) == false);
 
         var source = """
             [Named(Values = null)]
@@ -413,7 +409,7 @@ public class TryParse
 
         var (_, attributeData, _) = await CompilationStore.GetComponents(source, "Foo");
 
-        var result = Target(parser, recorderMock.Object, attributeData);
+        var result = Target(parser, recorder, attributeData);
 
         Assert.False(result);
     }
