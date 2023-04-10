@@ -158,7 +158,7 @@ public class TryParse
         var (compilation, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
         var expectedType = compilation.GetSpecialType(SpecialType.System_String);
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().TypeArgument(((GenericNameSyntax)attributeSyntax.Name).TypeArgumentList.Arguments[0]);
+        var expectedLocation = ExpectedLocation.TypeArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -183,7 +183,7 @@ public class TryParse
         var (compilation, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
         var expectedType = compilation.GetSpecialType(SpecialType.System_String);
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().TypeArgument(((GenericNameSyntax)attributeSyntax.Name).TypeArgumentList.Arguments[0]);
+        var expectedLocation = ExpectedLocation.TypeArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -211,7 +211,7 @@ public class TryParse
         var intType = compilation.GetSpecialType(SpecialType.System_Int32);
 
         var expectedType = compilation.GetTypeByMetadataName("System.ValueTuple`2")!.Construct(stringType, intType);
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().TypeArgument(((GenericNameSyntax)attributeSyntax.Name).TypeArgumentList.Arguments[0]);
+        var expectedLocation = ExpectedLocation.TypeArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -236,7 +236,7 @@ public class TryParse
 
         var intType = compilation.GetSpecialType(SpecialType.System_Int32);
 
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().TypeArgument(((GenericNameSyntax)((QualifiedNameSyntax)attributeSyntax.Name).Right).TypeArgumentList.Arguments[0]);
+        var expectedLocation = ExpectedLocation.TypeArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -279,7 +279,7 @@ public class TryParse
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
+        var expectedLocation = ExpectedLocation.SingleArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -303,7 +303,7 @@ public class TryParse
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
+        var expectedLocation = ExpectedLocation.SingleArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -327,7 +327,7 @@ public class TryParse
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
+        var expectedLocation = ExpectedLocation.SingleArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -371,7 +371,7 @@ public class TryParse
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var (expectedCollectionLocation, expectedElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ArrayArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -399,7 +399,7 @@ public class TryParse
 
         var intType = compilation.GetSpecialType(SpecialType.System_Int32);
 
-        var (expectedCollectionLocation, expectedElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ArrayArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -451,7 +451,7 @@ public class TryParse
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[1].Expression);
+        var expectedLocation = ExpectedLocation.SingleArgument(attributeSyntax, 1);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -475,7 +475,7 @@ public class TryParse
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
+        var expectedLocation = ExpectedLocation.SingleArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -499,7 +499,7 @@ public class TryParse
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
+        var expectedLocation = ExpectedLocation.SingleArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -523,7 +523,7 @@ public class TryParse
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[1].Expression);
+        var expectedLocation = ExpectedLocation.SingleArgument(attributeSyntax, 1);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -567,7 +567,7 @@ public class TryParse
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var (expectedCollectionLocation, expectedElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ArrayArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -595,7 +595,7 @@ public class TryParse
 
         var intType = compilation.GetSpecialType(SpecialType.System_Int32);
 
-        var (expectedCollectionLocation, expectedElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ArrayArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -643,24 +643,31 @@ public class TryParse
 
         var (compilation, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
+        var stringType = compilation.GetSpecialType(SpecialType.System_String);
         var intType = compilation.GetSpecialType(SpecialType.System_Int32);
 
-        var expectedValueLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
-        var (expectedArrayValuesCollectionLocation, expectedArrayValuesElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ArrayArgument(attributeSyntax.ArgumentList!.Arguments[1].Expression);
-        var (expectedParamsValuesCollectionLocation, expectedParamsValuesElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ParamsArguments(attributeSyntax.ArgumentList!.Arguments[2].Expression, attributeSyntax.ArgumentList!.Arguments[3].Expression);
-        var expectedNamedValueLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[4].Expression);
-        var (expectedNamedValuesCollectionLocation, expectedNamedValuesElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ArrayArgument(attributeSyntax.ArgumentList!.Arguments[5].Expression);
+        var expectedT1Location = ExpectedLocation.TypeArgument(attributeSyntax, 0);
+        var expectedT2Location = ExpectedLocation.TypeArgument(attributeSyntax, 1);
+        var expectedValueLocation = ExpectedLocation.SingleArgument(attributeSyntax, 0);
+        var (expectedArrayValuesCollectionLocation, expectedArrayValuesElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 1);
+        var (expectedParamsValuesCollectionLocation, expectedParamsValuesElementLocations) = ExpectedLocation.ParamsArgument(attributeSyntax, 2, 2);
+        var expectedNamedValueLocation = ExpectedLocation.SingleArgument(attributeSyntax, 4);
+        var (expectedNamedValuesCollectionLocation, expectedNamedValuesElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 5);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
         Assert.True(result);
 
+        Assert.Equal(stringType, recorder.T1);
+        Assert.Equal(intType, recorder.T2);
         Assert.Equal("42", recorder.Value!);
         Assert.Empty(recorder.ArrayValues!);
         Assert.Equal(new object[] { "42", 42 }, recorder.ParamsValues);
         Assert.Equal(intType, recorder.NamedValue);
         Assert.Equal(new object[] { 42, "42" }, recorder.NamedValues);
 
+        Assert.Equal(expectedT1Location, recorder.T1Location);
+        Assert.Equal(expectedT2Location, recorder.T2Location);
         Assert.Equal(expectedValueLocation, recorder.ValueLocation);
         Assert.Equal(expectedArrayValuesCollectionLocation, recorder.ArrayValuesCollectionLocation);
         Assert.Equal(expectedArrayValuesElementLocations, recorder.ArrayValuesElementLocations);
@@ -700,24 +707,31 @@ public class TryParse
 
         var (compilation, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
+        var stringType = compilation.GetSpecialType(SpecialType.System_String);
         var intType = compilation.GetSpecialType(SpecialType.System_Int32);
 
-        var expectedValueLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
-        var (expectedArrayValuesCollectionLocation, expectedArrayValuesElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ArrayArgument(attributeSyntax.ArgumentList!.Arguments[1].Expression);
-        var (expectedParamsValuesCollectionLocation, expectedParamsValuesElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ArrayArgument(attributeSyntax.ArgumentList!.Arguments[2].Expression);
-        var expectedNamedValueLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[3].Expression);
-        var (expectedNamedValuesCollectionLocation, expectedNamedValuesElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ArrayArgument(attributeSyntax.ArgumentList!.Arguments[4].Expression);
+        var expectedT1Location = ExpectedLocation.TypeArgument(attributeSyntax, 0);
+        var expectedT2Location = ExpectedLocation.TypeArgument(attributeSyntax, 1);
+        var expectedValueLocation = ExpectedLocation.SingleArgument(attributeSyntax, 0);
+        var (expectedArrayValuesCollectionLocation, expectedArrayValuesElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 1);
+        var (expectedParamsValuesCollectionLocation, expectedParamsValuesElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 2);
+        var expectedNamedValueLocation = ExpectedLocation.SingleArgument(attributeSyntax, 3);
+        var (expectedNamedValuesCollectionLocation, expectedNamedValuesElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 4);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
         Assert.True(result);
 
+        Assert.Equal(stringType, recorder.T1);
+        Assert.Equal(intType, recorder.T2);
         Assert.Equal("42", recorder.Value!);
         Assert.Empty(recorder.ArrayValues!);
         Assert.Equal(new object[] { "42", 42 }, recorder.ParamsValues);
         Assert.Equal(intType, recorder.NamedValue);
         Assert.Equal(new object[] { 42, "42" }, recorder.NamedValues);
 
+        Assert.Equal(expectedT1Location, recorder.T1Location);
+        Assert.Equal(expectedT2Location, recorder.T2Location);
         Assert.Equal(expectedValueLocation, recorder.ValueLocation);
         Assert.Equal(expectedArrayValuesCollectionLocation, recorder.ArrayValuesCollectionLocation);
         Assert.Equal(expectedArrayValuesElementLocations, recorder.ArrayValuesElementLocations);
