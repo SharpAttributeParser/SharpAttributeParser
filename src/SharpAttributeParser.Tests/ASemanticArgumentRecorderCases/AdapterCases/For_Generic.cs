@@ -14,11 +14,9 @@ public class For_Generic
 {
     private static bool TryRecordGenericArgument(ASemanticArgumentRecorder recorder, string parameterName, ITypeSymbol value)
     {
-        Mock<ITypeParameterSymbol> parameterMock = new();
+        var parameter = Mock.Of<ITypeParameterSymbol>((parameter) => parameter.Name == parameterName);
 
-        parameterMock.SetupGet(static (parameter) => parameter.Name).Returns(parameterName);
-
-        return recorder.TryRecordGenericArgument(parameterMock.Object, value);
+        return recorder.TryRecordGenericArgument(parameter, value);
     }
 
     [Fact]
@@ -27,13 +25,13 @@ public class For_Generic
         Recorder recorder = new();
 
         var parameterName = "Value";
-        Mock<ITypeSymbol> symbolMock = new();
+        var symbol = Mock.Of<ITypeSymbol>();
 
-        var actual = TryRecordGenericArgument(recorder, parameterName, symbolMock.Object);
+        var actual = TryRecordGenericArgument(recorder, parameterName, symbol);
 
         Assert.True(actual);
 
-        Assert.Equal(symbolMock.Object, recorder.Value);
+        Assert.Equal(symbol, recorder.Value);
     }
 
     private sealed class Recorder : ASemanticArgumentRecorder

@@ -11,29 +11,13 @@ internal static class Datasets
     public static string GetValidParameterName() => "Bar";
     public static string GetNullParameterName() => null!;
 
-    public static ITypeParameterSymbol GetMockedTypeParameter()
-    {
-        Mock<ITypeParameterSymbol> mock = new();
-
-        mock.SetupGet(static (parameter) => parameter.Name).Returns("Bar");
-
-        return mock.Object;
-    }
-
+    public static ITypeParameterSymbol GetMockedTypeParameter() => Mock.Of<ITypeParameterSymbol>(static (parameter) => parameter.Name == "Bar");
     public static ITypeParameterSymbol GetNullTypeParameter() => null!;
 
-    public static IParameterSymbol GetMockedParameter()
-    {
-        Mock<IParameterSymbol> mock = new();
-
-        mock.SetupGet(static (parameter) => parameter.Name).Returns("Bar");
-
-        return mock.Object;
-    }
-
+    public static IParameterSymbol GetMockedParameter() => Mock.Of<IParameterSymbol>(static (parameter) => parameter.Name == "Bar");
     public static IParameterSymbol GetNullParameter() => null!;
 
-    public static ITypeSymbol GetValidTypeSymbol() => new Mock<ITypeSymbol>().Object;
+    public static ITypeSymbol GetValidTypeSymbol() => Mock.Of<ITypeSymbol>();
     public static ITypeSymbol GetNullTypeSymbol() => null!;
 
     public static IReadOnlyList<object?>? GetValidArrayArgument() => new[] { "42" };
