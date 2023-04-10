@@ -67,7 +67,7 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
             return false;
         }
 
-        if (attributeSyntax.Name is not GenericNameSyntax genericNameSyntax)
+        if (GetGenericNameSyntax() is not GenericNameSyntax genericNameSyntax)
         {
             return true;
         }
@@ -88,6 +88,21 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
         }
 
         return true;
+
+        GenericNameSyntax? GetGenericNameSyntax()
+        {
+            if (attributeSyntax.Name is GenericNameSyntax genericNameSyntax)
+            {
+                return genericNameSyntax;
+            }
+
+            if (attributeSyntax.Name is QualifiedNameSyntax qualifiedNameSyntax && qualifiedNameSyntax.Right is GenericNameSyntax qualifiedGenericNameSyntax)
+            {
+                return qualifiedGenericNameSyntax;
+            }
+
+            return null;
+        }
     }
 
     private bool TryParseConstructorArguments(ISyntacticArgumentRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax)
