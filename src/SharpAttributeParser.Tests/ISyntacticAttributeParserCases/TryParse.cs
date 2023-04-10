@@ -222,6 +222,31 @@ public class TryParse
     }
 
     [Theory]
+    [ClassData(typeof(Datasets.GenericAttributeSources))]
+    public async Task QualifiedGeneric_True_RecorderPopulated(ISyntacticAttributeParser parser, SyntacticGenericAttributeRecorder recorder)
+    {
+        Assert.Null(recorder.T);
+
+        var source = """
+            [SharpAttributeParser.Tests.QualifiedGeneric<int>]
+            public class Foo { }
+            """;
+
+        var (compilation, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
+
+        var intType = compilation.GetSpecialType(SpecialType.System_Int32);
+
+        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().TypeArgument(((GenericNameSyntax)((QualifiedNameSyntax)attributeSyntax.Name).Right).TypeArgumentList.Arguments[0]);
+
+        var result = Target(parser, recorder, attributeData, attributeSyntax);
+
+        Assert.True(result);
+
+        Assert.Equal(intType, recorder.T);
+        Assert.Equal(expectedLocation, recorder.TLocation);
+    }
+
+    [Theory]
     [ClassData(typeof(Datasets.ParserSources))]
     [SuppressMessage("Minor Code Smell", "S1125: Boolean literals should not be redundant", Justification = "Prefer equality check over negation.")]
     public async Task ConstructorSingle_FalseReturningRecorder_False(ISyntacticAttributeParser parser)
