@@ -107,6 +107,11 @@ public sealed class ArgumentLocator : IArgumentLocator
             throw new ArgumentNullException(nameof(expressions));
         }
 
+        if (expressions.Count is 0)
+        {
+            return (Location.None, Array.Empty<Location>());
+        }
+
         var elementLocations = new Location[expressions.Count];
 
         for (var i = 0; i < elementLocations.Length; i++)
