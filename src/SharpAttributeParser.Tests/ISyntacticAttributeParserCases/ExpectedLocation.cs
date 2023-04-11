@@ -63,9 +63,9 @@ internal static class ExpectedLocation
             throw new ArgumentException($"The provided {nameof(AttributeSyntax)} does not describe an attribute with arguments.", nameof(syntax));
         }
 
-        if (syntax.ArgumentList.Arguments.Count < firstIndex + 1 + count)
+        if (syntax.ArgumentList.Arguments.Count < firstIndex + count)
         {
-            throw new ArgumentException($"The attribute described by the provided {nameof(AttributeSyntax)} does not include at least {firstIndex + 1 + count} arguments.");
+            throw new ArgumentException($"The attribute described by the provided {nameof(AttributeSyntax)} does not include at least {firstIndex + count} arguments.");
         }
 
         return DependencyInjection.GetRequiredService<IArgumentLocator>().ParamsArguments(syntax.ArgumentList.Arguments.Skip(firstIndex).Take(count).Select(static (argument) => argument.Expression).ToList());

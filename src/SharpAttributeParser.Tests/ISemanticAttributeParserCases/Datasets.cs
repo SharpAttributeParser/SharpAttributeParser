@@ -47,6 +47,15 @@ internal static class Datasets
     }
 
     [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "Used as test input.")]
+    public sealed class ParamsAttributeSources : ATestDataset<(ISemanticAttributeParser, SemanticParamsAttributeRecorder)>
+    {
+        protected override IEnumerable<(ISemanticAttributeParser, SemanticParamsAttributeRecorder)> GetSamples() => new (ISemanticAttributeParser, SemanticParamsAttributeRecorder)[]
+        {
+            (new SemanticAttributeParser(), new SemanticParamsAttributeRecorder())
+        };
+    }
+
+    [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "Used as test input.")]
     public sealed class NamedAttributeSources : ATestDataset<(ISemanticAttributeParser, SemanticNamedAttributeRecorder)>
     {
         protected override IEnumerable<(ISemanticAttributeParser, SemanticNamedAttributeRecorder)> GetSamples() => new (ISemanticAttributeParser, SemanticNamedAttributeRecorder)[]

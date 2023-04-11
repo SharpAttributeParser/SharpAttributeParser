@@ -49,6 +49,15 @@ internal static class Datasets
     }
 
     [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "Used as test input.")]
+    public sealed class ParamsAttributeSources : ATestDataset<(ISyntacticAttributeParser, SyntacticParamsAttributeRecorder)>
+    {
+        protected override IEnumerable<(ISyntacticAttributeParser, SyntacticParamsAttributeRecorder)> GetSamples() => new (ISyntacticAttributeParser, SyntacticParamsAttributeRecorder)[]
+        {
+            (new SyntacticAttributeParser(new ArgumentLocator()), new SyntacticParamsAttributeRecorder())
+        };
+    }
+
+    [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "Used as test input.")]
     public sealed class NamedAttributeSources : ATestDataset<(ISyntacticAttributeParser, SyntacticNamedAttributeRecorder)>
     {
         protected override IEnumerable<(ISyntacticAttributeParser, SyntacticNamedAttributeRecorder)> GetSamples() => new (ISyntacticAttributeParser, SyntacticNamedAttributeRecorder)[]
