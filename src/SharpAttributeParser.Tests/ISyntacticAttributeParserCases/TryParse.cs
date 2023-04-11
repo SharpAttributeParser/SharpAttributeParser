@@ -158,7 +158,7 @@ public class TryParse
         var (compilation, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
         var expectedType = compilation.GetSpecialType(SpecialType.System_String);
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().TypeArgument(((GenericNameSyntax)attributeSyntax.Name).TypeArgumentList.Arguments[0]);
+        var expectedLocation = ExpectedLocation.TypeArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -183,7 +183,7 @@ public class TryParse
         var (compilation, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
         var expectedType = compilation.GetSpecialType(SpecialType.System_String);
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().TypeArgument(((GenericNameSyntax)attributeSyntax.Name).TypeArgumentList.Arguments[0]);
+        var expectedLocation = ExpectedLocation.TypeArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -211,7 +211,7 @@ public class TryParse
         var intType = compilation.GetSpecialType(SpecialType.System_Int32);
 
         var expectedType = compilation.GetTypeByMetadataName("System.ValueTuple`2")!.Construct(stringType, intType);
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().TypeArgument(((GenericNameSyntax)attributeSyntax.Name).TypeArgumentList.Arguments[0]);
+        var expectedLocation = ExpectedLocation.TypeArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -236,7 +236,7 @@ public class TryParse
 
         var intType = compilation.GetSpecialType(SpecialType.System_Int32);
 
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().TypeArgument(((GenericNameSyntax)((QualifiedNameSyntax)attributeSyntax.Name).Right).TypeArgumentList.Arguments[0]);
+        var expectedLocation = ExpectedLocation.TypeArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -279,7 +279,7 @@ public class TryParse
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
+        var expectedLocation = ExpectedLocation.SingleArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -303,7 +303,7 @@ public class TryParse
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
+        var expectedLocation = ExpectedLocation.SingleArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -327,7 +327,7 @@ public class TryParse
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
+        var expectedLocation = ExpectedLocation.SingleArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -371,7 +371,7 @@ public class TryParse
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var (expectedCollectionLocation, expectedElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ArrayArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -399,7 +399,339 @@ public class TryParse
 
         var intType = compilation.GetSpecialType(SpecialType.System_Int32);
 
-        var (expectedCollectionLocation, expectedElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ArrayArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 0);
+
+        var result = Target(parser, recorder, attributeData, attributeSyntax);
+
+        Assert.True(result);
+
+        Assert.Equal(7, recorder.Value!.Count);
+        Assert.Equal("42", recorder.Value[0]);
+        Assert.Null(recorder.Value[1]);
+        Assert.Equal(intType, recorder.Value[2]);
+        Assert.Equal("Foo", recorder.Value[3]);
+        Assert.Equal(42, recorder.Value[4]);
+        Assert.Equal((double)42, recorder.Value[5]);
+        Assert.Equal(new object[] { "42", 42 }, (object?[])recorder.Value[6]!);
+
+        Assert.Equal(expectedCollectionLocation, recorder.ValueCollectionLocation);
+        Assert.Equal(expectedElementLocations, recorder.ValueElementLocations);
+    }
+
+    [Theory]
+    [ClassData(typeof(Datasets.ArrayConstructorAttributeSources))]
+    public async Task ConstructorArray_Empty_True_RecorderPopulated(ISyntacticAttributeParser parser, SyntacticArrayConstructorAttributeRecorder recorder)
+    {
+        Assert.Null(recorder.Value);
+        Assert.Null(recorder.ValueCollectionLocation);
+        Assert.Null(recorder.ValueElementLocations);
+
+        var source = """
+            [ArrayConstructor(value: new object[] { })]
+            public class Foo { }
+            """;
+
+        var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
+
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 0);
+
+        var result = Target(parser, recorder, attributeData, attributeSyntax);
+
+        Assert.True(result);
+
+        Assert.Empty(recorder.Value!);
+
+        Assert.Equal(expectedCollectionLocation, recorder.ValueCollectionLocation);
+        Assert.Equal(expectedElementLocations, recorder.ValueElementLocations);
+    }
+
+    [Theory]
+    [ClassData(typeof(Datasets.ArrayConstructorAttributeSources))]
+    public async Task ConstructorArray_Labelled_True_RecorderPopulated(ISyntacticAttributeParser parser, SyntacticArrayConstructorAttributeRecorder recorder)
+    {
+        Assert.Null(recorder.Value);
+        Assert.Null(recorder.ValueCollectionLocation);
+        Assert.Null(recorder.ValueElementLocations);
+
+        var source = """
+            [ArrayConstructor(value: new object[] { "42", null, typeof(int), nameof(Foo), ((42)), (double)(float)42, new object[] { "42", 42 } })]
+            public class Foo { }
+            """;
+
+        var (compilation, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
+
+        var intType = compilation.GetSpecialType(SpecialType.System_Int32);
+
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 0);
+
+        var result = Target(parser, recorder, attributeData, attributeSyntax);
+
+        Assert.True(result);
+
+        Assert.Equal(7, recorder.Value!.Count);
+        Assert.Equal("42", recorder.Value[0]);
+        Assert.Null(recorder.Value[1]);
+        Assert.Equal(intType, recorder.Value[2]);
+        Assert.Equal("Foo", recorder.Value[3]);
+        Assert.Equal(42, recorder.Value[4]);
+        Assert.Equal((double)42, recorder.Value[5]);
+        Assert.Equal(new object[] { "42", 42 }, (object?[])recorder.Value[6]!);
+
+        Assert.Equal(expectedCollectionLocation, recorder.ValueCollectionLocation);
+        Assert.Equal(expectedElementLocations, recorder.ValueElementLocations);
+    }
+    [Theory]
+    [ClassData(typeof(Datasets.ParamsAttributeSources))]
+    public async Task Params_NullLiteral_True_RecorderPopulated(ISyntacticAttributeParser parser, SyntacticParamsAttributeRecorder recorder)
+    {
+        Assert.Null(recorder.Value);
+        Assert.Null(recorder.ValueCollectionLocation);
+        Assert.Null(recorder.ValueElementLocations);
+
+        var source = """
+            [Params(null)]
+            public class Foo { }
+            """;
+
+        var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
+
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 0);
+
+        var result = Target(parser, recorder, attributeData, attributeSyntax);
+
+        Assert.True(result);
+
+        Assert.Null(recorder.Value);
+        Assert.Equal(expectedCollectionLocation, recorder.ValueCollectionLocation);
+        Assert.Equal(expectedElementLocations, recorder.ValueElementLocations);
+    }
+
+    [Theory]
+    [ClassData(typeof(Datasets.ParamsAttributeSources))]
+    public async Task Params_OneParamsValue_True_RecorderPopulated(ISyntacticAttributeParser parser, SyntacticParamsAttributeRecorder recorder)
+    {
+        Assert.Null(recorder.Value);
+        Assert.Null(recorder.ValueCollectionLocation);
+        Assert.Null(recorder.ValueElementLocations);
+
+        var source = """
+            [Params("42")]
+            public class Foo { }
+            """;
+
+        var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
+
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ParamsArgument(attributeSyntax, 0, 1);
+
+        var result = Target(parser, recorder, attributeData, attributeSyntax);
+
+        Assert.True(result);
+
+        Assert.Equal(1, recorder.Value!.Count);
+        Assert.Equal("42", recorder.Value[0]);
+
+        Assert.Equal(expectedCollectionLocation, recorder.ValueCollectionLocation);
+        Assert.Equal(expectedElementLocations, recorder.ValueElementLocations);
+    }
+
+    [Theory]
+    [ClassData(typeof(Datasets.ParamsAttributeSources))]
+    public async Task Params_OneArrayValuedParamsValue_True_RecorderPopulated(ISyntacticAttributeParser parser, SyntacticParamsAttributeRecorder recorder)
+    {
+        Assert.Null(recorder.Value);
+        Assert.Null(recorder.ValueCollectionLocation);
+        Assert.Null(recorder.ValueElementLocations);
+
+        var source = """
+            [Params(new int[] { 4 })]
+            public class Foo { }
+            """;
+
+        var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
+
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ParamsArgument(attributeSyntax, 0, 1);
+
+        var result = Target(parser, recorder, attributeData, attributeSyntax);
+
+        Assert.True(result);
+
+        Assert.Equal(1, recorder.Value!.Count);
+        Assert.Equal(new int[] { 4 }, recorder.Value[0]);
+
+        Assert.Equal(expectedCollectionLocation, recorder.ValueCollectionLocation);
+        Assert.Equal(expectedElementLocations, recorder.ValueElementLocations);
+    }
+
+    [Theory]
+    [ClassData(typeof(Datasets.ParamsAttributeSources))]
+    public async Task Params_MultipleParamsValues_True_RecorderPopulated(ISyntacticAttributeParser parser, SyntacticParamsAttributeRecorder recorder)
+    {
+        Assert.Null(recorder.Value);
+        Assert.Null(recorder.ValueCollectionLocation);
+        Assert.Null(recorder.ValueElementLocations);
+
+        var source = """
+            [Params("42", null, typeof(int), nameof(Foo), ((42)), (double)(float)42, new object[] { "42", 42 })]
+            public class Foo { }
+            """;
+
+        var (compilation, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
+
+        var intType = compilation.GetSpecialType(SpecialType.System_Int32);
+
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ParamsArgument(attributeSyntax, 0, 7);
+
+        var result = Target(parser, recorder, attributeData, attributeSyntax);
+
+        Assert.True(result);
+
+        Assert.Equal(7, recorder.Value!.Count);
+        Assert.Equal("42", recorder.Value[0]);
+        Assert.Null(recorder.Value[1]);
+        Assert.Equal(intType, recorder.Value[2]);
+        Assert.Equal("Foo", recorder.Value[3]);
+        Assert.Equal(42, recorder.Value[4]);
+        Assert.Equal((double)42, recorder.Value[5]);
+        Assert.Equal(new object[] { "42", 42 }, (object?[])recorder.Value[6]!);
+
+        Assert.Equal(expectedCollectionLocation, recorder.ValueCollectionLocation);
+        Assert.Equal(expectedElementLocations, recorder.ValueElementLocations);
+    }
+
+    [Theory]
+    [ClassData(typeof(Datasets.ParamsAttributeSources))]
+    public async Task Params_OneArrayValue_True_RecorderPopulated(ISyntacticAttributeParser parser, SyntacticParamsAttributeRecorder recorder)
+    {
+        Assert.Null(recorder.Value);
+        Assert.Null(recorder.ValueCollectionLocation);
+        Assert.Null(recorder.ValueElementLocations);
+
+        var source = """
+            [Params(new object[] { 4 })]
+            public class Foo { }
+            """;
+
+        var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
+
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ParamsArgument(attributeSyntax, 0, 1);
+
+        var result = Target(parser, recorder, attributeData, attributeSyntax);
+
+        Assert.True(result);
+
+        Assert.Equal(1, recorder.Value!.Count);
+        Assert.Equal(4, recorder.Value[0]);
+
+        Assert.Equal(expectedCollectionLocation, recorder.ValueCollectionLocation);
+        Assert.Equal(expectedElementLocations, recorder.ValueElementLocations);
+    }
+
+    [Theory]
+    [ClassData(typeof(Datasets.ParamsAttributeSources))]
+    public async Task Params_MultipleArrayValues_True_RecorderPopulated(ISyntacticAttributeParser parser, SyntacticParamsAttributeRecorder recorder)
+    {
+        Assert.Null(recorder.Value);
+        Assert.Null(recorder.ValueCollectionLocation);
+        Assert.Null(recorder.ValueElementLocations);
+
+        var source = """
+            [Params(new object[] { "42", null, typeof(int), nameof(Foo), ((42)), (double)(float)42, new object[] { "42", 42 } })]
+            public class Foo { }
+            """;
+
+        var (compilation, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
+
+        var intType = compilation.GetSpecialType(SpecialType.System_Int32);
+
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 0);
+
+        var result = Target(parser, recorder, attributeData, attributeSyntax);
+
+        Assert.True(result);
+
+        Assert.Equal(7, recorder.Value!.Count);
+        Assert.Equal("42", recorder.Value[0]);
+        Assert.Null(recorder.Value[1]);
+        Assert.Equal(intType, recorder.Value[2]);
+        Assert.Equal("Foo", recorder.Value[3]);
+        Assert.Equal(42, recorder.Value[4]);
+        Assert.Equal((double)42, recorder.Value[5]);
+        Assert.Equal(new object[] { "42", 42 }, (object?[])recorder.Value[6]!);
+
+        Assert.Equal(expectedCollectionLocation, recorder.ValueCollectionLocation);
+        Assert.Equal(expectedElementLocations, recorder.ValueElementLocations);
+    }
+
+    [Theory]
+    [ClassData(typeof(Datasets.ParamsAttributeSources))]
+    public async Task Params_EmptyArray_True_RecorderPopulated(ISyntacticAttributeParser parser, SyntacticParamsAttributeRecorder recorder)
+    {
+        Assert.Null(recorder.Value);
+        Assert.Null(recorder.ValueCollectionLocation);
+        Assert.Null(recorder.ValueElementLocations);
+
+        var source = """
+            [Params(new object[0])]
+            public class Foo { }
+            """;
+
+        var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
+
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 0);
+
+        var result = Target(parser, recorder, attributeData, attributeSyntax);
+
+        Assert.True(result);
+
+        Assert.Empty(recorder.Value!);
+
+        Assert.Equal(expectedCollectionLocation, recorder.ValueCollectionLocation);
+        Assert.Equal(expectedElementLocations, recorder.ValueElementLocations);
+    }
+
+    [Theory]
+    [ClassData(typeof(Datasets.ParamsAttributeSources))]
+    public async Task Params_Empty_True_RecorderPopulated(ISyntacticAttributeParser parser, SyntacticParamsAttributeRecorder recorder)
+    {
+        Assert.Null(recorder.Value);
+        Assert.Null(recorder.ValueCollectionLocation);
+        Assert.Null(recorder.ValueElementLocations);
+
+        var source = """
+            [Params]
+            public class Foo { }
+            """;
+
+        var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
+
+        var result = Target(parser, recorder, attributeData, attributeSyntax);
+
+        Assert.True(result);
+
+        Assert.Empty(recorder.Value!);
+
+        Assert.Equal(Location.None, recorder.ValueCollectionLocation);
+        Assert.Empty(recorder.ValueElementLocations!);
+    }
+
+    [Theory]
+    [ClassData(typeof(Datasets.ParamsAttributeSources))]
+    public async Task Params_Labelled_True_RecorderPopulated(ISyntacticAttributeParser parser, SyntacticParamsAttributeRecorder recorder)
+    {
+        Assert.Null(recorder.Value);
+        Assert.Null(recorder.ValueCollectionLocation);
+        Assert.Null(recorder.ValueElementLocations);
+
+        var source = """
+            [Params(value: new object[] { "42", null, typeof(int), nameof(Foo), ((42)), (double)(float)42, new object[] { "42", 42 } })]
+            public class Foo { }
+            """;
+
+        var (compilation, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
+
+        var intType = compilation.GetSpecialType(SpecialType.System_Int32);
+
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -451,7 +783,7 @@ public class TryParse
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[1].Expression);
+        var expectedLocation = ExpectedLocation.SingleArgument(attributeSyntax, 1);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -475,7 +807,7 @@ public class TryParse
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
+        var expectedLocation = ExpectedLocation.SingleArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -499,7 +831,7 @@ public class TryParse
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
+        var expectedLocation = ExpectedLocation.SingleArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -523,7 +855,7 @@ public class TryParse
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var expectedLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[1].Expression);
+        var expectedLocation = ExpectedLocation.SingleArgument(attributeSyntax, 1);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -567,7 +899,7 @@ public class TryParse
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var (expectedCollectionLocation, expectedElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ArrayArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -595,7 +927,7 @@ public class TryParse
 
         var intType = compilation.GetSpecialType(SpecialType.System_Int32);
 
-        var (expectedCollectionLocation, expectedElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ArrayArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 0);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
@@ -643,29 +975,163 @@ public class TryParse
 
         var (compilation, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
+        var stringType = compilation.GetSpecialType(SpecialType.System_String);
         var intType = compilation.GetSpecialType(SpecialType.System_Int32);
 
-        var expectedValueLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
-        var (expectedArrayValuesCollectionLocation, expectedArrayValuesElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ArrayArgument(attributeSyntax.ArgumentList!.Arguments[1].Expression);
-        var (expectedParamsValuesCollectionLocation, expectedParamsValuesElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ParamsArguments(attributeSyntax.ArgumentList!.Arguments[2].Expression, attributeSyntax.ArgumentList!.Arguments[3].Expression);
-        var expectedNamedValueLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[4].Expression);
-        var (expectedNamedValuesCollectionLocation, expectedNamedValuesElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ArrayArgument(attributeSyntax.ArgumentList!.Arguments[5].Expression);
+        var expectedT1Location = ExpectedLocation.TypeArgument(attributeSyntax, 0);
+        var expectedT2Location = ExpectedLocation.TypeArgument(attributeSyntax, 1);
+        var expectedValueLocation = ExpectedLocation.SingleArgument(attributeSyntax, 0);
+        var (expectedArrayValuesCollectionLocation, expectedArrayValuesElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 1);
+        var (expectedParamsValuesCollectionLocation, expectedParamsValuesElementLocations) = ExpectedLocation.ParamsArgument(attributeSyntax, 2, 2);
+        var expectedNamedValueLocation = ExpectedLocation.SingleArgument(attributeSyntax, 4);
+        var (expectedNamedValuesCollectionLocation, expectedNamedValuesElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 5);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
         Assert.True(result);
 
+        Assert.Equal(stringType, recorder.T1);
+        Assert.Equal(intType, recorder.T2);
         Assert.Equal("42", recorder.Value!);
         Assert.Empty(recorder.ArrayValues!);
         Assert.Equal(new object[] { "42", 42 }, recorder.ParamsValues);
         Assert.Equal(intType, recorder.NamedValue);
         Assert.Equal(new object[] { 42, "42" }, recorder.NamedValues);
 
+        Assert.Equal(expectedT1Location, recorder.T1Location);
+        Assert.Equal(expectedT2Location, recorder.T2Location);
         Assert.Equal(expectedValueLocation, recorder.ValueLocation);
         Assert.Equal(expectedArrayValuesCollectionLocation, recorder.ArrayValuesCollectionLocation);
         Assert.Equal(expectedArrayValuesElementLocations, recorder.ArrayValuesElementLocations);
         Assert.Equal(expectedParamsValuesCollectionLocation, recorder.ParamsValuesCollectionLocation);
         Assert.Equal(expectedParamsValuesElementLocations, recorder.ParamsValuesElementLocations);
+        Assert.Equal(expectedNamedValueLocation, recorder.NamedValueLocation);
+        Assert.Equal(expectedNamedValuesCollectionLocation, recorder.NamedValuesCollectionLocation);
+        Assert.Equal(expectedNamedValuesElementLocations, recorder.NamedValuesElementLocations);
+    }
+
+    [Theory]
+    [ClassData(typeof(Datasets.CombinedAttributeSources))]
+    public async Task Combined_EmptyParams_RecorderPopulated(ISyntacticAttributeParser parser, SyntacticCombinedAttributeRecorder recorder)
+    {
+        Assert.Null(recorder.Value);
+        Assert.Null(recorder.ValueLocation);
+
+        Assert.Null(recorder.ArrayValues);
+        Assert.Null(recorder.ArrayValuesCollectionLocation);
+        Assert.Null(recorder.ArrayValuesElementLocations);
+
+        Assert.Null(recorder.ParamsValues);
+        Assert.Null(recorder.ParamsValuesCollectionLocation);
+        Assert.Null(recorder.ParamsValuesElementLocations);
+
+        Assert.Null(recorder.NamedValue);
+        Assert.Null(recorder.NamedValueLocation);
+
+        Assert.Null(recorder.NamedValues);
+        Assert.Null(recorder.NamedValuesCollectionLocation);
+        Assert.Null(recorder.NamedValuesElementLocations);
+
+        var source = """
+            [Combined<string, int>("42", new object[0], NamedValue = typeof(int), NamedValues = new object[] { 42, "42" })]
+            public class Foo { }
+            """;
+
+        var (compilation, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
+
+        var stringType = compilation.GetSpecialType(SpecialType.System_String);
+        var intType = compilation.GetSpecialType(SpecialType.System_Int32);
+
+        var expectedT1Location = ExpectedLocation.TypeArgument(attributeSyntax, 0);
+        var expectedT2Location = ExpectedLocation.TypeArgument(attributeSyntax, 1);
+        var expectedValueLocation = ExpectedLocation.SingleArgument(attributeSyntax, 0);
+        var (expectedArrayValuesCollectionLocation, expectedArrayValuesElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 1);
+        var expectedNamedValueLocation = ExpectedLocation.SingleArgument(attributeSyntax, 2);
+        var (expectedNamedValuesCollectionLocation, expectedNamedValuesElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 3);
+
+        var result = Target(parser, recorder, attributeData, attributeSyntax);
+
+        Assert.True(result);
+
+        Assert.Equal(stringType, recorder.T1);
+        Assert.Equal(intType, recorder.T2);
+        Assert.Equal("42", recorder.Value!);
+        Assert.Empty(recorder.ArrayValues!);
+        Assert.Empty(recorder.ParamsValues!);
+        Assert.Equal(intType, recorder.NamedValue);
+        Assert.Equal(new object[] { 42, "42" }, recorder.NamedValues);
+
+        Assert.Equal(expectedT1Location, recorder.T1Location);
+        Assert.Equal(expectedT2Location, recorder.T2Location);
+        Assert.Equal(expectedValueLocation, recorder.ValueLocation);
+        Assert.Equal(expectedArrayValuesCollectionLocation, recorder.ArrayValuesCollectionLocation);
+        Assert.Equal(expectedArrayValuesElementLocations, recorder.ArrayValuesElementLocations);
+        Assert.Equal(Location.None, recorder.ParamsValuesCollectionLocation);
+        Assert.Empty(recorder.ParamsValuesElementLocations!);
+        Assert.Equal(expectedNamedValueLocation, recorder.NamedValueLocation);
+        Assert.Equal(expectedNamedValuesCollectionLocation, recorder.NamedValuesCollectionLocation);
+        Assert.Equal(expectedNamedValuesElementLocations, recorder.NamedValuesElementLocations);
+    }
+
+    [Theory]
+    [ClassData(typeof(Datasets.CombinedAttributeSources))]
+    public async Task Combined_OneElementParams_RecorderPopulated(ISyntacticAttributeParser parser, SyntacticCombinedAttributeRecorder recorder)
+    {
+        Assert.Null(recorder.Value);
+        Assert.Null(recorder.ValueLocation);
+
+        Assert.Null(recorder.ArrayValues);
+        Assert.Null(recorder.ArrayValuesCollectionLocation);
+        Assert.Null(recorder.ArrayValuesElementLocations);
+
+        Assert.Null(recorder.ParamsValues);
+        Assert.Null(recorder.ParamsValuesCollectionLocation);
+        Assert.Null(recorder.ParamsValuesElementLocations);
+
+        Assert.Null(recorder.NamedValue);
+        Assert.Null(recorder.NamedValueLocation);
+
+        Assert.Null(recorder.NamedValues);
+        Assert.Null(recorder.NamedValuesCollectionLocation);
+        Assert.Null(recorder.NamedValuesElementLocations);
+
+        var source = """
+            [Combined<string, int>("42", new object[0], 42, NamedValue = typeof(int), NamedValues = new object[] { 42, "42" })]
+            public class Foo { }
+            """;
+
+        var (compilation, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
+
+        var stringType = compilation.GetSpecialType(SpecialType.System_String);
+        var intType = compilation.GetSpecialType(SpecialType.System_Int32);
+
+        var expectedT1Location = ExpectedLocation.TypeArgument(attributeSyntax, 0);
+        var expectedT2Location = ExpectedLocation.TypeArgument(attributeSyntax, 1);
+        var expectedValueLocation = ExpectedLocation.SingleArgument(attributeSyntax, 0);
+        var (expectedArrayValuesCollectionLocation, expectedArrayValuesElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 1);
+        var (expectedParamsValuesCollectionLocation, expectedParamsValuesElementLocations) = ExpectedLocation.ParamsArgument(attributeSyntax, 2, 1);
+        var expectedNamedValueLocation = ExpectedLocation.SingleArgument(attributeSyntax, 3);
+        var (expectedNamedValuesCollectionLocation, expectedNamedValuesElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 4);
+
+        var result = Target(parser, recorder, attributeData, attributeSyntax);
+
+        Assert.True(result);
+
+        Assert.Equal(stringType, recorder.T1);
+        Assert.Equal(intType, recorder.T2);
+        Assert.Equal("42", recorder.Value!);
+        Assert.Empty(recorder.ArrayValues!);
+        Assert.Equal(new object[] { 42 }, recorder.ParamsValues);
+        Assert.Equal(intType, recorder.NamedValue);
+        Assert.Equal(new object[] { 42, "42" }, recorder.NamedValues);
+
+        Assert.Equal(expectedT1Location, recorder.T1Location);
+        Assert.Equal(expectedT2Location, recorder.T2Location);
+        Assert.Equal(expectedValueLocation, recorder.ValueLocation);
+        Assert.Equal(expectedArrayValuesCollectionLocation, recorder.ArrayValuesCollectionLocation);
+        Assert.Equal(expectedArrayValuesElementLocations, recorder.ArrayValuesElementLocations);
+        Assert.Equal(expectedParamsValuesCollectionLocation, recorder.ParamsValuesCollectionLocation);
+        Assert.Equal(expectedParamsValuesElementLocations, recorder.ParamsValuesElementLocations!);
         Assert.Equal(expectedNamedValueLocation, recorder.NamedValueLocation);
         Assert.Equal(expectedNamedValuesCollectionLocation, recorder.NamedValuesCollectionLocation);
         Assert.Equal(expectedNamedValuesElementLocations, recorder.NamedValuesElementLocations);
@@ -700,24 +1166,31 @@ public class TryParse
 
         var (compilation, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
+        var stringType = compilation.GetSpecialType(SpecialType.System_String);
         var intType = compilation.GetSpecialType(SpecialType.System_Int32);
 
-        var expectedValueLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[0].Expression);
-        var (expectedArrayValuesCollectionLocation, expectedArrayValuesElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ArrayArgument(attributeSyntax.ArgumentList!.Arguments[1].Expression);
-        var (expectedParamsValuesCollectionLocation, expectedParamsValuesElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ArrayArgument(attributeSyntax.ArgumentList!.Arguments[2].Expression);
-        var expectedNamedValueLocation = DependencyInjection.GetRequiredService<IArgumentLocator>().SingleArgument(attributeSyntax.ArgumentList!.Arguments[3].Expression);
-        var (expectedNamedValuesCollectionLocation, expectedNamedValuesElementLocations) = DependencyInjection.GetRequiredService<IArgumentLocator>().ArrayArgument(attributeSyntax.ArgumentList!.Arguments[4].Expression);
+        var expectedT1Location = ExpectedLocation.TypeArgument(attributeSyntax, 0);
+        var expectedT2Location = ExpectedLocation.TypeArgument(attributeSyntax, 1);
+        var expectedValueLocation = ExpectedLocation.SingleArgument(attributeSyntax, 0);
+        var (expectedArrayValuesCollectionLocation, expectedArrayValuesElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 1);
+        var (expectedParamsValuesCollectionLocation, expectedParamsValuesElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 2);
+        var expectedNamedValueLocation = ExpectedLocation.SingleArgument(attributeSyntax, 3);
+        var (expectedNamedValuesCollectionLocation, expectedNamedValuesElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 4);
 
         var result = Target(parser, recorder, attributeData, attributeSyntax);
 
         Assert.True(result);
 
+        Assert.Equal(stringType, recorder.T1);
+        Assert.Equal(intType, recorder.T2);
         Assert.Equal("42", recorder.Value!);
         Assert.Empty(recorder.ArrayValues!);
         Assert.Equal(new object[] { "42", 42 }, recorder.ParamsValues);
         Assert.Equal(intType, recorder.NamedValue);
         Assert.Equal(new object[] { 42, "42" }, recorder.NamedValues);
 
+        Assert.Equal(expectedT1Location, recorder.T1Location);
+        Assert.Equal(expectedT2Location, recorder.T2Location);
         Assert.Equal(expectedValueLocation, recorder.ValueLocation);
         Assert.Equal(expectedArrayValuesCollectionLocation, recorder.ArrayValuesCollectionLocation);
         Assert.Equal(expectedArrayValuesElementLocations, recorder.ArrayValuesElementLocations);

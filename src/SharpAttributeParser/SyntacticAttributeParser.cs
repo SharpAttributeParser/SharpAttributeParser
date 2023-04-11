@@ -119,6 +119,13 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
 
         if (attributeSyntax.ArgumentList is null)
         {
+            if (attributeConstructor.Parameters.Length is 1 && attributeConstructor.Parameters[0].IsParams)
+            {
+                var (paramsCollectionLocation, paramsElementLocations) = ArgumentLocator.ParamsArguments(Array.Empty<ExpressionSyntax>());
+
+                return recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[0], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[0]), paramsCollectionLocation, paramsElementLocations);
+            }
+
             return false;
         }
 
@@ -136,9 +143,9 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
 
             if (attributeData.ConstructorArguments[i].Kind is TypedConstantKind.Array)
             {
-                if (i == attributeConstructor.Parameters.Count() - 1 && attributeSyntax.ArgumentList.Arguments.Count > attributeData.ConstructorArguments.Length + attributeData.NamedArguments.Length)
+                if (attributeConstructor.Parameters[i].IsParams)
                 {
-                    if (TryParseParamsArgument(recorder, attributeData, attributeSyntax) is false)
+                    if (TryParseParamsOrArrayArgument(recorder, attributeData, attributeSyntax) is false)
                     {
                         return false;
                     }
@@ -167,7 +174,7 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
         return true;
     }
 
-    private bool TryParseParamsArgument(ISyntacticArgumentRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax)
+    private bool TryParseParamsOrArrayArgument(ISyntacticArgumentRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax)
     {
         if (attributeData.AttributeConstructor is not IMethodSymbol attributeConstructor)
         {
@@ -181,9 +188,42 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
 
         var index = attributeData.ConstructorArguments.Length - 1;
 
-        var (paramsCollectionLocation, paramsElementLocations) = ArgumentLocator.ParamsArguments(attributeSyntax.ArgumentList.Arguments.Skip(index).Take(attributeSyntax.ArgumentList.Arguments.Count - (attributeData.ConstructorArguments.Length + attributeData.NamedArguments.Length) + 1).Select(static (argument) => argument.Expression).ToArray());
+        if (attributeData.ConstructorArguments[index].IsNull)
+        {
+            var (nullCollectionLocation, nullElementLocations) = ArgumentLocator.ArrayArgument(attributeSyntax.ArgumentList.Arguments[index].Expression);
 
-        return recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[index], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[index]), paramsCollectionLocation, paramsElementLocations);
+            return recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[index], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[index]), nullCollectionLocation, nullElementLocations);
+        }
+
+        if (attributeSyntax.ArgumentList.Arguments.Count < attributeConstructor.Parameters.Length || attributeSyntax.ArgumentList.Arguments[index].NameEquals is not null)
+        {
+            var (emptyParamsCollectionLocation, emptyParamsElementLocations) = ArgumentLocator.ParamsArguments(Array.Empty<ExpressionSyntax>());
+
+            return recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[index], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[index]), emptyParamsCollectionLocation, emptyParamsElementLocations);
+        }
+
+        if (attributeSyntax.ArgumentList.Arguments.Count > attributeConstructor.Parameters.Length && attributeSyntax.ArgumentList.Arguments[index + 1].NameEquals is null)
+        {
+            var (paramsCollectionLocation, paramsElementLocations) = ArgumentLocator.ParamsArguments(attributeSyntax.ArgumentList.Arguments.Skip(index).Take(attributeSyntax.ArgumentList.Arguments.Count - (attributeData.ConstructorArguments.Length + attributeData.NamedArguments.Length) + 1).Select(static (argument) => argument.Expression).ToArray());
+
+            return recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[index], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[index]), paramsCollectionLocation, paramsElementLocations);
+        }
+
+        if (attributeSyntax.ArgumentList.Arguments.Count == attributeConstructor.Parameters.Length || attributeSyntax.ArgumentList.Arguments[index + 1].NameEquals is not null)
+        {
+            if (attributeData.ConstructorArguments[index].Values.Length is not 1)
+            {
+                var (arrayCollectionLocation, arrayElementLocations) = ArgumentLocator.ArrayArgument(attributeSyntax.ArgumentList.Arguments[index].Expression);
+
+                return recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[index], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[index]), arrayCollectionLocation, arrayElementLocations);
+            }
+
+            var (paramsCollectionLocation, paramsElementLocations) = ArgumentLocator.ParamsArguments(attributeSyntax.ArgumentList.Arguments[index].Expression);
+
+            return recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[index], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[index]), paramsCollectionLocation, paramsElementLocations);
+        }
+
+        return false;
     }
 
     private bool TryParseNamedArguments(ISyntacticArgumentRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax)
@@ -194,11 +234,6 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
         }
 
         if (attributeSyntax.ArgumentList is null)
-        {
-            return false;
-        }
-
-        if (attributeSyntax.ArgumentList.Arguments.Count < attributeData.ConstructorArguments.Length + attributeData.NamedArguments.Length)
         {
             return false;
         }

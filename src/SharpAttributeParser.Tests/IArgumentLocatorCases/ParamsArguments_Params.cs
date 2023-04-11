@@ -53,6 +53,18 @@ public class ParamsArguments_Params
 
     [Theory]
     [ClassData(typeof(Datasets.Sources))]
+    public void Empty_CollectionNoLocation_ElementsEmpty(IArgumentLocator locator)
+    {
+        var expressions = Array.Empty<ExpressionSyntax>();
+
+        var (collection, elements) = Target(locator, expressions);
+
+        Assert.Equal(Location.None, collection);
+        Assert.Empty(elements);
+    }
+
+    [Theory]
+    [ClassData(typeof(Datasets.Sources))]
     public void CollectionIncludesEntire_ElementsMatchEachArgument(IArgumentLocator locator)
     {
         var expressions = GetExpressions();
