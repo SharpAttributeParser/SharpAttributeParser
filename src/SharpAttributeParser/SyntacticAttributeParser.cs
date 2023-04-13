@@ -361,11 +361,6 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
             return true;
         }
 
-        if (expression is LiteralExpressionSyntax)
-        {
-            return value.Kind is TypedConstantKind.Primitive;
-        }
-
-        return false;
+        return value.Kind is not TypedConstantKind.Array;
     }
 }
