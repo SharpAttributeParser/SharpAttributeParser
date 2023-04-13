@@ -210,6 +210,62 @@ public class TryParse_Params
 
     [Theory]
     [ClassData(typeof(Datasets.ParamsAttributeSources))]
+    public async Task Params_OneArrayValueSameType_Typeof_NotTreatedAsParams_True_RecorderPopulated(ISyntacticAttributeParser parser, SyntacticParamsAttributeRecorder recorder)
+    {
+        Assert.Null(recorder.Value);
+        Assert.Null(recorder.ValueCollectionLocation);
+        Assert.Null(recorder.ValueElementLocations);
+
+        var source = """
+            [Params(new object[] { typeof(int) })]
+            public class Foo { }
+            """;
+
+        var (compilation, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
+
+        var intType = compilation.GetSpecialType(SpecialType.System_Int32);
+
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 0);
+
+        var result = Target(parser, recorder, attributeData, attributeSyntax);
+
+        Assert.True(result);
+
+        Assert.Equal(new[] { intType }, recorder.Value);
+
+        Assert.Equal(expectedCollectionLocation, recorder.ValueCollectionLocation);
+        Assert.Equal(expectedElementLocations, recorder.ValueElementLocations);
+    }
+
+    [Theory]
+    [ClassData(typeof(Datasets.ParamsAttributeSources))]
+    public async Task Params_OneArrayValueSameType_Null_NotTreatedAsParams_True_RecorderPopulated(ISyntacticAttributeParser parser, SyntacticParamsAttributeRecorder recorder)
+    {
+        Assert.Null(recorder.Value);
+        Assert.Null(recorder.ValueCollectionLocation);
+        Assert.Null(recorder.ValueElementLocations);
+
+        var source = """
+            [Params(new object[] { null })]
+            public class Foo { }
+            """;
+
+        var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
+
+        var (expectedCollectionLocation, expectedElementLocations) = ExpectedLocation.ArrayArgument(attributeSyntax, 0);
+
+        var result = Target(parser, recorder, attributeData, attributeSyntax);
+
+        Assert.True(result);
+
+        Assert.Equal(new object?[] { null }, recorder.Value);
+
+        Assert.Equal(expectedCollectionLocation, recorder.ValueCollectionLocation);
+        Assert.Equal(expectedElementLocations, recorder.ValueElementLocations);
+    }
+
+    [Theory]
+    [ClassData(typeof(Datasets.ParamsAttributeSources))]
     public async Task Params_OneArrayValueDifferentType_TreatedAsParams_True_RecorderPopulated(ISyntacticAttributeParser parser, SyntacticParamsAttributeRecorder recorder)
     {
         Assert.Null(recorder.Value);
