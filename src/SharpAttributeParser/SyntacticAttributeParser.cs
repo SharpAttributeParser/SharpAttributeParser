@@ -1,6 +1,7 @@
 ﻿namespace SharpAttributeParser;
 
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using System;
@@ -145,14 +146,21 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
             {
                 if (attributeConstructor.Parameters[i].IsParams)
                 {
-                    if (TryParseParamsOrArrayArgument(recorder, attributeData, attributeSyntax) is false)
+                if (attributeSyntax.ArgumentList.Arguments.Count <= i || attributeData.ConstructorArguments[i].Kind is TypedConstantKind.Array)
                     {
+                    return TryParseParamsOrArrayArgument(recorder, attributeData, attributeSyntax);
+                }
+
                         return false;
                     }
 
-                    break;
+            if (attributeSyntax.ArgumentList.Arguments.Count <= i)
+            {
+                return false;
                 }
 
+            if (attributeData.ConstructorArguments[i].Kind is TypedConstantKind.Array)
+            {
                 var (collectionLocation, elementLocations) = ArgumentLocator.ArrayArgument(attributeSyntax.ArgumentList.Arguments[i].Expression);
 
                 if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[i]), collectionLocation, elementLocations) is false)
@@ -211,7 +219,7 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
 
         if (attributeSyntax.ArgumentList.Arguments.Count == attributeConstructor.Parameters.Length || attributeSyntax.ArgumentList.Arguments[index + 1].NameEquals is not null)
         {
-            if (attributeData.ConstructorArguments[index].Values.Length is not 1)
+            if (CheckIfMatchingStructure(attributeData.ConstructorArguments[index], attributeSyntax.ArgumentList.Arguments[index].Expression))
             {
                 var (arrayCollectionLocation, arrayElementLocations) = ArgumentLocator.ArrayArgument(attributeSyntax.ArgumentList.Arguments[index].Expression);
 
@@ -283,5 +291,80 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
         var argumentName = attributeData.NamedArguments[index].Key;
 
         return attributeSyntax.ArgumentList.Arguments.Where((argument) => argument.NameEquals?.Name.Identifier.Text == argumentName).Select((argument) => argument.Expression).FirstOrDefault();
+    }
+
+    private static bool CheckIfMatchingStructure(TypedConstant value, ExpressionSyntax expression)
+    {
+        if (expression is ArrayCreationExpressionSyntax arrayCreationExpression)
+        {
+            if (value.Kind is not TypedConstantKind.Array)
+            {
+                return false;
+            }
+
+            if (arrayCreationExpression.Initializer is null || arrayCreationExpression.Initializer.Expressions.Count is 0)
+            {
+                return value.Values.Length is 0;
+            }
+
+            if (value.Values.Length is 0)
+            {
+                return false;
+            }
+
+            return CheckIfMatchingStructure(value.Values[0], arrayCreationExpression.Initializer.Expressions[0]);
+        }
+
+        if (expression is InitializerExpressionSyntax initializerExpression)
+        {
+            if (initializerExpression.IsKind(SyntaxKind.ArrayInitializerExpression) is false)
+            {
+                return value.Kind is not TypedConstantKind.Array;
+            }
+
+            if (initializerExpression.Expressions.Count is 0)
+            {
+                return value.Values.Length is 0 || value.Values[0].Kind is not TypedConstantKind.Array;
+            }
+
+            if (value.Values.Length is 0)
+            {
+                return false;
+            }
+
+            return CheckIfMatchingStructure(value.Values[0], initializerExpression.Expressions[0]);
+        }
+
+        if (expression is ImplicitArrayCreationExpressionSyntax implicitArrayCreationExpression)
+        {
+            return CheckIfMatchingStructure(value, implicitArrayCreationExpression.Initializer);
+        }
+
+        if (expression is CastExpressionSyntax castExpression)
+        {
+            return CheckIfMatchingStructure(value, castExpression.Expression);
+        }
+
+        if (expression is ParenthesizedExpressionSyntax parenthesizedExpression)
+        {
+            return CheckIfMatchingStructure(value, parenthesizedExpression.Expression);
+        }
+
+        if (expression is LiteralExpressionSyntax && (expression.IsKind(SyntaxKind.NullLiteralExpression) || expression.IsKind(SyntaxKind.DefaultLiteralExpression)))
+        {
+            if (value.Kind is TypedConstantKind.Array)
+            {
+                return value.Value is null;
+            }
+
+            return true;
+        }
+
+        if (expression is LiteralExpressionSyntax)
+        {
+            return value.Kind is TypedConstantKind.Primitive;
+        }
+
+        return false;
     }
 }
