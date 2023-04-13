@@ -129,7 +129,7 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
             return false;
         }
 
-        if (attributeData.ConstructorArguments.Length != attributeConstructor.Parameters.Count() || attributeSyntax.ArgumentList.Arguments.Count < attributeData.ConstructorArguments.Length)
+        if (attributeData.ConstructorArguments.Length != attributeConstructor.Parameters.Count())
         {
             return false;
         }
