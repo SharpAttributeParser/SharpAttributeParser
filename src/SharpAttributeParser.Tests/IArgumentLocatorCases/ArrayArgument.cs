@@ -39,6 +39,18 @@ public class ArrayArgument
 
     [Theory]
     [ClassData(typeof(Datasets.Sources))]
+    public void DefaultLiteral_CollectionIncludesEntire_ElementsEmpty(IArgumentLocator locator)
+    {
+        var expression = SyntaxFactory.LiteralExpression(SyntaxKind.DefaultLiteralExpression);
+
+        var (actualCollection, actualElements) = Target(locator, expression);
+
+        Assert.Equal(expression.GetLocation(), actualCollection);
+        Assert.Empty(actualElements);
+    }
+
+    [Theory]
+    [ClassData(typeof(Datasets.Sources))]
     public void Implicit_Empty_CollectionIncludesInitializer_ElementsEmpty(IArgumentLocator locator)
     {
         var expression = SyntaxFactory.ImplicitArrayCreationExpression(SyntaxFactory.InitializerExpression(SyntaxKind.ArrayInitializerExpression));

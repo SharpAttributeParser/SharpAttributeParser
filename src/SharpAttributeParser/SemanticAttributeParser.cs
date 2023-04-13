@@ -86,16 +86,6 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
                 continue;
             }
 
-            if (i == attributeConstructor.Parameters.Count() - 1 && attributeConstructor.Parameters.Count() < attributeData.ConstructorArguments.Length)
-            {
-                if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[i])) is false)
-                {
-                    return false;
-                }
-
-                break;
-            }
-
             if (attributeData.ConstructorArguments[i].Kind is TypedConstantKind.Array)
             {
                 if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[i])) is false)

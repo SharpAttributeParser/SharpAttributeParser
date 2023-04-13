@@ -86,7 +86,7 @@ public sealed class ArgumentLocator : IArgumentLocator
             return ArrayArgument(castExpression.Expression);
         }
 
-        if (expression is LiteralExpressionSyntax && expression.IsKind(SyntaxKind.NullLiteralExpression))
+        if (expression is LiteralExpressionSyntax && (expression.IsKind(SyntaxKind.NullLiteralExpression) || expression.IsKind(SyntaxKind.DefaultLiteralExpression)))
         {
             return (expression.GetLocation(), Array.Empty<Location>());
         }
@@ -94,6 +94,11 @@ public sealed class ArgumentLocator : IArgumentLocator
         if (expression is ParenthesizedExpressionSyntax parenthesizedExpression)
         {
             return ArrayArgument(parenthesizedExpression.Expression);
+        }
+
+        if (expression is DefaultExpressionSyntax)
+        {
+            return (expression.GetLocation(), Array.Empty<Location>());
         }
 
         throw new ArgumentException($"The provided {nameof(ExpressionSyntax)} could not be interpreted as constructing an array.", nameof(expression));
