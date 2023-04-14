@@ -8,7 +8,7 @@
     <PropertyGroup>
         <Title>SharpAttributeParser</Title>
         <Description>
-            Parses C\# attributes using the Roslyn API, primarily intended for Analyzers and Source Generators.
+            Parses C# attributes using the Roslyn API, primarily intended for Analyzers and Source Generators.
         </Description>
         <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
     </PropertyGroup>
