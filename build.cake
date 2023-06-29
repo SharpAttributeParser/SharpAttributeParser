@@ -81,7 +81,7 @@ Task("Build")
 
 Task("Test")
     .IsDependentOn("Build")
-    .DoesForEach<BuildParameters, FilePath>(() => GetFiles("./src/**/*.Tests.csproj"), (parameters, project, context) =>
+    .DoesForEach<BuildParameters, FilePath>(() => GetFiles("./tests/**/*.csproj"), (parameters, project, context) =>
     {
         FilePath testResultsPath = MakeAbsolute(parameters.Paths.TestResults
             .CombineWithFilePath($"{project.GetFilenameWithoutExtension()}_TestResults.xml"));
