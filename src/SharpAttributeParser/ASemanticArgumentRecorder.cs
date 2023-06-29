@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>An abstract <see cref="ISemanticArgumentRecorder"/>, recording parsed attribute arguments using delegates accessed through <see cref="string"/>-dictionaries.</summary>
 /// <remarks>Mappings from parameter names to delegates are added by overriding the following methods:
@@ -81,15 +82,15 @@ public abstract class ASemanticArgumentRecorder : ISemanticArgumentRecorder
 
     /// <summary>Maps the names of type-parameters to recorders, responsible for recording the argument of the parameter.</summary>
     /// <returns>The mappings from parameter names to recorders.</returns>
-    protected virtual IEnumerable<(string, DSemanticGenericRecorder)> AddGenericRecorders() => Array.Empty<(string, DSemanticGenericRecorder)>();
+    protected virtual IEnumerable<(string, DSemanticGenericRecorder)> AddGenericRecorders() => Enumerable.Empty<(string, DSemanticGenericRecorder)>();
 
     /// <summary>Maps the names of non-array-valued parameters to recorders, responsible for recording the argument of the parameter.</summary>
     /// <returns>The mappings from parameter names to recorders.</returns>
-    protected virtual IEnumerable<(string, DSemanticSingleRecorder)> AddSingleRecorders() => Array.Empty<(string, DSemanticSingleRecorder)>();
+    protected virtual IEnumerable<(string, DSemanticSingleRecorder)> AddSingleRecorders() => Enumerable.Empty<(string, DSemanticSingleRecorder)>();
 
     /// <summary>Maps the names of array-valued parameters to recorders, responsible for recording the argument of the parameter.</summary>
     /// <returns>The mappings from parameter names to recorders.</returns>
-    protected virtual IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders() => Array.Empty<(string, DSemanticArrayRecorder)>();
+    protected virtual IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders() => Enumerable.Empty<(string, DSemanticArrayRecorder)>();
 
     /// <inheritdoc/>
     public bool TryRecordGenericArgument(ITypeParameterSymbol parameter, ITypeSymbol value)

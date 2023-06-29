@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 /// <summary>An abstract <see cref="ISyntacticArgumentRecorder"/>, recording parsed attribute arguments using delegates accessed through <see cref="string"/>-dictionaries.</summary>
 /// <remarks>Mappings from parameter names to delegates are added by overriding the following methods:
@@ -82,17 +83,17 @@ public abstract class ASyntacticArgumentRecorder : ISyntacticArgumentRecorder
     /// <summary>Adds mappings from the names of type parameters to <see cref="DSyntacticGenericRecorder"/>, responsible for recording the argument of the parameter.</summary>
     /// <returns>The mappings from parameter names to <see cref="DSyntacticGenericRecorder"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
-    protected virtual IEnumerable<(string, DSyntacticGenericRecorder)> AddGenericRecorders() => Array.Empty<(string, DSyntacticGenericRecorder)>();
+    protected virtual IEnumerable<(string, DSyntacticGenericRecorder)> AddGenericRecorders() => Enumerable.Empty<(string, DSyntacticGenericRecorder)>();
 
     /// <summary>Adds mappings from the names of non-array-valued parameters to <see cref="DSyntacticSingleRecorder"/>, responsible for recording the argument of the parameter.</summary>
     /// <returns>The mappings from parameter names to <see cref="DSyntacticSingleRecorder"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
-    protected virtual IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders() => Array.Empty<(string, DSyntacticSingleRecorder)>();
+    protected virtual IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders() => Enumerable.Empty<(string, DSyntacticSingleRecorder)>();
 
     /// <summary>Adds mappings from the names of array-valued parameters to <see cref="DSyntacticArrayRecorder"/>, responsible for recording the argument of the parameter.</summary>
     /// <returns>The mappings from parameter names to <see cref="DSyntacticArrayRecorder"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
-    protected virtual IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders() => Array.Empty<(string, DSyntacticArrayRecorder)>();
+    protected virtual IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders() => Enumerable.Empty<(string, DSyntacticArrayRecorder)>();
 
     /// <inheritdoc/>
     public bool TryRecordGenericArgument(ITypeParameterSymbol parameter, ITypeSymbol value, Location location)
