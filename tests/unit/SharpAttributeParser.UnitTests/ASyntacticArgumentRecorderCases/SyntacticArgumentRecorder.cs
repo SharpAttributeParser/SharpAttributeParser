@@ -1,4 +1,4 @@
-﻿namespace SharpAttributeParser.Tests.ASyntacticArgumentRecorderCases;
+﻿namespace SharpAttributeParser.ASyntacticArgumentRecorderCases;
 
 using Microsoft.CodeAnalysis;
 
@@ -6,14 +6,17 @@ using System.Collections.Generic;
 
 internal sealed class SyntacticArgumentRecorder : ASyntacticArgumentRecorder
 {
-    public ITypeSymbol? TGeneric { get; private set; }
-    public object? Value { get; private set; }
-    public IReadOnlyList<object?>? Values { get; private set; }
+    public ITypeSymbol? T { get; private set; }
+    public bool TRecorded { get; private set; }
+    public Location? TLocation { get; private set; }
 
-    public Location? TGenericLocation { get; private set; }
+    public object? SingleValue { get; private set; }
+    public bool SingleValueRecorded { get; private set; }
     public Location? ValueLocation { get; private set; }
-    public Location? ValuesCollectionLocation { get; private set; }
-    public IReadOnlyList<Location>? ValuesElementLocations { get; private set; }
+
+    public IReadOnlyList<object?>? ArrayValue { get; private set; }
+    public bool ArrayValueRecorded { get; private set; }
+    public CollectionLocation? ArrayValueLocation { get; private set; }
 
     protected override IEqualityComparer<string> Comparer { get; }
 
@@ -22,42 +25,49 @@ internal sealed class SyntacticArgumentRecorder : ASyntacticArgumentRecorder
         Comparer = comparer;
     }
 
-    protected override IEnumerable<(string, DSyntacticGenericRecorder)> AddGenericRecorders()
+    protected override IEnumerable<(int, DSyntacticGenericRecorder)> AddIndexedGenericRecorders()
     {
-        yield return ("TGeneric", RecordTGeneric);
+        yield return (0, RecordT);
+    }
+
+    protected override IEnumerable<(string, DSyntacticGenericRecorder)> AddNamedGenericRecorders()
+    {
+        yield return (string.Empty, RecordT);
     }
 
     protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
     {
-        yield return ("Value", RecordValue);
+        yield return (string.Empty, RecordSingleValue);
     }
 
     protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
     {
-        yield return ("Values", RecordValues);
+        yield return (string.Empty, RecordArrayValue);
     }
 
-    private bool RecordTGeneric(ITypeSymbol value, Location location)
+    private bool RecordT(ITypeSymbol value, Location location)
     {
-        TGeneric = value;
-        TGenericLocation = location;
+        T = value;
+        TRecorded = true;
+        TLocation = location;
 
         return true;
     }
 
-    private bool RecordValue(object? value, Location location)
+    private bool RecordSingleValue(object? value, Location location)
     {
-        Value = value;
+        SingleValue = value;
+        SingleValueRecorded = true;
         ValueLocation = location;
 
         return true;
     }
 
-    private bool RecordValues(IReadOnlyList<object?>? values, Location collectionLocation, IReadOnlyList<Location> elementLocations)
+    private bool RecordArrayValue(IReadOnlyList<object?>? value, CollectionLocation location)
     {
-        Values = values;
-        ValuesCollectionLocation = collectionLocation;
-        ValuesElementLocations = elementLocations;
+        ArrayValue = value;
+        ArrayValueRecorded = true;
+        ArrayValueLocation = location;
 
         return true;
     }

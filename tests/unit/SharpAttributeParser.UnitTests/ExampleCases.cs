@@ -1,4 +1,4 @@
-﻿namespace SharpAttributeParser.Tests;
+﻿namespace SharpAttributeParser;
 
 using Microsoft.CodeAnalysis;
 
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 using Xunit;
 
-public class ExampleCases
+public sealed class ExampleCases
 {
     private static bool Target(ISemanticAttributeParser parser, ISemanticArgumentRecorder recorder, AttributeData attributeData) => parser.TryParse(recorder, attributeData);
 
@@ -16,7 +16,7 @@ public class ExampleCases
     {
         var source = """
             [Example<System.Type>(new[] { 0, 1, 1, 2 }, name: "Fib", Answer = 41 + 1)]
-            public class Foo { }
+            public sealed class Foo { }
             """;
 
         var parser = DependencyInjection.GetRequiredService<ISemanticAttributeParser>();
@@ -39,25 +39,25 @@ public class ExampleCases
 
     private sealed class ExampleRecorder : ASemanticArgumentRecorder
     {
-        public ITypeSymbol T { get; set; } = null!;
-        public IReadOnlyList<int> Sequence { get; set; } = null!;
-        public string Name { get; set; } = null!;
+        public ITypeSymbol? T { get; set; }
+        public IReadOnlyList<int>? Sequence { get; set; }
+        public string? Name { get; set; }
         public int? Answer { get; set; }
 
-        protected override IEnumerable<(string, DSemanticGenericRecorder)> AddGenericRecorders()
+        protected override IEnumerable<(int, DSemanticGenericRecorder)> AddIndexedGenericRecorders()
         {
-            yield return ("T", Adapters.For(RecordT));
+            yield return (0, Adapters.For(RecordT));
         }
 
         protected override IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders()
         {
-            yield return ("Sequence", Adapters.For<int>(RecordSequence));
+            yield return (nameof(ExampleAttribute<object>.Sequence), Adapters.For<int>(RecordSequence));
         }
 
         protected override IEnumerable<(string, DSemanticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Name", Adapters.For<string>(RecordName));
-            yield return ("Answer", Adapters.For<int>(RecordAnswer));
+            yield return (nameof(ExampleAttribute<object>.Name), Adapters.For<string>(RecordName));
+            yield return (nameof(ExampleAttribute<object>.Answer), Adapters.For<int>(RecordAnswer));
         }
 
         private void RecordT(ITypeSymbol t) => T = t;

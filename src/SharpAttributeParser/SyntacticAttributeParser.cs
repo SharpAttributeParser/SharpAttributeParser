@@ -5,7 +5,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 /// <inheritdoc cref="ISyntacticAttributeParser"/>
@@ -39,17 +38,17 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
             throw new ArgumentNullException(nameof(attributeSyntax));
         }
 
-        if (attributeData.AttributeClass is null || attributeData.AttributeClass.TypeKind is TypeKind.Error || attributeData.AttributeConstructor is null)
+        if (attributeData.AttributeClass is not INamedTypeSymbol attributeType || attributeType.TypeKind is TypeKind.Error || attributeData.AttributeConstructor is not IMethodSymbol targetConstructor)
         {
             return false;
         }
 
-        if (TryParseGenericArguments(recorder, attributeData, attributeSyntax) is false)
+        if (TryParseGenericArguments(recorder, attributeType, attributeSyntax) is false)
         {
             return false;
         }
 
-        if (TryParseConstructorArguments(recorder, attributeData, attributeSyntax) is false)
+        if (TryParseConstructorArguments(recorder, attributeData, targetConstructor, attributeSyntax) is false)
         {
             return false;
         }
@@ -62,25 +61,25 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
         return true;
     }
 
-    private bool TryParseGenericArguments(ISyntacticArgumentRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax)
+    private bool TryParseGenericArguments(ISyntacticArgumentRecorder recorder, INamedTypeSymbol attributeType, AttributeSyntax attributeSyntax)
     {
-        if (attributeData.AttributeClass is not INamedTypeSymbol attributeType)
-        {
-            return false;
-        }
-
-        if (GetGenericNameSyntax() is not GenericNameSyntax genericNameSyntax)
+        if (getGenericNameSyntax() is not GenericNameSyntax genericNameSyntax)
         {
             return true;
         }
 
-        if (genericNameSyntax.TypeArgumentList.Arguments.Count < attributeType.TypeArguments.Length)
+        if (genericNameSyntax.TypeArgumentList.Arguments.Count != attributeType.TypeArguments.Length)
         {
             return false;
         }
 
         for (var i = 0; i < attributeType.TypeArguments.Length; i++)
         {
+            if (attributeType.TypeArguments[i].Kind is SymbolKind.ErrorType)
+            {
+                return false;
+            }
+
             var location = ArgumentLocator.TypeArgument(genericNameSyntax.TypeArgumentList.Arguments[i]);
 
             if (recorder.TryRecordGenericArgument(attributeType.TypeParameters[i], attributeType.TypeArguments[i], location) is false)
@@ -91,7 +90,7 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
 
         return true;
 
-        GenericNameSyntax? GetGenericNameSyntax()
+        GenericNameSyntax? getGenericNameSyntax()
         {
             if (attributeSyntax.Name is GenericNameSyntax genericNameSyntax)
             {
@@ -107,32 +106,27 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
         }
     }
 
-    private bool TryParseConstructorArguments(ISyntacticArgumentRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax)
+    private bool TryParseConstructorArguments(ISyntacticArgumentRecorder recorder, AttributeData attributeData, IMethodSymbol targetConstructor, AttributeSyntax attributeSyntax)
     {
-        if (attributeData.AttributeConstructor is not IMethodSymbol attributeConstructor)
-        {
-            return false;
-        }
-
         if (attributeData.ConstructorArguments.IsEmpty)
         {
             return true;
         }
 
-        if (attributeSyntax.ArgumentList is null)
+        if (attributeData.ConstructorArguments.Length != targetConstructor.Parameters.Count())
         {
-            if (attributeConstructor.Parameters.Length is 1 && attributeConstructor.Parameters[0].IsParams)
-            {
-                var (paramsCollectionLocation, paramsElementLocations) = ArgumentLocator.ParamsArguments(Array.Empty<ExpressionSyntax>());
-
-                return recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[0], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[0]), paramsCollectionLocation, paramsElementLocations);
-            }
-
             return false;
         }
 
-        if (attributeData.ConstructorArguments.Length != attributeConstructor.Parameters.Count())
+        if (attributeSyntax.ArgumentList is null)
         {
+            if (targetConstructor.Parameters.Length is 1 && targetConstructor.Parameters[0].IsParams)
+            {
+                var paramsLocation = ArgumentLocator.ParamsArguments(Array.Empty<ExpressionSyntax>());
+
+                return recorder.TryRecordConstructorArgument(targetConstructor.Parameters[0], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[0]), paramsLocation);
+            }
+
             return false;
         }
 
@@ -140,14 +134,14 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
         {
             if (attributeData.ConstructorArguments[i].Kind is TypedConstantKind.Error)
             {
-                continue;
+                return false;
             }
 
-            if (attributeConstructor.Parameters[i].IsParams)
+            if (targetConstructor.Parameters[i].IsParams)
             {
                 if (attributeSyntax.ArgumentList.Arguments.Count <= i || attributeData.ConstructorArguments[i].Kind is TypedConstantKind.Array)
                 {
-                    return TryParseParamsOrArrayArgument(recorder, attributeData, attributeSyntax);
+                    return TryParseParamsOrArrayArgument(recorder, attributeData, targetConstructor, attributeSyntax);
                 }
 
                 return false;
@@ -160,9 +154,9 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
 
             if (attributeData.ConstructorArguments[i].Kind is TypedConstantKind.Array)
             {
-                var (collectionLocation, elementLocations) = ArgumentLocator.ArrayArgument(attributeSyntax.ArgumentList.Arguments[i].Expression);
+                var collectionLocation = ArgumentLocator.ArrayArgument(attributeSyntax.ArgumentList.Arguments[i].Expression);
 
-                if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[i]), collectionLocation, elementLocations) is false)
+                if (recorder.TryRecordConstructorArgument(targetConstructor.Parameters[i], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[i]), collectionLocation) is false)
                 {
                     return false;
                 }
@@ -172,7 +166,7 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
 
             var location = ArgumentLocator.SingleArgument(attributeSyntax.ArgumentList.Arguments[i].Expression);
 
-            if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i], CommonAttributeParsing.SingleArgument(attributeData.ConstructorArguments[i]), location) is false)
+            if (recorder.TryRecordConstructorArgument(targetConstructor.Parameters[i], CommonAttributeParsing.SingleArgument(attributeData.ConstructorArguments[i]), location) is false)
             {
                 return false;
             }
@@ -181,13 +175,8 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
         return true;
     }
 
-    private bool TryParseParamsOrArrayArgument(ISyntacticArgumentRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax)
+    private bool TryParseParamsOrArrayArgument(ISyntacticArgumentRecorder recorder, AttributeData attributeData, IMethodSymbol targetConstructor, AttributeSyntax attributeSyntax)
     {
-        if (attributeData.AttributeConstructor is not IMethodSymbol attributeConstructor)
-        {
-            return false;
-        }
-
         if (attributeSyntax.ArgumentList is null)
         {
             return false;
@@ -197,42 +186,42 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
 
         if (attributeData.ConstructorArguments[index].IsNull)
         {
-            var (nullCollectionLocation, nullElementLocations) = ArgumentLocator.ArrayArgument(attributeSyntax.ArgumentList.Arguments[index].Expression);
+            var nullLocation = ArgumentLocator.ArrayArgument(attributeSyntax.ArgumentList.Arguments[index].Expression);
 
-            return tryRecordConstructorArgument(nullCollectionLocation, nullElementLocations);
+            return tryRecordConstructorArgument(nullLocation);
         }
 
-        if (attributeSyntax.ArgumentList.Arguments.Count < attributeConstructor.Parameters.Length || attributeSyntax.ArgumentList.Arguments[index].NameEquals is not null)
+        if (attributeSyntax.ArgumentList.Arguments.Count < targetConstructor.Parameters.Length || attributeSyntax.ArgumentList.Arguments[index].NameEquals is not null)
         {
-            var (emptyParamsCollectionLocation, emptyParamsElementLocations) = ArgumentLocator.ParamsArguments(Array.Empty<ExpressionSyntax>());
+            var emptyParamsLocation = ArgumentLocator.ParamsArguments(Array.Empty<ExpressionSyntax>());
 
-            return tryRecordConstructorArgument(emptyParamsCollectionLocation, emptyParamsElementLocations);
+            return tryRecordConstructorArgument(emptyParamsLocation);
         }
 
-        if (attributeSyntax.ArgumentList.Arguments.Count > attributeConstructor.Parameters.Length && attributeSyntax.ArgumentList.Arguments[index + 1].NameEquals is null)
+        if (attributeSyntax.ArgumentList.Arguments.Count > targetConstructor.Parameters.Length && attributeSyntax.ArgumentList.Arguments[index + 1].NameEquals is null)
         {
-            var (paramsCollectionLocation, paramsElementLocations) = ArgumentLocator.ParamsArguments(attributeSyntax.ArgumentList.Arguments.Skip(index).Take(attributeSyntax.ArgumentList.Arguments.Count - (attributeData.ConstructorArguments.Length + attributeData.NamedArguments.Length) + 1).Select(static (argument) => argument.Expression).ToArray());
+            var paramsLocation = ArgumentLocator.ParamsArguments(attributeSyntax.ArgumentList.Arguments.Skip(index).Take(attributeSyntax.ArgumentList.Arguments.Count - (attributeData.ConstructorArguments.Length + attributeData.NamedArguments.Length) + 1).Select(static (argument) => argument.Expression).ToArray());
 
-            return tryRecordConstructorArgument(paramsCollectionLocation, paramsElementLocations);
+            return tryRecordConstructorArgument(paramsLocation);
         }
 
-        if (attributeSyntax.ArgumentList.Arguments.Count == attributeConstructor.Parameters.Length || attributeSyntax.ArgumentList.Arguments[index + 1].NameEquals is not null)
+        if (attributeSyntax.ArgumentList.Arguments.Count == targetConstructor.Parameters.Length || attributeSyntax.ArgumentList.Arguments[index + 1].NameEquals is not null)
         {
-            if (CheckIfMatchingStructure(attributeData.ConstructorArguments[index], attributeSyntax.ArgumentList.Arguments[index].Expression))
+            if (CheckIfArgumentMatchesArrayStructure(attributeData.ConstructorArguments[index], attributeSyntax.ArgumentList.Arguments[index].Expression))
             {
-                var (arrayCollectionLocation, arrayElementLocations) = ArgumentLocator.ArrayArgument(attributeSyntax.ArgumentList.Arguments[index].Expression);
+                var arrayLocation = ArgumentLocator.ArrayArgument(attributeSyntax.ArgumentList.Arguments[index].Expression);
 
-                return tryRecordConstructorArgument(arrayCollectionLocation, arrayElementLocations);
+                return tryRecordConstructorArgument(arrayLocation);
             }
 
-            var (paramsCollectionLocation, paramsElementLocations) = ArgumentLocator.ParamsArguments(attributeSyntax.ArgumentList.Arguments[index].Expression);
+            var paramsLocation = ArgumentLocator.ParamsArguments(attributeSyntax.ArgumentList.Arguments[index].Expression);
 
-            return tryRecordConstructorArgument(paramsCollectionLocation, paramsElementLocations);
+            return tryRecordConstructorArgument(paramsLocation);
         }
 
         return false;
 
-        bool tryRecordConstructorArgument(Location collectionLocation, IReadOnlyList<Location> elementLocations) => recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[index], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[index]), collectionLocation, elementLocations);
+        bool tryRecordConstructorArgument(CollectionLocation location) => recorder.TryRecordConstructorArgument(targetConstructor.Parameters[index], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[index]), location);
     }
 
     private bool TryParseNamedArguments(ISyntacticArgumentRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax)
@@ -261,9 +250,9 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
 
             if (attributeData.NamedArguments[i].Value.Kind is TypedConstantKind.Array)
             {
-                var (collectionLocation, elementLocations) = ArgumentLocator.ArrayArgument(argumentExpression);
+                var collectionLocation = ArgumentLocator.ArrayArgument(argumentExpression);
 
-                if (recorder.TryRecordNamedArgument(attributeData.NamedArguments[i].Key, CommonAttributeParsing.ArrayArguments(attributeData.NamedArguments[i].Value), collectionLocation, elementLocations) is false)
+                if (recorder.TryRecordNamedArgument(attributeData.NamedArguments[i].Key, CommonAttributeParsing.ArrayArguments(attributeData.NamedArguments[i].Value), collectionLocation) is false)
                 {
                     return false;
                 }
@@ -294,11 +283,16 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
         return attributeSyntax.ArgumentList.Arguments.Where((argument) => argument.NameEquals?.Name.Identifier.Text == argumentName).Select((argument) => argument.Expression).FirstOrDefault();
     }
 
-    private static bool CheckIfMatchingStructure(TypedConstant value, ExpressionSyntax expression)
+    private static bool CheckIfArgumentMatchesArrayStructure(TypedConstant value, ExpressionSyntax expression)
     {
         if (expression is ArrayCreationExpressionSyntax arrayCreationExpression)
         {
             if (value.Kind is not TypedConstantKind.Array)
+            {
+                return false;
+            }
+
+            if (value.Values.IsDefault)
             {
                 return false;
             }
@@ -308,12 +302,12 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
                 return value.Values.Length is 0;
             }
 
-            if (value.Values.Length is 0)
+            if (value.Values.Length != arrayCreationExpression.Initializer.Expressions.Count)
             {
                 return false;
             }
 
-            return CheckIfMatchingStructure(value.Values[0], arrayCreationExpression.Initializer.Expressions[0]);
+            return CheckIfArgumentMatchesArrayStructure(value.Values[0], arrayCreationExpression.Initializer.Expressions[0]);
         }
 
         if (expression is InitializerExpressionSyntax initializerExpression)
@@ -323,39 +317,44 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
                 return value.Kind is not TypedConstantKind.Array;
             }
 
-            if (initializerExpression.Expressions.Count is 0)
-            {
-                return value.Values.Length is 0 || value.Values[0].Kind is not TypedConstantKind.Array;
-            }
-
-            if (value.Values.Length is 0)
+            if (value.Values.IsDefault)
             {
                 return false;
             }
 
-            return CheckIfMatchingStructure(value.Values[0], initializerExpression.Expressions[0]);
+            if (initializerExpression.Expressions.Count is 0)
+            {
+                return value.Values.Length is 0;
+            }
+
+            if (value.Values.Length != initializerExpression.Expressions.Count)
+            {
+                return false;
+            }
+
+            return CheckIfArgumentMatchesArrayStructure(value.Values[0], initializerExpression.Expressions[0]);
         }
 
         if (expression is ImplicitArrayCreationExpressionSyntax implicitArrayCreationExpression)
         {
-            return CheckIfMatchingStructure(value, implicitArrayCreationExpression.Initializer);
+            return CheckIfArgumentMatchesArrayStructure(value, implicitArrayCreationExpression.Initializer);
         }
 
         if (expression is CastExpressionSyntax castExpression)
         {
-            return CheckIfMatchingStructure(value, castExpression.Expression);
+            return CheckIfArgumentMatchesArrayStructure(value, castExpression.Expression);
         }
 
         if (expression is ParenthesizedExpressionSyntax parenthesizedExpression)
         {
-            return CheckIfMatchingStructure(value, parenthesizedExpression.Expression);
+            return CheckIfArgumentMatchesArrayStructure(value, parenthesizedExpression.Expression);
         }
 
         if (expression is LiteralExpressionSyntax && (expression.IsKind(SyntaxKind.NullLiteralExpression) || expression.IsKind(SyntaxKind.DefaultLiteralExpression)))
         {
             if (value.Kind is TypedConstantKind.Array)
             {
-                return value.Value is null;
+                return value.Values.IsDefault;
             }
 
             return true;

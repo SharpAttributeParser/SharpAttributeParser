@@ -1,25 +1,24 @@
-﻿namespace SharpAttributeParser.Tests.ASyntacticArgumentRecorderCases;
+﻿namespace SharpAttributeParser.ASyntacticArgumentRecorderCases;
 
 using Microsoft.CodeAnalysis;
 
 using System;
+using System.Collections.Generic;
 
 using Xunit;
 
-public class TryRecordNamedArgument_Single
+public sealed class TryRecordNamedArgument_Single
 {
-    private static bool Target(ASyntacticArgumentRecorder recorder, string parameterName, object? value, Location location) => recorder.TryRecordNamedArgument(parameterName, value, location);
+    private static bool Target(ISyntacticArgumentRecorder recorder, string parameterName, object? value, Location location) => recorder.TryRecordNamedArgument(parameterName, value, location);
 
     [Fact]
     public void NullParameterName_ArgumentNullException()
     {
-        SyntacticArgumentRecorder recorder = new(StringComparer.OrdinalIgnoreCase);
+        var comparerMock = StringComparerMock.CreateMock(true);
 
-        var parameterName = Datasets.GetNullParameterName();
-        var value = Datasets.GetValidTypeSymbol();
-        var location = Datasets.GetValidLocation();
+        SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var exception = Record.Exception(() => Target(recorder, parameterName, value, location));
+        var exception = Record.Exception(() => Target(recorder, null!, null, Location.None));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -27,73 +26,46 @@ public class TryRecordNamedArgument_Single
     [Fact]
     public void NullLocation_ArgumentNullException()
     {
-        var comparerMock = ComparerMock.GetComparer(true);
+        var comparerMock = StringComparerMock.CreateMock(true);
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
-        var value = Datasets.GetValidTypeSymbol();
-        var location = Datasets.GetNullLocation();
-
-        var exception = Record.Exception(() => Target(recorder, parameterName, value, location));
+        var exception = Record.Exception(() => Target(recorder, string.Empty, null, null!));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
 
     [Fact]
-    public void NullValue_True_ArgumentRecorded()
-    {
-        var comparerMock = ComparerMock.GetComparer(true);
-
-        SyntacticArgumentRecorder recorder = new(comparerMock.Object);
-
-        var parameterName = Datasets.GetValidParameterName();
-        var value = Datasets.GetNullTypeSymbol();
-        var location = Datasets.GetValidLocation();
-
-        var actual = Target(recorder, parameterName, value, location);
-
-        Assert.True(actual);
-
-        Assert.Null(recorder.Value);
-        Assert.Equal(location, recorder.ValueLocation);
-    }
+    public void NullValue_True_Recorded() => TrueAndRecorded(null);
 
     [Fact]
-    public void Matching_True_ArgumentRecorded()
-    {
-        var comparerMock = ComparerMock.GetComparer(true);
-
-        SyntacticArgumentRecorder recorder = new(comparerMock.Object);
-
-        var parameterName = Datasets.GetValidParameterName();
-        var value = Datasets.GetValidTypeSymbol();
-        var location = Datasets.GetValidLocation();
-
-        var actual = Target(recorder, parameterName, value, location);
-
-        Assert.True(actual);
-
-        Assert.Equal(value, recorder.Value);
-        Assert.Equal(location, recorder.ValueLocation);
-    }
+    public void NonNullValue_True_Recorded() => TrueAndRecorded(string.Empty);
 
     [Fact]
-    public void NotMatching_False_ArgumentNotRecorded()
+    public void NotMatching_False_NotRecorded()
     {
-        var comparerMock = ComparerMock.GetComparer(false);
+        SyntacticArgumentRecorder recorder = new(StringComparerMock.CreateComparer(false));
 
-        SyntacticArgumentRecorder recorder = new(comparerMock.Object);
-
-        var parameterName = Datasets.GetValidParameterName();
-        var value = Datasets.GetValidTypeSymbol();
-        var location = Datasets.GetValidLocation();
-
-        var actual = Target(recorder, parameterName, value, location);
+        var actual = Target(recorder, string.Empty, null, Location.None);
 
         Assert.False(actual);
 
-        Assert.Null(recorder.Value);
-        Assert.Null(recorder.ValueLocation);
+        Assert.False(recorder.SingleValueRecorded);
+    }
+
+    [AssertionMethod]
+    private static void TrueAndRecorded(object? value)
+    {
+        SyntacticArgumentRecorder recorder = new(StringComparerMock.CreateComparer(true));
+
+        var location = CustomLocation.Create();
+
+        var actual = Target(recorder, string.Empty, value, location);
+
+        Assert.True(actual);
+
+        Assert.True(recorder.SingleValueRecorded);
+        Assert.Equal(value, recorder.SingleValue);
+        Assert.Equal(location, recorder.ValueLocation, ReferenceEqualityComparer.Instance);
     }
 }

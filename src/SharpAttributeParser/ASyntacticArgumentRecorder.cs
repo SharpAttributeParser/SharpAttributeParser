@@ -6,13 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-/// <summary>An abstract <see cref="ISyntacticArgumentRecorder"/>, recording parsed attribute arguments using delegates accessed through <see cref="string"/>-dictionaries.</summary>
-/// <remarks>Mappings from parameter names to delegates are added by overriding the following methods:
+/// <summary>An abstract <see cref="ISyntacticArgumentRecorder"/>, recording syntactically parsed attribute arguments using recorders provided through the following methods:
 /// <list type="bullet">
-/// <item><see cref="AddGenericRecorders"/></item>
+/// <item><see cref="AddIndexedGenericRecorders"/></item>
+/// <item><see cref="AddNamedGenericRecorders"/></item>
 /// <item><see cref="AddSingleRecorders"/></item>
 /// <item><see cref="AddArrayRecorders"/></item>
-/// </list></remarks>
+/// </list></summary>
 public abstract class ASyntacticArgumentRecorder : ISyntacticArgumentRecorder
 {
     /// <summary>Provides adapters that may be applied to parsed arguments before they are recorded.</summary>
@@ -20,7 +20,8 @@ public abstract class ASyntacticArgumentRecorder : ISyntacticArgumentRecorder
 
     private bool IsInitialized { get; set; }
 
-    private IReadOnlyDictionary<string, DSyntacticGenericRecorder> GenericRecorders { get; set; } = null!;
+    private IReadOnlyDictionary<int, DSyntacticGenericRecorder> IndexedGenericRecorders { get; set; } = null!;
+    private IReadOnlyDictionary<string, DSyntacticGenericRecorder> NamedGenericRecorders { get; set; } = null!;
     private IReadOnlyDictionary<string, DSyntacticSingleRecorder> SingleRecorders { get; set; } = null!;
     private IReadOnlyDictionary<string, DSyntacticArrayRecorder> ArrayRecorders { get; set; } = null!;
 
@@ -28,19 +29,23 @@ public abstract class ASyntacticArgumentRecorder : ISyntacticArgumentRecorder
     {
         var comparer = Comparer ?? throw new InvalidOperationException($"The provided {nameof(IEqualityComparer<string>)} was null.");
 
-        var genericRecorderMappings = AddGenericRecorders() ?? throw new InvalidOperationException($"The provided collection of {nameof(String)}-{nameof(DSyntacticGenericRecorder)} mappings was null.");
-        var singleRecorderMappings = AddSingleRecorders() ?? throw new InvalidOperationException($"The provided collection of {nameof(String)}-{nameof(DSyntacticSingleRecorder)} mappings was null.");
-        var arrayRecorderMappings = AddArrayRecorders() ?? throw new InvalidOperationException($"The provided collection of {nameof(String)}-{nameof(DSyntacticArrayRecorder)} mappings was null.");
+        var indexedGenericRecorderMappings = AddIndexedGenericRecorders() ?? throw new InvalidOperationException($"The provided collection of indexed type-parameter mappings was null.");
+        var namedGenericRecorderMappings = AddNamedGenericRecorders() ?? throw new InvalidOperationException($"The provided collection of named type-parameter mappings was null.");
+        var singleRecorderMappings = AddSingleRecorders() ?? throw new InvalidOperationException($"The provided collection of non-array-valued parameter mappings was null.");
+        var arrayRecorderMappings = AddArrayRecorders() ?? throw new InvalidOperationException($"The provided collection of array-valued parameter mappings was null.");
 
-        Dictionary<string, DSyntacticGenericRecorder> genericRecorderDictionary = new(comparer);
+        Dictionary<int, DSyntacticGenericRecorder> indexedGenericRecorderDictionary = new();
+        Dictionary<string, DSyntacticGenericRecorder> namedGenericRecorderDictionary = new(comparer);
         Dictionary<string, DSyntacticSingleRecorder> singleRecorderDictionary = new(comparer);
         Dictionary<string, DSyntacticArrayRecorder> arrayRecorderDictionary = new(comparer);
 
-        PopulateDictionary(genericRecorderDictionary, genericRecorderMappings);
+        PopulateDictionary(indexedGenericRecorderDictionary, indexedGenericRecorderMappings);
+        PopulateDictionary(namedGenericRecorderDictionary, namedGenericRecorderMappings);
         PopulateDictionary(singleRecorderDictionary, singleRecorderMappings);
         PopulateDictionary(arrayRecorderDictionary, arrayRecorderMappings);
 
-        GenericRecorders = genericRecorderDictionary;
+        IndexedGenericRecorders = indexedGenericRecorderDictionary;
+        NamedGenericRecorders = namedGenericRecorderDictionary;
         SingleRecorders = singleRecorderDictionary;
         ArrayRecorders = arrayRecorderDictionary;
 
@@ -53,17 +58,12 @@ public abstract class ASyntacticArgumentRecorder : ISyntacticArgumentRecorder
         {
             if (parameterName is null)
             {
-                throw new InvalidOperationException($"A {nameof(String)} in the provided collection of {nameof(String)}-{typeof(T).Name} mappings was null.");
-            }
-
-            if (parameterName is "")
-            {
-                throw new InvalidOperationException($"A {nameof(String)} in the provided collection of {nameof(String)}-{typeof(T).Name} mappings was null.");
+                throw new InvalidOperationException($"The name of a parameter in the provided collection of mappings was null.");
             }
 
             if (recorder is null)
             {
-                throw new InvalidOperationException($"A {typeof(T).Name} in the provided collection of mappings was null.");
+                throw new InvalidOperationException($"A recorder in the provided collection of mappings was null.");
             }
 
             try
@@ -77,22 +77,48 @@ public abstract class ASyntacticArgumentRecorder : ISyntacticArgumentRecorder
         }
     }
 
+    private static void PopulateDictionary<T>(IDictionary<int, T> dictionary, IEnumerable<(int, T)> mappings)
+    {
+        foreach (var (parameterIndex, recorder) in mappings)
+        {
+            if (parameterIndex < 0)
+            {
+                throw new InvalidOperationException($"The index of a parameter in the provided collection of mappings was negative.");
+            }
+
+            if (recorder is null)
+            {
+                throw new InvalidOperationException($"A recorder in the provided collection of mappings was null.");
+            }
+
+            try
+            {
+                dictionary.Add(parameterIndex, recorder);
+            }
+            catch (ArgumentException e)
+            {
+                throw new InvalidOperationException($"A parameter with the provided index, \"{parameterIndex}\", has already been added.", e);
+            }
+        }
+    }
+
     /// <summary>Determines how equality will be determined when comparing parameter names. The default value is <see cref="StringComparer.OrdinalIgnoreCase"/>.</summary>
     protected virtual IEqualityComparer<string> Comparer => StringComparer.OrdinalIgnoreCase;
 
-    /// <summary>Adds mappings from the names of type parameters to <see cref="DSyntacticGenericRecorder"/>, responsible for recording the argument of the parameter.</summary>
-    /// <returns>The mappings from parameter names to <see cref="DSyntacticGenericRecorder"/>.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    protected virtual IEnumerable<(string, DSyntacticGenericRecorder)> AddGenericRecorders() => Enumerable.Empty<(string, DSyntacticGenericRecorder)>();
+    /// <summary>Maps the indices of type-parameters to recorders, responsible for recording the argument of the parameter.</summary>
+    /// <returns>The mappings from type-parameter index to recorder.</returns>
+    protected virtual IEnumerable<(int, DSyntacticGenericRecorder)> AddIndexedGenericRecorders() => Enumerable.Empty<(int, DSyntacticGenericRecorder)>();
 
-    /// <summary>Adds mappings from the names of non-array-valued parameters to <see cref="DSyntacticSingleRecorder"/>, responsible for recording the argument of the parameter.</summary>
-    /// <returns>The mappings from parameter names to <see cref="DSyntacticSingleRecorder"/>.</returns>
-    /// <exception cref="ArgumentNullException"/>
+    /// <summary>Maps the names of type-parameters to recorders, responsible for recording the argument of the parameter.</summary>
+    /// <returns>The mappings from type-parameter name to recorder.</returns>
+    protected virtual IEnumerable<(string, DSyntacticGenericRecorder)> AddNamedGenericRecorders() => Enumerable.Empty<(string, DSyntacticGenericRecorder)>();
+
+    /// <summary>Maps the names of non-array-valued parameters to recorders, responsible for recording the argument of the parameter.</summary>
+    /// <returns>The mappings from parameter name to recorder.</returns>
     protected virtual IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders() => Enumerable.Empty<(string, DSyntacticSingleRecorder)>();
 
-    /// <summary>Adds mappings from the names of array-valued parameters to <see cref="DSyntacticArrayRecorder"/>, responsible for recording the argument of the parameter.</summary>
-    /// <returns>The mappings from parameter names to <see cref="DSyntacticArrayRecorder"/>.</returns>
-    /// <exception cref="ArgumentNullException"/>
+    /// <summary>Maps the names of array-valued parameters to recorders, responsible for recording the argument of the parameter.</summary>
+    /// <returns>The mappings from parameter name to recorder.</returns>
     protected virtual IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders() => Enumerable.Empty<(string, DSyntacticArrayRecorder)>();
 
     /// <inheritdoc/>
@@ -118,14 +144,26 @@ public abstract class ASyntacticArgumentRecorder : ISyntacticArgumentRecorder
             throw new ArgumentNullException(nameof(location));
         }
 
-        var recorders = GenericRecorders;
+        var hasIndexedRecorder = IndexedGenericRecorders.TryGetValue(parameter.Ordinal, out var indexedRecorder);
+        var hasNamedRecorder = NamedGenericRecorders.TryGetValue(parameter.Name, out var namedRecorder);
 
-        if (recorders is null || recorders.TryGetValue(parameter.Name, out var recorder) is false || recorder is null)
+        return (hasIndexedRecorder, hasNamedRecorder) switch
         {
+            (false, false) => false,
+            (true, false) => indexedRecorder(value, location),
+            (false, true) => namedRecorder(value, location),
+            (true, true) => attemptToResolveOverlappingRecorders(indexedRecorder, namedRecorder, value, location)
+        };
+
+        static bool attemptToResolveOverlappingRecorders(DSyntacticGenericRecorder indexedRecorder, DSyntacticGenericRecorder namedRecorder, ITypeSymbol value, Location location)
+        {
+            if (Equals(indexedRecorder, namedRecorder))
+            {
+                return indexedRecorder(value, location);
+            }
+
             return false;
         }
-
-        return recorder(value, location);
     }
 
     /// <inheritdoc/>
@@ -140,14 +178,14 @@ public abstract class ASyntacticArgumentRecorder : ISyntacticArgumentRecorder
     }
 
     /// <inheritdoc/>
-    public bool TryRecordConstructorArgument(IParameterSymbol parameter, IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
+    public bool TryRecordConstructorArgument(IParameterSymbol parameter, IReadOnlyList<object?>? value, CollectionLocation location)
     {
         if (parameter is null)
         {
             throw new ArgumentNullException(nameof(parameter));
         }
 
-        return TryRecordNamedArgument(parameter.Name, value, collectionLocation, elementLocations);
+        return TryRecordNamedArgument(parameter.Name, value, location);
     }
 
     /// <inheritdoc/>
@@ -168,9 +206,7 @@ public abstract class ASyntacticArgumentRecorder : ISyntacticArgumentRecorder
             throw new ArgumentNullException(nameof(location));
         }
 
-        var recorders = SingleRecorders;
-
-        if (recorders is null || recorders.TryGetValue(parameterName, out var recorder) is false || recorder is null)
+        if (SingleRecorders.TryGetValue(parameterName, out var recorder) is false)
         {
             return false;
         }
@@ -179,7 +215,7 @@ public abstract class ASyntacticArgumentRecorder : ISyntacticArgumentRecorder
     }
 
     /// <inheritdoc/>
-    public bool TryRecordNamedArgument(string parameterName, IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
+    public bool TryRecordNamedArgument(string parameterName, IReadOnlyList<object?>? value, CollectionLocation location)
     {
         if (IsInitialized is false)
         {
@@ -191,23 +227,16 @@ public abstract class ASyntacticArgumentRecorder : ISyntacticArgumentRecorder
             throw new ArgumentNullException(nameof(parameterName));
         }
 
-        if (collectionLocation is null)
+        if (location is null)
         {
-            throw new ArgumentNullException(nameof(collectionLocation));
+            throw new ArgumentNullException(nameof(location));
         }
 
-        if (elementLocations is null)
-        {
-            throw new ArgumentNullException(nameof(elementLocations));
-        }
-
-        var recorders = ArrayRecorders;
-
-        if (recorders is null || recorders.TryGetValue(parameterName, out var recorder) is false || recorder is null)
+        if (ArrayRecorders.TryGetValue(parameterName, out var recorder) is false)
         {
             return false;
         }
 
-        return recorder(value, collectionLocation, elementLocations);
+        return recorder(value, location);
     }
 }

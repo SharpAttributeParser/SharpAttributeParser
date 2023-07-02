@@ -1,26 +1,18 @@
-﻿namespace SharpAttributeParser.Tests.ASyntacticArgumentRecorderCases;
-
-using Microsoft.CodeAnalysis;
+﻿namespace SharpAttributeParser.ASyntacticArgumentRecorderCases;
 
 using System;
 using System.Collections.Generic;
 
 using Xunit;
 
-public class AddArrayRecorders
+public sealed class AddArrayRecorders
 {
-    private static void TryRecordNamedArgument(ASyntacticArgumentRecorder recorder, string parameterName, object? value, Location location) => recorder.TryRecordNamedArgument(parameterName, value, location);
-
     [Fact]
     public void Null_InvalidOperationExceptionWhenUsed()
     {
         NullGenericRecorder recorder = new();
 
-        var parameterName = Datasets.GetValidParameterName();
-        var value = Datasets.GetValidTypeSymbol();
-        var location = Datasets.GetValidLocation();
-
-        var exception = Record.Exception(() => TryRecordNamedArgument(recorder, parameterName, value, location));
+        var exception = Record.Exception(() => RecordArgument(recorder));
 
         Assert.IsType<InvalidOperationException>(exception);
     }
@@ -30,11 +22,7 @@ public class AddArrayRecorders
     {
         NullNameRecorder recorder = new();
 
-        var parameterName = Datasets.GetValidParameterName();
-        var value = Datasets.GetValidTypeSymbol();
-        var location = Datasets.GetValidLocation();
-
-        var exception = Record.Exception(() => TryRecordNamedArgument(recorder, parameterName, value, location));
+        var exception = Record.Exception(() => RecordArgument(recorder));
 
         Assert.IsType<InvalidOperationException>(exception);
     }
@@ -44,28 +32,22 @@ public class AddArrayRecorders
     {
         NullDelegateRecorder recorder = new();
 
-        var parameterName = Datasets.GetValidParameterName();
-        var value = Datasets.GetValidTypeSymbol();
-        var location = Datasets.GetValidLocation();
-
-        var exception = Record.Exception(() => TryRecordNamedArgument(recorder, parameterName, value, location));
+        var exception = Record.Exception(() => RecordArgument(recorder));
 
         Assert.IsType<InvalidOperationException>(exception);
     }
 
     [Fact]
-    public void Duplicate_InvalidOperationExceptionWhenUsed()
+    public void DuplicateName_InvalidOperationExceptionWhenUsed()
     {
-        DuplicateGenericRecorder recorder = new();
+        DuplicateNameGenericRecorder recorder = new();
 
-        var parameterName = Datasets.GetValidParameterName();
-        var value = Datasets.GetValidTypeSymbol();
-        var location = Datasets.GetValidLocation();
-
-        var exception = Record.Exception(() => TryRecordNamedArgument(recorder, parameterName, value, location));
+        var exception = Record.Exception(() => RecordArgument(recorder));
 
         Assert.IsType<InvalidOperationException>(exception);
     }
+
+    private static void RecordArgument(ASyntacticArgumentRecorder recorder) => recorder.TryRecordNamedArgument(string.Empty, null, CollectionLocation.None);
 
     private sealed class NullGenericRecorder : ASyntacticArgumentRecorder
     {
@@ -79,7 +61,7 @@ public class AddArrayRecorders
             yield return (null!, RecordValue);
         }
 
-        private static bool RecordValue(object? value, Location collectionLocation, IReadOnlyList<Location> elementLocations) => true;
+        private static bool RecordValue(IReadOnlyList<object?>? value, CollectionLocation location) => true;
     }
 
     private sealed class NullDelegateRecorder : ASyntacticArgumentRecorder
@@ -90,7 +72,7 @@ public class AddArrayRecorders
         }
     }
 
-    private sealed class DuplicateGenericRecorder : ASyntacticArgumentRecorder
+    private sealed class DuplicateNameGenericRecorder : ASyntacticArgumentRecorder
     {
         protected override IEnumerable<(string, DSyntacticArrayRecorder)> AddArrayRecorders()
         {
@@ -98,6 +80,6 @@ public class AddArrayRecorders
             yield return ("A", RecordValue);
         }
 
-        private static bool RecordValue(object? value, Location collectionLocation, IReadOnlyList<Location> elementLocations) => true;
+        private static bool RecordValue(IReadOnlyList<object?>? value, CollectionLocation location) => true;
     }
 }

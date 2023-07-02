@@ -1,4 +1,4 @@
-﻿namespace SharpAttributeParser.Tests.ASemanticArgumentRecorderCases;
+﻿namespace SharpAttributeParser.ASemanticArgumentRecorderCases;
 
 using Microsoft.CodeAnalysis;
 
@@ -6,12 +6,14 @@ using System.Collections.Generic;
 
 internal sealed class SemanticArgumentRecorder : ASemanticArgumentRecorder
 {
-    public ITypeSymbol? TGeneric { get; private set; }
-    public object? Value { get; private set; }
-    public IReadOnlyList<object?>? Values { get; private set; }
+    public ITypeSymbol? T { get; private set; }
+    public bool TRecorded { get; private set; }
 
-    public bool ValueRecorded { get; private set; }
-    public bool ValuesRecorded { get; private set; }
+    public object? SingleValue { get; private set; }
+    public bool SingleValueRecorded { get; private set; }
+
+    public IReadOnlyList<object?>? ArrayValue { get; private set; }
+    public bool ArrayValueRecorded { get; private set; }
 
     protected override IEqualityComparer<string> Comparer { get; }
 
@@ -20,40 +22,46 @@ internal sealed class SemanticArgumentRecorder : ASemanticArgumentRecorder
         Comparer = comparer;
     }
 
-    protected override IEnumerable<(string, DSemanticGenericRecorder)> AddGenericRecorders()
+    protected override IEnumerable<(int, DSemanticGenericRecorder)> AddIndexedGenericRecorders()
     {
-        yield return ("TGeneric", RecordTGeneric);
+        yield return (0, RecordT);
+    }
+
+    protected override IEnumerable<(string, DSemanticGenericRecorder)> AddNamedGenericRecorders()
+    {
+        yield return (string.Empty, RecordT);
     }
 
     protected override IEnumerable<(string, DSemanticSingleRecorder)> AddSingleRecorders()
     {
-        yield return ("Value", RecordValue);
+        yield return (string.Empty, RecordSingleValue);
     }
 
     protected override IEnumerable<(string, DSemanticArrayRecorder)> AddArrayRecorders()
     {
-        yield return ("Values", RecordValues);
+        yield return (string.Empty, RecordArrayValue);
     }
 
-    private bool RecordTGeneric(ITypeSymbol value)
+    private bool RecordT(ITypeSymbol value)
     {
-        TGeneric = value;
+        T = value;
+        TRecorded = true;
 
         return true;
     }
 
-    private bool RecordValue(object? value)
+    private bool RecordSingleValue(object? value)
     {
-        Value = value;
-        ValueRecorded = true;
+        SingleValue = value;
+        SingleValueRecorded = true;
 
         return true;
     }
 
-    private bool RecordValues(IReadOnlyList<object?>? values)
+    private bool RecordArrayValue(IReadOnlyList<object?>? value)
     {
-        Values = values;
-        ValuesRecorded = true;
+        ArrayValue = value;
+        ArrayValueRecorded = true;
 
         return true;
     }

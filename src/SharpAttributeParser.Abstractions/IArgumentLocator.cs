@@ -30,7 +30,7 @@ public interface IArgumentLocator
     /// <exception cref="ArgumentException"/>
     /// <exception cref="ArgumentNullException"/>
     /// <exception cref="InvalidOperationException"/>
-    public abstract (Location Collection, IReadOnlyList<Location> Elements) ArrayArgument(ExpressionSyntax expression);
+    public abstract CollectionLocation ArrayArgument(ExpressionSyntax expression);
 
     /// <summary>Determines the <see cref="Location"/> of an array-valued argument, expressed as a <see langword="params"/> array according to the provided <see cref="ExpressionSyntax"/>.</summary>
     /// <param name="expressions">The <see cref="ExpressionSyntax"/> describing how each element of the <see langword="params"/> array was expressed.</param>
@@ -38,7 +38,7 @@ public interface IArgumentLocator
     /// <exception cref="ArgumentException"/>
     /// <exception cref="ArgumentNullException"/>
     /// <exception cref="InvalidOperationException"/>
-    public abstract (Location Collection, IReadOnlyList<Location> Elements) ParamsArguments(IReadOnlyList<ExpressionSyntax> expressions);
+    public abstract CollectionLocation ParamsArguments(IReadOnlyList<ExpressionSyntax> expressions);
 
     /// <summary>Determines the <see cref="Location"/> of an array-valued argument, expressed as a <see langword="params"/> array according to the provided <see cref="ExpressionSyntax"/>.</summary>
     /// <param name="expressions">The <see cref="ExpressionSyntax"/> describing how each element of the <see langword="params"/> array was expressed.</param>
@@ -46,5 +46,5 @@ public interface IArgumentLocator
     /// <exception cref="ArgumentException"/>
     /// <exception cref="ArgumentNullException"/>
     /// <exception cref="InvalidOperationException"/>
-    public abstract (Location Collection, IReadOnlyList<Location> Elements) ParamsArguments(params ExpressionSyntax[] expressions);
+    public abstract CollectionLocation ParamsArguments(params ExpressionSyntax[] expressions);
 }

@@ -21,17 +21,17 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
             throw new ArgumentNullException(nameof(attributeData));
         }
 
-        if (attributeData.AttributeClass is null || attributeData.AttributeClass.TypeKind is TypeKind.Error || attributeData.AttributeConstructor is null)
+        if (attributeData.AttributeClass is not INamedTypeSymbol attributeType || attributeType.TypeKind is TypeKind.Error || attributeData.AttributeConstructor is not IMethodSymbol attributeConstructor)
         {
             return false;
         }
 
-        if (TryParseGenericArguments(recorder, attributeData) is false)
+        if (TryParseGenericArguments(recorder, attributeType) is false)
         {
             return false;
         }
 
-        if (TryParseConstructorArguments(recorder, attributeData) is false)
+        if (TryParseConstructorArguments(recorder, attributeData, attributeConstructor) is false)
         {
             return false;
         }
@@ -44,15 +44,15 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
         return true;
     }
 
-    private static bool TryParseGenericArguments(ISemanticArgumentRecorder recorder, AttributeData attributeData)
+    private static bool TryParseGenericArguments(ISemanticArgumentRecorder recorder, INamedTypeSymbol attributeType)
     {
-        if (attributeData.AttributeClass is not INamedTypeSymbol attributeType)
-        {
-            return false;
-        }
-
         for (var i = 0; i < attributeType.TypeArguments.Length; i++)
         {
+            if (attributeType.TypeArguments[i].Kind is SymbolKind.ErrorType)
+            {
+                return false;
+            }
+
             if (recorder.TryRecordGenericArgument(attributeType.TypeParameters[i], attributeType.TypeArguments[i]) is false)
             {
                 return false;
@@ -62,19 +62,14 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
         return true;
     }
 
-    private static bool TryParseConstructorArguments(ISemanticArgumentRecorder recorder, AttributeData attributeData)
+    private static bool TryParseConstructorArguments(ISemanticArgumentRecorder recorder, AttributeData attributeData, IMethodSymbol attributeConstructor)
     {
-        if (attributeData.AttributeConstructor is not IMethodSymbol attributeConstructor)
-        {
-            return false;
-        }
-
         if (attributeData.ConstructorArguments.IsEmpty)
         {
             return true;
         }
 
-        if (attributeData.ConstructorArguments.Length < attributeConstructor.Parameters.Count())
+        if (attributeData.ConstructorArguments.Length != attributeConstructor.Parameters.Count())
         {
             return false;
         }
@@ -83,7 +78,7 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
         {
             if (attributeData.ConstructorArguments[i].Kind is TypedConstantKind.Error)
             {
-                continue;
+                return false;
             }
 
             if (attributeData.ConstructorArguments[i].Kind is TypedConstantKind.Array)

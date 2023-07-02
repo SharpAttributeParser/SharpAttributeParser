@@ -10,6 +10,11 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
 {
     DSemanticGenericRecorder ISemanticAdapterProvider.For(Action<ITypeSymbol> recorder)
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
         bool wrapper(ITypeSymbol value)
@@ -20,11 +25,16 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    DSemanticSingleRecorder ISemanticAdapterProvider.For<T>(Func<T, bool> recorder) => For(recorder);
-    DSemanticArrayRecorder ISemanticAdapterProvider.For<T>(Func<IReadOnlyList<T>, bool> recorder) => For(recorder);
+    DSemanticSingleRecorder ISemanticAdapterProvider.For<T>(Func<T, bool> recorder) => For(recorder ?? throw new ArgumentNullException(nameof(recorder)));
+    DSemanticArrayRecorder ISemanticAdapterProvider.For<T>(Func<IReadOnlyList<T>, bool> recorder) => For(recorder ?? throw new ArgumentNullException(nameof(recorder)));
 
     DSemanticSingleRecorder ISemanticAdapterProvider.For<T>(Action<T> recorder)
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return For<T>(wrapper);
 
         bool wrapper(T value)
@@ -37,6 +47,11 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
 
     DSemanticArrayRecorder ISemanticAdapterProvider.For<T>(Action<IReadOnlyList<T>> recorder)
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return For<T>(wrapper);
 
         bool wrapper(IReadOnlyList<T> value)
@@ -47,14 +62,19 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    DSemanticSingleRecorder ISemanticAdapterProvider.ForNullable<T>(Func<T?, bool> recorder) where T : class => ForNullable(recorder);
-    DSemanticSingleRecorder ISemanticAdapterProvider.ForNullable<T>(Func<T?, bool> recorder) where T : struct => ForNullable(recorder);
+    DSemanticSingleRecorder ISemanticAdapterProvider.ForNullable<T>(Func<T?, bool> recorder) where T : class => ForNullable(recorder ?? throw new ArgumentNullException(nameof(recorder)));
+    DSemanticSingleRecorder ISemanticAdapterProvider.ForNullable<T>(Func<T?, bool> recorder) where T : struct => ForNullable(recorder ?? throw new ArgumentNullException(nameof(recorder)));
 
-    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullable<T>(Func<IReadOnlyList<T?>?, bool> recorder) where T : class => ForNullable(recorder);
-    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullable<T>(Func<IReadOnlyList<T?>?, bool> recorder) where T : struct => ForNullable(recorder);
+    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullable<T>(Func<IReadOnlyList<T?>?, bool> recorder) where T : class => ForNullable(recorder ?? throw new ArgumentNullException(nameof(recorder)));
+    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullable<T>(Func<IReadOnlyList<T?>?, bool> recorder) where T : struct => ForNullable(recorder ?? throw new ArgumentNullException(nameof(recorder)));
 
     DSemanticSingleRecorder ISemanticAdapterProvider.ForNullable<T>(Action<T?> recorder) where T : class
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return ForNullable<T>(wrapper);
 
         bool wrapper(T? value)
@@ -67,6 +87,11 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
 
     DSemanticSingleRecorder ISemanticAdapterProvider.ForNullable<T>(Action<T?> recorder) where T : struct
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return ForNullable<T>(wrapper);
 
         bool wrapper(T? value)
@@ -79,6 +104,11 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
 
     DSemanticArrayRecorder ISemanticAdapterProvider.ForNullable<T>(Action<IReadOnlyList<T?>?> recorder) where T : class
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return ForNullable<T>(wrapper);
 
         bool wrapper(IReadOnlyList<T?>? value)
@@ -91,6 +121,11 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
 
     DSemanticArrayRecorder ISemanticAdapterProvider.ForNullable<T>(Action<IReadOnlyList<T?>?> recorder) where T : struct
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return ForNullable<T>(wrapper);
 
         bool wrapper(IReadOnlyList<T?>? value)
@@ -101,11 +136,16 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullableElements<T>(Func<IReadOnlyList<T?>, bool> recorder) where T : class => ForNullableElements(recorder);
-    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullableElements<T>(Func<IReadOnlyList<T?>, bool> recorder) where T : struct => ForNullableElements(recorder);
+    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullableElements<T>(Func<IReadOnlyList<T?>, bool> recorder) where T : class => ForNullableElements(recorder ?? throw new ArgumentNullException(nameof(recorder)));
+    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullableElements<T>(Func<IReadOnlyList<T?>, bool> recorder) where T : struct => ForNullableElements(recorder ?? throw new ArgumentNullException(nameof(recorder)));
 
     DSemanticArrayRecorder ISemanticAdapterProvider.ForNullableElements<T>(Action<IReadOnlyList<T?>> recorder) where T : class
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return ForNullableElements<T>(wrapper);
 
         bool wrapper(IReadOnlyList<T?> value)
@@ -118,6 +158,11 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
 
     DSemanticArrayRecorder ISemanticAdapterProvider.ForNullableElements<T>(Action<IReadOnlyList<T?>> recorder) where T : struct
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return ForNullableElements<T>(wrapper);
 
         bool wrapper(IReadOnlyList<T?> value)
@@ -128,10 +173,15 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
         }
     }
 
-    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullableCollection<T>(Func<IReadOnlyList<T>?, bool> recorder) => ForNullableCollection(recorder);
+    DSemanticArrayRecorder ISemanticAdapterProvider.ForNullableCollection<T>(Func<IReadOnlyList<T>?, bool> recorder) => ForNullableCollection(recorder ?? throw new ArgumentNullException(nameof(recorder)));
 
     DSemanticArrayRecorder ISemanticAdapterProvider.ForNullableCollection<T>(Action<IReadOnlyList<T>?> recorder)
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return ForNullableCollection<T>(wrapper);
 
         bool wrapper(IReadOnlyList<T>? value)
@@ -153,14 +203,12 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
                 return false;
             }
 
-            var (success, tValue) = TryConvert<T>(value);
-
-            if (success)
+            if (value is not T tValue)
             {
-                return recorder(tValue!);
+                return false;
             }
 
-            return false;
+            return recorder(tValue);
         }
     }
 
@@ -175,6 +223,11 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
                 return false;
             }
 
+            if (value is IReadOnlyList<T> tList)
+            {
+                return recorder(tList);
+            }
+
             var converted = new T[value.Count];
 
             for (var i = 0; i < converted.Length; i++)
@@ -184,14 +237,12 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
                     return false;
                 }
 
-                var (success, tValue) = TryConvert<T>(value[i]);
-
-                if (success is false)
+                if (value[i] is not T tValue)
                 {
                     return false;
                 }
 
-                converted[i] = tValue!;
+                converted[i] = tValue;
             }
 
             return recorder(converted);
@@ -204,14 +255,17 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
 
         bool wrapper(object? value)
         {
-            var (success, tValue) = TryConvert<T>(value);
-
-            if (success)
+            if (value is null)
             {
-                return recorder(tValue);
+                return recorder(null);
             }
 
-            return false;
+            if (value is not T tValue)
+            {
+                return false;
+            }
+
+            return recorder(tValue);
         }
     }
 
@@ -221,14 +275,17 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
 
         bool wrapper(object? value)
         {
-            var (success, tValue) = TryConvert<T?>(value);
-
-            if (success)
+            if (value is null)
             {
-                return recorder(tValue);
+                return recorder(null);
             }
 
-            return false;
+            if (value is not T tValue)
+            {
+                return false;
+            }
+
+            return recorder(tValue);
         }
     }
 
@@ -243,13 +300,23 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
                 return recorder(null);
             }
 
+            if (value is IReadOnlyList<T?> tList)
+            {
+                return recorder(tList);
+            }
+
             var converted = new T?[value.Count];
 
             for (var i = 0; i < converted.Length; i++)
             {
-                var (success, tValue) = TryConvert<T>(value[i]);
+                if (value[i] is null)
+                {
+                    converted[i] = null;
 
-                if (success is false)
+                    continue;
+                }
+
+                if (value[i] is not T tValue)
                 {
                     return false;
                 }
@@ -272,13 +339,23 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
                 return recorder(null);
             }
 
+            if (value is IReadOnlyList<T?> tList)
+            {
+                return recorder(tList);
+            }
+
             var converted = new T?[value.Count];
 
             for (var i = 0; i < converted.Length; i++)
             {
-                var (success, tValue) = TryConvert<T?>(value[i]);
+                if (value[i] is null)
+                {
+                    converted[i] = null;
 
-                if (success is false)
+                    continue;
+                }
+
+                if (value[i] is not T tValue)
                 {
                     return false;
                 }
@@ -333,65 +410,5 @@ internal sealed class SemanticAdapterProvider : ISemanticAdapterProvider
 
             return For(recorder)(value);
         }
-    }
-
-    private static (bool, T?) TryConvert<T>(object? value)
-    {
-        if (value is null)
-        {
-            return (true, default);
-        }
-
-        if (value is T tValue)
-        {
-            return (true, tValue);
-        }
-
-        if (Nullable.GetUnderlyingType(typeof(T)) is Type definiteT)
-        {
-            return TryConvertToNullable<T>(definiteT, value);
-        }
-
-        try
-        {
-            return (true, (T)value);
-        }
-        catch (InvalidCastException)
-        {
-            return (false, default);
-        }
-    }
-
-    private static (bool, T?) TryConvertToNullable<T>(Type definiteT, object value)
-    {
-        if (value.GetType().IsEnum)
-        {
-            try
-            {
-                var definite = Convert.ChangeType(value, definiteT);
-
-                return (true, (T)definite);
-            }
-            catch (InvalidCastException)
-            {
-                return (false, default);
-            }
-        }
-
-        if (definiteT.IsEnum && value.GetType().IsPrimitive)
-        {
-            try
-            {
-                var definite = Enum.Parse(definiteT, value.ToString(), true);
-
-                return (true, (T)definite);
-            }
-            catch (ArgumentException)
-            {
-                return (false, default);
-            }
-        }
-
-        return (false, default);
     }
 }

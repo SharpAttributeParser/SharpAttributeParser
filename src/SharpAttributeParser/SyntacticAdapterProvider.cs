@@ -19,6 +19,11 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
 
     DSyntacticGenericRecorder ISyntacticAdapterProvider.For(Action<ITypeSymbol, Location> recorder)
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
         bool wrapper(ITypeSymbol value, Location location)
@@ -31,6 +36,11 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
 
     DSyntacticSingleRecorder ISyntacticAdapterProvider.For<T>(Func<T, Location, bool> recorder)
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
         bool wrapper(object? value, Location location)
@@ -41,20 +51,30 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    DSyntacticArrayRecorder ISyntacticAdapterProvider.For<T>(Func<IReadOnlyList<T>, Location, IReadOnlyList<Location>, bool> recorder)
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.For<T>(Func<IReadOnlyList<T>, CollectionLocation, bool> recorder)
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
-        bool wrapper(IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
+        bool wrapper(IReadOnlyList<object?>? value, CollectionLocation location)
         {
             return SemanticAdapters.For<T>(innerWrapper)(value);
 
-            bool innerWrapper(IReadOnlyList<T> value) => recorder(value, collectionLocation, elementLocations);
+            bool innerWrapper(IReadOnlyList<T> value) => recorder(value, location);
         }
     }
 
     DSyntacticSingleRecorder ISyntacticAdapterProvider.For<T>(Action<T, Location> recorder)
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
         bool wrapper(object? value, Location location)
@@ -65,20 +85,30 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    DSyntacticArrayRecorder ISyntacticAdapterProvider.For<T>(Action<IReadOnlyList<T>, Location, IReadOnlyList<Location>> recorder)
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.For<T>(Action<IReadOnlyList<T>, CollectionLocation> recorder)
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
-        bool wrapper(IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
+        bool wrapper(IReadOnlyList<object?>? value, CollectionLocation location)
         {
             return SemanticAdapters.For<T>(innerWrapper)(value);
 
-            void innerWrapper(IReadOnlyList<T> value) => recorder(value, collectionLocation, elementLocations);
+            void innerWrapper(IReadOnlyList<T> value) => recorder(value, location);
         }
     }
 
     DSyntacticSingleRecorder ISyntacticAdapterProvider.ForNullable<T>(Func<T?, Location, bool> recorder) where T : class
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
         bool wrapper(object? value, Location location)
@@ -91,6 +121,11 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
 
     DSyntacticSingleRecorder ISyntacticAdapterProvider.ForNullable<T>(Func<T?, Location, bool> recorder) where T : struct
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
         bool wrapper(object? value, Location location)
@@ -101,32 +136,47 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullable<T>(Func<IReadOnlyList<T?>?, Location, IReadOnlyList<Location>, bool> recorder) where T : class
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullable<T>(Func<IReadOnlyList<T?>?, CollectionLocation, bool> recorder) where T : class
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
-        bool wrapper(IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
+        bool wrapper(IReadOnlyList<object?>? value, CollectionLocation location)
         {
             return SemanticAdapters.ForNullable<T>(innerWrapper)(value);
 
-            bool innerWrapper(IReadOnlyList<T?>? value) => recorder(value, collectionLocation, elementLocations);
+            bool innerWrapper(IReadOnlyList<T?>? value) => recorder(value, location);
         }
     }
 
-    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullable<T>(Func<IReadOnlyList<T?>?, Location, IReadOnlyList<Location>, bool> recorder) where T : struct
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullable<T>(Func<IReadOnlyList<T?>?, CollectionLocation, bool> recorder) where T : struct
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
-        bool wrapper(IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
+        bool wrapper(IReadOnlyList<object?>? value, CollectionLocation location)
         {
             return SemanticAdapters.ForNullable<T>(innerWrapper)(value);
 
-            bool innerWrapper(IReadOnlyList<T?>? value) => recorder(value, collectionLocation, elementLocations);
+            bool innerWrapper(IReadOnlyList<T?>? value) => recorder(value, location);
         }
     }
 
     DSyntacticSingleRecorder ISyntacticAdapterProvider.ForNullable<T>(Action<T?, Location> recorder) where T : class
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
         bool wrapper(object? value, Location location)
@@ -139,6 +189,11 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
 
     DSyntacticSingleRecorder ISyntacticAdapterProvider.ForNullable<T>(Action<T?, Location> recorder) where T : struct
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
         bool wrapper(object? value, Location location)
@@ -149,99 +204,139 @@ internal sealed class SyntacticAdapterProvider : ISyntacticAdapterProvider
         }
     }
 
-    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullable<T>(Action<IReadOnlyList<T?>?, Location, IReadOnlyList<Location>> recorder) where T : class
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullable<T>(Action<IReadOnlyList<T?>?, CollectionLocation> recorder) where T : class
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
-        bool wrapper(IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
+        bool wrapper(IReadOnlyList<object?>? value, CollectionLocation location)
         {
             return SemanticAdapters.ForNullable<T>(innerWrapper)(value);
 
-            void innerWrapper(IReadOnlyList<T?>? value) => recorder(value, collectionLocation, elementLocations);
+            void innerWrapper(IReadOnlyList<T?>? value) => recorder(value, location);
         }
     }
 
-    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullable<T>(Action<IReadOnlyList<T?>?, Location, IReadOnlyList<Location>> recorder) where T : struct
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullable<T>(Action<IReadOnlyList<T?>?, CollectionLocation> recorder) where T : struct
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
-        bool wrapper(IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
+        bool wrapper(IReadOnlyList<object?>? value, CollectionLocation location)
         {
             return SemanticAdapters.ForNullable<T>(innerWrapper)(value);
 
-            void innerWrapper(IReadOnlyList<T?>? value) => recorder(value, collectionLocation, elementLocations);
+            void innerWrapper(IReadOnlyList<T?>? value) => recorder(value, location);
         }
     }
 
-    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullableElements<T>(Func<IReadOnlyList<T?>, Location, IReadOnlyList<Location>, bool> recorder) where T : class
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullableElements<T>(Func<IReadOnlyList<T?>, CollectionLocation, bool> recorder) where T : class
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
-        bool wrapper(IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
+        bool wrapper(IReadOnlyList<object?>? value, CollectionLocation location)
         {
             return SemanticAdapters.ForNullableElements<T>(innerWrapper)(value);
 
-            bool innerWrapper(IReadOnlyList<T?> value) => recorder(value, collectionLocation, elementLocations);
+            bool innerWrapper(IReadOnlyList<T?> value) => recorder(value, location);
         }
     }
 
-    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullableElements<T>(Func<IReadOnlyList<T?>, Location, IReadOnlyList<Location>, bool> recorder) where T : struct
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullableElements<T>(Func<IReadOnlyList<T?>, CollectionLocation, bool> recorder) where T : struct
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
-        bool wrapper(IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
+        bool wrapper(IReadOnlyList<object?>? value, CollectionLocation location)
         {
             return SemanticAdapters.ForNullableElements<T>(innerWrapper)(value);
 
-            bool innerWrapper(IReadOnlyList<T?> value) => recorder(value, collectionLocation, elementLocations);
+            bool innerWrapper(IReadOnlyList<T?> value) => recorder(value, location);
         }
     }
 
-    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullableElements<T>(Action<IReadOnlyList<T?>, Location, IReadOnlyList<Location>> recorder) where T : class
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullableElements<T>(Action<IReadOnlyList<T?>, CollectionLocation> recorder) where T : class
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
-        bool wrapper(IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
+        bool wrapper(IReadOnlyList<object?>? value, CollectionLocation location)
         {
             return SemanticAdapters.ForNullableElements<T>(innerWrapper)(value);
 
-            void innerWrapper(IReadOnlyList<T?> value) => recorder(value, collectionLocation, elementLocations);
+            void innerWrapper(IReadOnlyList<T?> value) => recorder(value, location);
         }
     }
 
-    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullableElements<T>(Action<IReadOnlyList<T?>, Location, IReadOnlyList<Location>> recorder) where T : struct
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullableElements<T>(Action<IReadOnlyList<T?>, CollectionLocation> recorder) where T : struct
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
-        bool wrapper(IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
+        bool wrapper(IReadOnlyList<object?>? value, CollectionLocation location)
         {
             return SemanticAdapters.ForNullableElements<T>(innerWrapper)(value);
 
-            void innerWrapper(IReadOnlyList<T?> value) => recorder(value, collectionLocation, elementLocations);
+            void innerWrapper(IReadOnlyList<T?> value) => recorder(value, location);
         }
     }
 
-    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullableCollection<T>(Func<IReadOnlyList<T>?, Location, IReadOnlyList<Location>, bool> recorder)
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullableCollection<T>(Func<IReadOnlyList<T>?, CollectionLocation, bool> recorder)
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
-        bool wrapper(IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
+        bool wrapper(IReadOnlyList<object?>? value, CollectionLocation location)
         {
             return SemanticAdapters.ForNullableCollection<T>(innerWrapper)(value);
 
-            bool innerWrapper(IReadOnlyList<T>? value) => recorder(value, collectionLocation, elementLocations);
+            bool innerWrapper(IReadOnlyList<T>? value) => recorder(value, location);
         }
     }
 
-    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullableCollection<T>(Action<IReadOnlyList<T>?, Location, IReadOnlyList<Location>> recorder)
+    DSyntacticArrayRecorder ISyntacticAdapterProvider.ForNullableCollection<T>(Action<IReadOnlyList<T>?, CollectionLocation> recorder)
     {
+        if (recorder is null)
+        {
+            throw new ArgumentNullException(nameof(recorder));
+        }
+
         return wrapper;
 
-        bool wrapper(IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations)
+        bool wrapper(IReadOnlyList<object?>? value, CollectionLocation location)
         {
             return SemanticAdapters.ForNullableCollection<T>(innerWrapper)(value);
 
-            void innerWrapper(IReadOnlyList<T>? value) => recorder(value, collectionLocation, elementLocations);
+            void innerWrapper(IReadOnlyList<T>? value) => recorder(value, location);
         }
     }
 }

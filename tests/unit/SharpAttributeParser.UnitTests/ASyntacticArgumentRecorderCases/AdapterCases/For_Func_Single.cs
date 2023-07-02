@@ -1,4 +1,4 @@
-﻿namespace SharpAttributeParser.Tests.ASyntacticArgumentRecorderCases.AdapterCases;
+﻿namespace SharpAttributeParser.ASyntacticArgumentRecorderCases.AdapterCases;
 
 using Microsoft.CodeAnalysis;
 
@@ -7,417 +7,227 @@ using System.Collections.Generic;
 
 using Xunit;
 
-public class For_Func_Single
+public sealed class For_Func_Single
 {
-    private static bool TryRecordConstructorArgument(ASyntacticArgumentRecorder recorder, string parameterName, object? value) => recorder.TryRecordNamedArgument(parameterName, value, Location.None);
+    private static DSyntacticSingleRecorder Target<T>(ISyntacticAdapterProvider adapters, Func<T, Location, bool> recorder) where T : notnull => adapters.For(recorder);
 
     [Fact]
-    public void Enum_SameType_True_RecorderPopulated()
+    public void NullDelegate_ArgumentNullExceptionWhenUsed()
     {
-        EnumRecorder recorder = new();
+        NullDelegateRecorder recorder = new();
 
-        var parameterName = "Value";
+        var exception = Record.Exception(() => RecordArgument(recorder, null, Location.None));
+
+        Assert.IsType<ArgumentNullException>(exception);
+    }
+
+    [Fact]
+    public void Enum_SameType_True_Recorded()
+    {
         var value = StringComparison.OrdinalIgnoreCase;
 
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.True(actual);
-
-        Assert.Equal(value, recorder.Value);
+        TrueAndRecorded(value, value);
     }
 
     [Fact]
-    public void Enum_NullableSameType_True_RecorderPopulated()
+    public void Enum_DifferentEnumType_False_NotRecorded()
     {
-        EnumRecorder recorder = new();
-
-        var parameterName = "Value";
-        StringComparison? value = StringComparison.OrdinalIgnoreCase;
-
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.True(actual);
-
-        Assert.Equal(StringComparison.OrdinalIgnoreCase, recorder.Value);
-    }
-
-    [Fact]
-    public void Enum_Int_True_RecorderPopulated()
-    {
-        EnumRecorder recorder = new();
-
-        var parameterName = "Value";
-        var value = 5;
-
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.True(actual);
-
-        Assert.Equal((StringComparison)value, recorder.Value);
-    }
-
-    [Fact]
-    public void Enum_Double_False_RecorderNotPopulated()
-    {
-        EnumRecorder recorder = new();
-
-        var parameterName = "Value";
-        var value = 4.2;
-
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.False(actual);
-
-        Assert.False(recorder.ValueRecorded);
-    }
-
-    [Fact]
-    public void Enum_AnotherEnum_True_RecorderPopulated()
-    {
-        EnumRecorder recorder = new();
-
-        var parameterName = "Value";
         var value = StringSplitOptions.TrimEntries;
 
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.True(actual);
-
-        Assert.Equal((StringComparison)StringSplitOptions.TrimEntries, recorder.Value);
+        FalseAndNotRecorded<StringComparison, StringSplitOptions>(value);
     }
 
     [Fact]
-    public void Enum_IntString_False_RecordedNotPopulated()
+    public void Enum_Int_False_NotRecorded()
     {
-        EnumRecorder recorder = new();
-
-        var parameterName = "Value";
-        var value = "5";
-
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.False(actual);
-
-        Assert.False(recorder.ValueRecorded);
-    }
-
-    [Fact]
-    public void Enum_EnumString_False_RecordedNotPopulated()
-    {
-        EnumRecorder recorder = new();
-
-        var parameterName = "Value";
-        var value = "OrdinalIgnoreCase";
-
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.False(actual);
-
-        Assert.False(recorder.ValueRecorded);
-    }
-
-    [Fact]
-    public void Enum_Null_False_RecorderNotPopulated()
-    {
-        EnumRecorder recorder = new();
-
-        var parameterName = "Value";
-        object? value = null;
-
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.False(actual);
-
-        Assert.False(recorder.ValueRecorded);
-    }
-
-    [Fact]
-    public void Int_Int_True_RecorderPopulated()
-    {
-        IntRecorder recorder = new();
-
-        var parameterName = "Value";
         var value = 3;
 
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.True(actual);
-
-        Assert.Equal(value, recorder.Value);
+        FalseAndNotRecorded<StringComparison, int>(value);
     }
 
     [Fact]
-    public void Int_NullableInt_True_RecorderPopulated()
+    public void Int_SameType_True_Recorded()
     {
-        IntRecorder recorder = new();
+        var value = 3;
 
-        var parameterName = "Value";
-        int? value = 3;
-
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.True(actual);
-
-        Assert.Equal(value, recorder.Value);
+        TrueAndRecorded(value, value);
     }
 
     [Fact]
-    public void Int_Enum_True_RecorderPopulated()
+    public void Int_NullableWithValue_True_Recorded()
     {
-        IntRecorder recorder = new();
+        var expected = 3;
 
-        var parameterName = "Value";
-        var value = StringComparison.OrdinalIgnoreCase;
+        var value = (int?)expected;
 
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.True(actual);
-
-        Assert.Equal((int)value, recorder.Value);
+        TrueAndRecorded(expected, value);
     }
 
     [Fact]
-    public void Int_Double_False_RecorderNotPopulated()
+    public void Int_Enum_False_NotRecorded()
     {
-        IntRecorder recorder = new();
+        var value = StringComparison.Ordinal;
 
-        var parameterName = "Value";
-        var value = 4.2;
-
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.False(actual);
-
-        Assert.False(recorder.ValueRecorded);
+        FalseAndNotRecorded<int, StringComparison>(value);
     }
 
     [Fact]
-    public void Int_IntString_False_RecordedNotPopulated()
+    public void Int_Double_False_NotRecorded()
     {
-        IntRecorder recorder = new();
+        var value = 3.14;
 
-        var parameterName = "Value";
-        var value = "5";
-
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.False(actual);
-
-        Assert.False(recorder.ValueRecorded);
+        FalseAndNotRecorded<int, double>(value);
     }
 
     [Fact]
-    public void Int_Null_False_RecorderNotPopulated()
+    public void Int_String_False_NotRecorded()
     {
-        IntRecorder recorder = new();
+        var value = "3";
 
-        var parameterName = "Value";
-        object? value = null;
-
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.False(actual);
-
-        Assert.False(recorder.ValueRecorded);
+        FalseAndNotRecorded<int, string>(value);
     }
 
     [Fact]
-    public void IntArray_IntArray_True_RecorderPopulated()
+    public void Int_Null_False_NotRecorded()
     {
-        ArrayRecorder recorder = new();
+        int? value = null;
 
-        var parameterName = "Value";
-        var value = new[] { 1, 2, 3 };
-
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.True(actual);
-
-        Assert.Equal(value, recorder.Value);
+        FalseAndNotRecorded<int, int?>(value);
     }
 
     [Fact]
-    public void IntArray_NullableIntArray_False_RecorderNotPopulated()
+    public void Double_Int_False_NotRecorded()
     {
-        ArrayRecorder recorder = new();
-
-        var parameterName = "Value";
-        var value = new int?[] { 1, 2, 3 };
-
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.False(actual);
-
-        Assert.False(recorder.ValueRecorded);
-    }
-
-    [Fact]
-    public void IntArray_Null_False_RecorderNotPopulated()
-    {
-        ArrayRecorder recorder = new();
-
-        var parameterName = "Value";
-        object? value = null;
-
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.False(actual);
-
-        Assert.False(recorder.ValueRecorded);
-    }
-
-    [Fact]
-    public void String_String_True_RecorderPopulated()
-    {
-        StringRecorder recorder = new();
-
-        var parameterName = "Value";
-        var value = "1";
-
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.True(actual);
-
-        Assert.Equal(value, recorder.Value);
-    }
-
-    [Fact]
-    public void String_Enum_False_RecorderNotPopulated()
-    {
-        StringRecorder recorder = new();
-
-        var parameterName = "Value";
-        var value = StringComparison.OrdinalIgnoreCase;
-
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.False(actual);
-
-        Assert.False(recorder.ValueRecorded);
-    }
-
-    [Fact]
-    public void String_Null_False_RecorderNotPopulated()
-    {
-        StringRecorder recorder = new();
-
-        var parameterName = "Value";
-        object? value = null;
-
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.False(actual);
-
-        Assert.False(recorder.ValueRecorded);
-    }
-
-    [Fact]
-    public void FalseRecorder_False_RecorderPopulated()
-    {
-        FalseRecorder recorder = new();
-
-        var parameterName = "Value";
         var value = 5;
 
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
+        FalseAndNotRecorded<double, int>(value);
+    }
+
+    [Fact]
+    public void NullableIntArray_NullElement_True_Recorded()
+    {
+        var value = new int?[] { null, 3 };
+
+        TrueAndRecorded(value, value);
+    }
+
+    [Fact]
+    public void NullableIntArray_NullCollection_False_NotRecorded()
+    {
+        IReadOnlyList<int?>? value = null;
+
+        FalseAndNotRecorded<IReadOnlyList<int?>, IReadOnlyList<int?>?>(value);
+    }
+
+    [Fact]
+    public void String_SameType_True_Recorded()
+    {
+        var value = "1";
+
+        TrueAndRecorded(value, value);
+    }
+
+    [Fact]
+    public void String_Enum_False_NotRecorded()
+    {
+        var value = StringComparison.OrdinalIgnoreCase;
+
+        FalseAndNotRecorded<string, StringComparison>(value);
+    }
+
+    [Fact]
+    public void String_Null_False_NotRecorded()
+    {
+        string? value = null;
+
+        FalseAndNotRecorded<string, string?>(value);
+    }
+
+    [Fact]
+    public void FalseReturningRecorder_False_Recorded()
+    {
+        Recorder<int> recorder = new(false);
+
+        var value = 3;
+
+        var location = CustomLocation.Create();
+
+        var actual = RecordArgument(recorder, value, location);
 
         Assert.False(actual);
 
         Assert.Equal(value, recorder.Value);
+        Assert.True(recorder.ValueRecorded);
+        Assert.Equal(location, recorder.ValueLocation, ReferenceEqualityComparer.Instance);
     }
 
-    private sealed class EnumRecorder : ASyntacticArgumentRecorder
+    [AssertionMethod]
+    private static void TrueAndRecorded<T1, T2>(T1 expected, T2 value) where T1 : notnull
     {
-        public StringComparison? Value { get; private set; }
-        public bool ValueRecorded { get; private set; }
+        Recorder<T1> recorder = new(true);
+
+        var location = CustomLocation.Create();
+
+        var actual = RecordArgument(recorder, value, location);
+
+        Assert.True(actual);
+
+        Assert.Equal(expected, recorder.Value);
+        Assert.True(recorder.ValueRecorded);
+        Assert.Equal(location, recorder.ValueLocation, ReferenceEqualityComparer.Instance);
+    }
+
+    [AssertionMethod]
+    private static void FalseAndNotRecorded<T1, T2>(T2? value) where T1 : notnull
+    {
+        Recorder<T1> recorder = new(true);
+
+        var actual = RecordArgument(recorder, value, Location.None);
+
+        Assert.False(actual);
+
+        Assert.False(recorder.ValueRecorded);
+    }
+
+    private static bool RecordArgument(ASyntacticArgumentRecorder recorder, object? value, Location location) => recorder.TryRecordNamedArgument(string.Empty, value, location);
+
+    private sealed class NullDelegateRecorder : ASyntacticArgumentRecorder
+    {
+        protected override IEqualityComparer<string> Comparer { get; } = StringComparerMock.CreateComparer(true);
 
         protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.For<StringComparison>(RecordStringComparison));
-        }
-
-        private bool RecordStringComparison(StringComparison value, Location location)
-        {
-            Value = value;
-            ValueRecorded = true;
-
-            return true;
+            yield return (string.Empty, Target<string>(Adapters, null!));
         }
     }
 
-    private sealed class IntRecorder : ASyntacticArgumentRecorder
+    private sealed class Recorder<T> : ASyntacticArgumentRecorder where T : notnull
     {
-        public int? Value { get; private set; }
+        public T? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
+        public Location? ValueLocation { get; private set; }
+
+        private bool ReturnValue { get; }
+
+        protected override IEqualityComparer<string> Comparer { get; } = StringComparerMock.CreateComparer(true);
+
+        public Recorder(bool returnValue)
+        {
+            ReturnValue = returnValue;
+        }
 
         protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.For<int>(RecordInt));
+            yield return (string.Empty, Target<T>(Adapters, RecordValue));
         }
 
-        private bool RecordInt(int value, Location location)
+        private bool RecordValue(T value, Location location)
         {
             Value = value;
             ValueRecorded = true;
+            ValueLocation = location;
 
-            return true;
-        }
-    }
-
-    private sealed class ArrayRecorder : ASyntacticArgumentRecorder
-    {
-        public IReadOnlyList<int>? Value { get; private set; }
-        public bool ValueRecorded { get; private set; }
-
-        protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
-        {
-            yield return ("Value", Adapters.For<IReadOnlyList<int>>(RecordIntArray));
-        }
-
-        private bool RecordIntArray(IReadOnlyList<int> value, Location location)
-        {
-            Value = value;
-            ValueRecorded = true;
-
-            return true;
-        }
-    }
-
-    private sealed class StringRecorder : ASyntacticArgumentRecorder
-    {
-        public string? Value { get; private set; }
-        public bool ValueRecorded { get; private set; }
-
-        protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
-        {
-            yield return ("Value", Adapters.For<string>(RecordString));
-        }
-
-        private bool RecordString(string value, Location location)
-        {
-            Value = value;
-            ValueRecorded = true;
-
-            return true;
-        }
-    }
-
-    private sealed class FalseRecorder : ASyntacticArgumentRecorder
-    {
-        public int? Value { get; private set; }
-        public bool ValueRecorded { get; private set; }
-
-        protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
-        {
-            yield return ("Value", Adapters.For<int>(RecordInt));
-        }
-
-        private bool RecordInt(int value, Location location)
-        {
-            Value = value;
-            ValueRecorded = true;
-
-            return false;
+            return ReturnValue;
         }
     }
 }

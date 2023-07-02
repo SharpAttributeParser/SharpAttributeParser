@@ -7,17 +7,17 @@ using System.Diagnostics.CodeAnalysis;
 [SuppressMessage("Major Bug", "S3903: Types should be defined in named namespaces")]
 public sealed class CombinedAttribute<T1, T2> : Attribute
 {
-    public object? NamedValue { get; set; }
-    public object?[]? NamedValues { get; set; }
+    public object? NamedSingleValue { get; set; }
+    public object?[]? NamedArrayValue { get; set; }
 
-    public object? Value { get; }
-    public object?[]? ArrayValues { get; }
-    public object?[] ParamsValues { get; }
+    public object? SingleValue { get; }
+    public object?[]? ArrayValue { get; }
+    public object?[] ParamsValue { get; }
 
-    public CombinedAttribute(object? value, object?[]? arrayValues, params object?[] paramsValues)
+    public CombinedAttribute(object? singleValue, object?[]? arrayValue, params object?[] paramsValue)
     {
-        Value = value;
-        ArrayValues = arrayValues;
-        ParamsValues = paramsValues;
+        SingleValue = singleValue;
+        ArrayValue = arrayValue;
+        ParamsValue = paramsValue;
     }
 }

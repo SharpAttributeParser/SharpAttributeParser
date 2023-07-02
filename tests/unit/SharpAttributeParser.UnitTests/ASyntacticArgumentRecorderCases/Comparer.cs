@@ -1,32 +1,21 @@
-﻿namespace SharpAttributeParser.Tests.ASyntacticArgumentRecorderCases;
+﻿namespace SharpAttributeParser.ASyntacticArgumentRecorderCases;
 
 using Microsoft.CodeAnalysis;
 
+using Moq;
+
 using System;
-using System.Collections.Generic;
 
 using Xunit;
 
-public class Comparer
+public sealed class Comparer
 {
-    private static void TryRecordGenericArgument(ASyntacticArgumentRecorder recorder, ITypeParameterSymbol parameter, ITypeSymbol value, Location location) => recorder.TryRecordGenericArgument(parameter, value, location);
-    private static void TryRecordConstructorArgument(ASyntacticArgumentRecorder recorder, IParameterSymbol parameter, object? value, Location location) => recorder.TryRecordConstructorArgument(parameter, value, location);
-    private static void TryRecordConstructorArgument(ASyntacticArgumentRecorder recorder, IParameterSymbol parameter, IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations) => recorder.TryRecordConstructorArgument(parameter, value, collectionLocation, elementLocations);
-    private static void TryRecordNamedArgument(ASyntacticArgumentRecorder recorder, string parameterName, object? value, Location location) => recorder.TryRecordNamedArgument(parameterName, value, location);
-    private static void TryRecordNamedArgument(ASyntacticArgumentRecorder recorder, string parameterName, IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations) => recorder.TryRecordNamedArgument(parameterName, value, collectionLocation, elementLocations);
-
     [Fact]
     public void Null_InvalidOperationExceptionWhenUsed()
     {
-        var comparer = Datasets.GetNullComparer();
+        SyntacticArgumentRecorder recorder = new(null!);
 
-        SyntacticArgumentRecorder recorder = new(comparer);
-
-        var parameter = Datasets.GetMockedTypeParameter();
-        var value = Datasets.GetValidTypeSymbol();
-        var location = Datasets.GetValidLocation();
-
-        var exception = Record.Exception(() => TryRecordGenericArgument(recorder, parameter, value, location));
+        var exception = Record.Exception(() => RecordGenericArgument(recorder));
 
         Assert.IsType<InvalidOperationException>(exception);
     }
@@ -34,82 +23,66 @@ public class Comparer
     [Fact]
     public void TryRecordGenericArgument_InvokedAtLeastOnce()
     {
-        var comparerMock = ComparerMock.GetComparer(true);
+        var comparerMock = StringComparerMock.CreateMock(true);
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameter = Datasets.GetMockedTypeParameter();
-        var value = Datasets.GetValidTypeSymbol();
-        var location = Datasets.GetValidLocation();
+        RecordGenericArgument(recorder);
 
-        TryRecordGenericArgument(recorder, parameter, value, location);
-
-        ComparerMock.VerifyInvoked(comparerMock);
+        StringComparerMock.VerifyInvoked(comparerMock);
     }
 
     [Fact]
     public void TryRecordConstructorArgument_Single_InvokedAtLeastOnce()
     {
-        var comparerMock = ComparerMock.GetComparer(true);
+        var comparerMock = StringComparerMock.CreateMock(true);
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameter = Datasets.GetMockedParameter();
-        var value = Datasets.GetValidTypeSymbol();
-        var location = Datasets.GetValidLocation();
+        RecordSingleConstructorArgument(recorder);
 
-        TryRecordConstructorArgument(recorder, parameter, value, location);
-
-        ComparerMock.VerifyInvoked(comparerMock);
+        StringComparerMock.VerifyInvoked(comparerMock);
     }
 
     [Fact]
     public void TryRecordConstructorArgument_Array_InvokedAtLeastOnce()
     {
-        var comparerMock = ComparerMock.GetComparer(true);
+        var comparerMock = StringComparerMock.CreateMock(true);
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameter = Datasets.GetMockedParameter();
-        var value = new[] { Datasets.GetValidTypeSymbol() };
-        var collectionLocation = Datasets.GetValidLocation();
-        var elementLocations = Datasets.GetValidElementLocations();
+        RecordArrayConstructorArgument(recorder);
 
-        TryRecordConstructorArgument(recorder, parameter, value, collectionLocation, elementLocations);
-
-        ComparerMock.VerifyInvoked(comparerMock);
+        StringComparerMock.VerifyInvoked(comparerMock);
     }
 
     [Fact]
     public void TryRecordNamedArgument_Single_InvokedAtLeastOnce()
     {
-        var comparerMock = ComparerMock.GetComparer(true);
+        var comparerMock = StringComparerMock.CreateMock(true);
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
-        var value = Datasets.GetValidTypeSymbol();
-        var location = Datasets.GetValidLocation();
+        RecordSingleNamedArgument(recorder);
 
-        TryRecordNamedArgument(recorder, parameterName, value, location);
-
-        ComparerMock.VerifyInvoked(comparerMock);
+        StringComparerMock.VerifyInvoked(comparerMock);
     }
 
     [Fact]
     public void TryRecordNamedArgument_Array_InvokedAtLeastOnce()
     {
-        var comparerMock = ComparerMock.GetComparer(true);
+        var comparerMock = StringComparerMock.CreateMock(true);
 
         SyntacticArgumentRecorder recorder = new(comparerMock.Object);
 
-        var parameterName = Datasets.GetValidParameterName();
-        var value = new[] { Datasets.GetValidTypeSymbol() };
-        var collectionLocation = Datasets.GetValidLocation();
-        var elementLocations = Datasets.GetValidElementLocations();
+        RecordArrayNamedArgument(recorder);
 
-        TryRecordNamedArgument(recorder, parameterName, value, collectionLocation, elementLocations);
-
-        ComparerMock.VerifyInvoked(comparerMock);
+        StringComparerMock.VerifyInvoked(comparerMock);
     }
+
+    private static void RecordGenericArgument(ASyntacticArgumentRecorder recorder) => recorder.TryRecordGenericArgument(Mock.Of<ITypeParameterSymbol>(static (symbol) => symbol.Name == string.Empty), Mock.Of<ITypeSymbol>(), Location.None);
+    private static void RecordSingleConstructorArgument(ASyntacticArgumentRecorder recorder) => recorder.TryRecordConstructorArgument(Mock.Of<IParameterSymbol>(static (symbol) => symbol.Name == string.Empty), null, Location.None);
+    private static void RecordArrayConstructorArgument(ASyntacticArgumentRecorder recorder) => recorder.TryRecordConstructorArgument(Mock.Of<IParameterSymbol>(static (symbol) => symbol.Name == string.Empty), null, CollectionLocation.None);
+    private static void RecordSingleNamedArgument(ASyntacticArgumentRecorder recorder) => recorder.TryRecordNamedArgument(string.Empty, null, Location.None);
+    private static void RecordArrayNamedArgument(ASyntacticArgumentRecorder recorder) => recorder.TryRecordNamedArgument(string.Empty, null, CollectionLocation.None);
 }
