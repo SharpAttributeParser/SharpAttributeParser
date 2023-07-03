@@ -10,10 +10,8 @@ public static class IServiceCollectionExtensions
     /// <returns>The provided <see cref="IServiceCollection"/>, so that calls can be chained.</returns>
     public static IServiceCollection AddSharpAttributeParser(this IServiceCollection services)
     {
-        services.AddSingleton<IArgumentLocator, ArgumentLocator>();
-
+        services.AddSingleton<ISemanticAttributeRecorderFactory, SemanticAttributeRecorderFactory>();
         services.AddSingleton<ISemanticAttributeParser, SemanticAttributeParser>();
-        services.AddSingleton<ISyntacticAttributeParser, SyntacticAttributeParser>();
 
         return services;
     }

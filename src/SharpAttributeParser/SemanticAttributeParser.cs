@@ -9,7 +9,7 @@ using System.Linq;
 public sealed class SemanticAttributeParser : ISemanticAttributeParser
 {
     /// <inheritdoc/>
-    public bool TryParse(ISemanticArgumentRecorder recorder, AttributeData attributeData)
+    public bool TryParse(ISemanticAttributeRecorder recorder, AttributeData attributeData)
     {
         if (recorder is null)
         {
@@ -44,7 +44,7 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
         return true;
     }
 
-    private static bool TryParseGenericArguments(ISemanticArgumentRecorder recorder, INamedTypeSymbol attributeType)
+    private static bool TryParseGenericArguments(ISemanticAttributeRecorder recorder, INamedTypeSymbol attributeType)
     {
         for (var i = 0; i < attributeType.TypeArguments.Length; i++)
         {
@@ -53,7 +53,7 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
                 return false;
             }
 
-            if (recorder.TryRecordGenericArgument(attributeType.TypeParameters[i], attributeType.TypeArguments[i]) is false)
+            if (recorder.TryRecordTypeArgument(attributeType.TypeParameters[i], attributeType.TypeArguments[i]) is false)
             {
                 return false;
             }
@@ -62,7 +62,7 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
         return true;
     }
 
-    private static bool TryParseConstructorArguments(ISemanticArgumentRecorder recorder, AttributeData attributeData, IMethodSymbol attributeConstructor)
+    private static bool TryParseConstructorArguments(ISemanticAttributeRecorder recorder, AttributeData attributeData, IMethodSymbol attributeConstructor)
     {
         if (attributeData.ConstructorArguments.IsEmpty)
         {
@@ -100,7 +100,7 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
         return true;
     }
 
-    private static bool TryParseNamedArguments(ISemanticArgumentRecorder recorder, AttributeData attributeData)
+    private static bool TryParseNamedArguments(ISemanticAttributeRecorder recorder, AttributeData attributeData)
     {
         if (attributeData.NamedArguments.IsEmpty)
         {
