@@ -2,6 +2,8 @@
 
 using Microsoft.CodeAnalysis;
 
+using SharpAttributeParser.Recording;
+
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,18 +12,25 @@ using Xunit;
 
 public sealed class TryParse_Combined
 {
-    private static bool Target(ISemanticAttributeParser parser, ISemanticArgumentRecorder recorder, AttributeData attributeData) => parser.TryParse(recorder, attributeData);
+    private ISemanticCombinedAttributeRecorderFactory RecorderFactory { get; }
+
+    public TryParse_Combined(ISemanticCombinedAttributeRecorderFactory recorderFactory)
+    {
+        RecorderFactory = recorderFactory;
+    }
+
+    private static bool Target(ISemanticAttributeParser parser, ISemanticAttributeRecorder recorder, AttributeData attributeData) => parser.TryParse(recorder, attributeData);
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task Params_True_Recorded(ISemanticAttributeParser parser)
+    public async Task Params_TrueAndRecorded(ISemanticAttributeParser parser)
     {
         var source = """
-            [Combined<string, int>("42", new object[0], "42", 42, NamedSingleValue = typeof(int), NamedArrayValue = new object[] { 42, "42" })]
-            public sealed class Foo { }
+            [Combined<string, int>("42", new object[0], "42", 42, SimpleNamedValue = typeof(int), ArrayNamedValue = new object[] { 42, "42" })]
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expectedResult);
+        await TrueAndRecordedAsExpected(parser, source, expectedResult);
 
         static ExpectedResult expectedResult(Compilation compilation)
         {
@@ -30,25 +39,25 @@ public sealed class TryParse_Combined
 
             return new ExpectedResult(stringType, intType)
             {
-                SingleValue = "42",
+                SimpleValue = "42",
                 ArrayValue = Array.Empty<object>(),
                 ParamsValue = new object[] { "42", 42 },
-                NamedSingleValue = intType,
-                NamedArrayValue = new object[] { 42, "42" }
+                SimpleNamedValue = intType,
+                ArrayNamedValue = new object[] { 42, "42" }
             };
         }
     }
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task EmptyParams_True_Recorded(ISemanticAttributeParser parser)
+    public async Task EmptyParams_TrueAndRecorded(ISemanticAttributeParser parser)
     {
         var source = """
-            [Combined<string, int>("42", new object[0], NamedSingleValue = typeof(int), NamedArrayValue = new object[] { 42, "42" })]
-            public sealed class Foo { }
+            [Combined<string, int>("42", new object[0], SimpleNamedValue = typeof(int), ArrayNamedValue = new object[] { 42, "42" })]
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expectedResult);
+        await TrueAndRecordedAsExpected(parser, source, expectedResult);
 
         static ExpectedResult expectedResult(Compilation compilation)
         {
@@ -57,25 +66,25 @@ public sealed class TryParse_Combined
 
             return new ExpectedResult(stringType, intType)
             {
-                SingleValue = "42",
+                SimpleValue = "42",
                 ArrayValue = Array.Empty<object>(),
                 ParamsValue = Array.Empty<object>(),
-                NamedSingleValue = intType,
-                NamedArrayValue = new object[] { 42, "42" }
+                SimpleNamedValue = intType,
+                ArrayNamedValue = new object[] { 42, "42" }
             };
         }
     }
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task OneParamsElement_True_Recorded(ISemanticAttributeParser parser)
+    public async Task OneParamsElement_TrueAndRecorded(ISemanticAttributeParser parser)
     {
         var source = """
-            [Combined<string, int>("42", new object[0], 42, NamedSingleValue = typeof(int), NamedArrayValue = new object[] { 42, "42" })]
-            public sealed class Foo { }
+            [Combined<string, int>("42", new object[0], 42, SimpleNamedValue = typeof(int), ArrayNamedValue = new object[] { 42, "42" })]
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expectedResult);
+        await TrueAndRecordedAsExpected(parser, source, expectedResult);
 
         static ExpectedResult expectedResult(Compilation compilation)
         {
@@ -84,25 +93,25 @@ public sealed class TryParse_Combined
 
             return new ExpectedResult(stringType, intType)
             {
-                SingleValue = "42",
+                SimpleValue = "42",
                 ArrayValue = Array.Empty<object>(),
                 ParamsValue = new object[] { 42 },
-                NamedSingleValue = intType,
-                NamedArrayValue = new object[] { 42, "42" }
+                SimpleNamedValue = intType,
+                ArrayNamedValue = new object[] { 42, "42" }
             };
         }
     }
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task Array_True_Recorded(ISemanticAttributeParser parser)
+    public async Task Array_TrueAndRecorded(ISemanticAttributeParser parser)
     {
         var source = """
-            [Combined<string, int>("42", new object[0], new object[] { "42", 42 }, NamedSingleValue = typeof(int), NamedArrayValue = new object[] { 42, "42" })]
-            public sealed class Foo { }
+            [Combined<string, int>("42", new object[0], new object[] { "42", 42 }, SimpleNamedValue = typeof(int), ArrayNamedValue = new object[] { 42, "42" })]
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expectedResult);
+        await TrueAndRecordedAsExpected(parser, source, expectedResult);
 
         static ExpectedResult expectedResult(Compilation compilation)
         {
@@ -111,48 +120,49 @@ public sealed class TryParse_Combined
 
             return new ExpectedResult(stringType, intType)
             {
-                SingleValue = "42",
+                SimpleValue = "42",
                 ArrayValue = Array.Empty<object>(),
                 ParamsValue = new object[] { "42", 42 },
-                NamedSingleValue = intType,
-                NamedArrayValue = new object[] { 42, "42" }
+                SimpleNamedValue = intType,
+                ArrayNamedValue = new object[] { 42, "42" }
             };
         }
     }
 
     [AssertionMethod]
-    private static async Task TrueAndIdenticalToExpected(ISemanticAttributeParser parser, string source, Func<Compilation, ExpectedResult> expectedDelegate)
+    private async Task TrueAndRecordedAsExpected(ISemanticAttributeParser parser, string source, Func<Compilation, ExpectedResult> expectedDelegate)
     {
-        SemanticCombinedAttributeRecorder recorder = new();
+        var recorder = RecorderFactory.Create();
 
         var (compilation, attributeData, _) = await CompilationStore.GetComponents(source, "Foo");
 
         var expected = expectedDelegate(compilation);
 
-        var result = Target(parser, recorder, attributeData);
+        var outcome = Target(parser, recorder, attributeData);
+        var result = recorder.GetResult();
 
-        Assert.True(result);
+        Assert.True(outcome);
 
-        Assert.Equal(expected.T1, recorder.T1);
-        Assert.True(recorder.T1Recorded);
+        Assert.Equal(expected.T1, result.T1);
+        Assert.True(result.T1Recorded);
 
-        Assert.Equal(expected.T2, recorder.T2);
-        Assert.True(recorder.T2Recorded);
+        Assert.Equal(expected.T2, result.T2);
+        Assert.True(result.T2Recorded);
 
-        Assert.Equal(expected.SingleValue, recorder.SingleValue);
-        Assert.True(recorder.SingleValueRecorded);
+        Assert.Equal(expected.SimpleValue, result.SimpleValue);
+        Assert.True(result.SimpleValueRecorded);
 
-        Assert.Equal(expected.ArrayValue, recorder.ArrayValue);
-        Assert.True(recorder.ArrayValueRecorded);
+        Assert.Equal(expected.ArrayValue, result.ArrayValue);
+        Assert.True(result.ArrayValueRecorded);
 
-        Assert.Equal(expected.ParamsValue, recorder.ParamsValue);
-        Assert.True(recorder.ParamsValueRecorded);
+        Assert.Equal(expected.ParamsValue, result.ParamsValue);
+        Assert.True(result.ParamsValueRecorded);
 
-        Assert.Equal(expected.NamedSingleValue, recorder.NamedSingleValue);
-        Assert.True(recorder.NamedSingleValueRecorded);
+        Assert.Equal(expected.SimpleNamedValue, result.SimpleNamedValue);
+        Assert.True(result.SimpleNamedValueRecorded);
 
-        Assert.Equal(expected.NamedArrayValue, recorder.NamedArrayValue);
-        Assert.True(recorder.NamedArrayValueRecorded);
+        Assert.Equal(expected.ArrayNamedValue, result.ArrayNamedValue);
+        Assert.True(result.ArrayNamedValueRecorded);
     }
 
     private sealed class ExpectedResult
@@ -160,11 +170,11 @@ public sealed class TryParse_Combined
         public ITypeSymbol T1 { get; }
         public ITypeSymbol T2 { get; }
 
-        public object? SingleValue { get; init; }
+        public object? SimpleValue { get; init; }
         public IReadOnlyList<object?>? ArrayValue { get; init; }
         public IReadOnlyList<object?>? ParamsValue { get; init; }
-        public object? NamedSingleValue { get; init; }
-        public IReadOnlyList<object?>? NamedArrayValue { get; init; }
+        public object? SimpleNamedValue { get; init; }
+        public IReadOnlyList<object?>? ArrayNamedValue { get; init; }
 
         public ExpectedResult(ITypeSymbol t1, ITypeSymbol t2)
         {

@@ -2,96 +2,105 @@
 
 using Microsoft.CodeAnalysis;
 
-using System;
+using SharpAttributeParser.Recording;
+
 using System.Collections.Generic;
+using System;
 using System.Threading.Tasks;
 
 using Xunit;
 
 public sealed class TryParse_Params_InterpretedAsArray
 {
-    private static bool Target(ISemanticAttributeParser parser, ISemanticArgumentRecorder recorder, AttributeData attributeData) => parser.TryParse(recorder, attributeData);
+    private ISemanticParamsAttributeRecorderFactory RecorderFactory { get; }
+
+    public TryParse_Params_InterpretedAsArray(ISemanticParamsAttributeRecorderFactory recorderFactory)
+    {
+        RecorderFactory = recorderFactory;
+    }
+
+    private static bool Target(ISemanticAttributeParser parser, ISemanticAttributeRecorder recorder, AttributeData attributeData) => parser.TryParse(recorder, attributeData);
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task NullLiteral_True_Recorded(ISemanticAttributeParser parser)
+    public async Task NullLiteral_TrueAndRecorded(ISemanticAttributeParser parser)
     {
         var source = """
             [Params(null)]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expected);
+        await TrueAndRecordedAsExpected(parser, source, expected);
 
         static IReadOnlyList<object?>? expected(Compilation compilation) => null;
     }
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task DefaultLiteral_True_Recorded(ISemanticAttributeParser parser)
+    public async Task DefaultLiteral_TrueAndRecorded(ISemanticAttributeParser parser)
     {
         var source = """
             [Params(default)]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expected);
+        await TrueAndRecordedAsExpected(parser, source, expected);
 
         static IReadOnlyList<object?>? expected(Compilation compilation) => null;
     }
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task DefaultExpression_True_Recorded(ISemanticAttributeParser parser)
+    public async Task DefaultExpression_TrueAndRecorded(ISemanticAttributeParser parser)
     {
         var source = """
             [Params(default(object[]))]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expected);
+        await TrueAndRecordedAsExpected(parser, source, expected);
 
         static IReadOnlyList<object?>? expected(Compilation compilation) => null;
     }
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task ObjectArrayCastedToObject_True_Recorded(ISemanticAttributeParser parser)
+    public async Task ObjectArrayCastedToObject_TrueAndRecorded(ISemanticAttributeParser parser)
     {
         var source = """
             [Params((object)(new object[] { 4 }))]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expected);
+        await TrueAndRecordedAsExpected(parser, source, expected);
 
         static IReadOnlyList<object?>? expected(Compilation compilation) => new object?[] { 4 };
     }
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task IntArrayCastedToObjectArray_True_Recorded(ISemanticAttributeParser parser)
+    public async Task IntArrayCastedToObjectArray_TrueAndRecorded(ISemanticAttributeParser parser)
     {
         var source = """
             [Params((object[])(new int[] { 4 }))]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expected);
+        await TrueAndRecordedAsExpected(parser, source, expected);
 
         static IReadOnlyList<object?>? expected(Compilation compilation) => new object?[] { 4 };
     }
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task PopulatedArray_True_Recorded(ISemanticAttributeParser parser)
+    public async Task PopulatedArray_TrueAndRecorded(ISemanticAttributeParser parser)
     {
         var source = """
             [Params(new object[] { "42", null, typeof(int), nameof(Foo), ((42)), (double)(float)42, new object[] { "42", 42 } })]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expected);
+        await TrueAndRecordedAsExpected(parser, source, expected);
 
         static IReadOnlyList<object?>? expected(Compilation compilation)
         {
@@ -103,28 +112,28 @@ public sealed class TryParse_Params_InterpretedAsArray
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task EmptyArray_True_Recorded(ISemanticAttributeParser parser)
+    public async Task EmptyArray_TrueAndRecorded(ISemanticAttributeParser parser)
     {
         var source = """
             [Params(new object[0])]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expected);
+        await TrueAndRecordedAsExpected(parser, source, expected);
 
         static IReadOnlyList<object?>? expected(Compilation compilation) => Array.Empty<object?>();
     }
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task Labelled_True_Recorded(ISemanticAttributeParser parser)
+    public async Task Labelled_TrueAndRecorded(ISemanticAttributeParser parser)
     {
         var source = """
             [Params(value: new object[] { "42", null, typeof(int), nameof(Foo), ((42)), (double)(float)42, new object[] { "42", 42 } })]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expected);
+        await TrueAndRecordedAsExpected(parser, source, expected);
 
         static IReadOnlyList<object?>? expected(Compilation compilation)
         {
@@ -135,19 +144,20 @@ public sealed class TryParse_Params_InterpretedAsArray
     }
 
     [AssertionMethod]
-    private static async Task TrueAndIdenticalToExpected(ISemanticAttributeParser parser, string source, Func<Compilation, IReadOnlyList<object?>?> expectedDelegate)
+    private async Task TrueAndRecordedAsExpected(ISemanticAttributeParser parser, string source, Func<Compilation, IReadOnlyList<object?>?> expectedDelegate)
     {
-        SemanticParamsAttributeRecorder recorder = new();
+        var recorder = RecorderFactory.Create();
 
         var (compilation, attributeData, _) = await CompilationStore.GetComponents(source, "Foo");
 
         var expected = expectedDelegate(compilation);
 
-        var result = Target(parser, recorder, attributeData);
+        var outcome = Target(parser, recorder, attributeData);
+        var result = recorder.GetResult();
 
-        Assert.True(result);
+        Assert.True(outcome);
 
-        Assert.Equal(expected, recorder.Value);
-        Assert.True(recorder.ValueRecorded);
+        Assert.Equal(expected, result.Value);
+        Assert.True(result.ValueRecorded);
     }
 }

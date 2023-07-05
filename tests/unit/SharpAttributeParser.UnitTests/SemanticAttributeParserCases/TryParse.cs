@@ -4,6 +4,8 @@ using Microsoft.CodeAnalysis;
 
 using Moq;
 
+using SharpAttributeParser.Recording;
+
 using System;
 using System.Threading.Tasks;
 
@@ -11,7 +13,14 @@ using Xunit;
 
 public sealed class TryParse
 {
-    private static bool Target(ISemanticAttributeParser parser, ISemanticArgumentRecorder recorder, AttributeData attributeData) => parser.TryParse(recorder, attributeData);
+    private ISemanticGenericAttributeRecorderFactory RecorderFactory { get; }
+
+    public TryParse(ISemanticGenericAttributeRecorderFactory recorderFactory)
+    {
+        RecorderFactory = recorderFactory;
+    }
+
+    private static bool Target(ISemanticAttributeParser parser, ISemanticAttributeRecorder recorder, AttributeData attributeData) => parser.TryParse(recorder, attributeData);
 
     [Theory]
     [ClassData(typeof(ParserSources))]
@@ -26,18 +35,18 @@ public sealed class TryParse
     [ClassData(typeof(ParserSources))]
     public void NullAttributeData_ArgumentNullException(ISemanticAttributeParser parser)
     {
-        var exception = Record.Exception(() => Target(parser, new SemanticGenericAttributeRecorder(), null!));
+        var exception = Record.Exception(() => Target(parser, RecorderFactory.Create(), null!));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task NonExistingAttribute_False_NotRecorded(ISemanticAttributeParser parser)
+    public async Task NonExistingAttribute_FalseAndNotRecorded(ISemanticAttributeParser parser)
     {
         var source = """
             [NonExisting]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
         await Generic_FalseAndNotRecorded(parser, source);
@@ -45,11 +54,11 @@ public sealed class TryParse
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task NonExistingConstructor_False_NotRecorded(ISemanticAttributeParser parser)
+    public async Task NonExistingConstructor_FalseAndNotRecorded(ISemanticAttributeParser parser)
     {
         var source = """
             [Generic<string, int>(4)]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
         await Generic_FalseAndNotRecorded(parser, source);
@@ -57,11 +66,11 @@ public sealed class TryParse
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task NonExistingNamedParameter_True_Recorded(ISemanticAttributeParser parser)
+    public async Task NonExistingNamedParameter_TrueAndRecorded(ISemanticAttributeParser parser)
     {
         var source = """
             [Generic<string, int>(NonExisting = 4)]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
         await Generic_TrueAndRecorded(parser, source, expected);
@@ -76,38 +85,40 @@ public sealed class TryParse
     }
 
     [AssertionMethod]
-    private static async Task Generic_TrueAndRecorded(ISemanticAttributeParser parser, string source, Func<Compilation, ExpectedResult> expectedDelegate)
+    private async Task Generic_TrueAndRecorded(ISemanticAttributeParser parser, string source, Func<Compilation, ExpectedResult> expectedDelegate)
     {
-        SemanticGenericAttributeRecorder recorder = new();
+        var recorder = RecorderFactory.Create();
 
         var (compilation, attributeData, _) = await CompilationStore.GetComponents(source, "Foo");
 
         var expected = expectedDelegate(compilation);
 
-        var result = Target(parser, recorder, attributeData);
+        var outcome = Target(parser, recorder, attributeData);
+        var result = recorder.GetResult();
 
-        Assert.True(result);
+        Assert.True(outcome);
 
-        Assert.Equal(expected.T1, recorder.T1);
-        Assert.Equal(expected.T2, recorder.T2);
+        Assert.Equal(expected.T1, result.T1);
+        Assert.True(result.T1Recorded);
 
-        Assert.True(recorder.T1Recorded);
-        Assert.True(recorder.T2Recorded);
+        Assert.Equal(expected.T2, result.T2);
+        Assert.True(result.T2Recorded);
     }
 
     [AssertionMethod]
-    private static async Task Generic_FalseAndNotRecorded(ISemanticAttributeParser parser, string source)
+    private async Task Generic_FalseAndNotRecorded(ISemanticAttributeParser parser, string source)
     {
-        SemanticGenericAttributeRecorder recorder = new();
+        var recorder = RecorderFactory.Create();
 
         var (_, attributeData, _) = await CompilationStore.GetComponents(source, "Foo");
 
-        var result = Target(parser, recorder, attributeData);
+        var outcome = Target(parser, recorder, attributeData);
+        var result = recorder.GetResult();
 
-        Assert.False(result);
+        Assert.False(outcome);
 
-        Assert.False(recorder.T1Recorded);
-        Assert.False(recorder.T2Recorded);
+        Assert.False(result.T1Recorded);
+        Assert.False(result.T2Recorded);
     }
 
     private sealed class ExpectedResult

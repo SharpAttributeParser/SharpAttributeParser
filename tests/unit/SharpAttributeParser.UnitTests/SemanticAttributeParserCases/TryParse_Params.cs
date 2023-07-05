@@ -2,21 +2,30 @@
 
 using Microsoft.CodeAnalysis;
 
+using SharpAttributeParser.Recording;
+
 using System.Threading.Tasks;
 
 using Xunit;
 
 public sealed class TryParse_Params
 {
-    private static bool Target(ISemanticAttributeParser parser, ISemanticArgumentRecorder recorder, AttributeData attributeData) => parser.TryParse(recorder, attributeData);
+    private ISemanticParamsAttributeRecorderFactory RecorderFactory { get; }
+
+    public TryParse_Params(ISemanticParamsAttributeRecorderFactory recorderFactory)
+    {
+        RecorderFactory = recorderFactory;
+    }
+
+    private static bool Target(ISemanticAttributeParser parser, ISemanticAttributeRecorder recorder, AttributeData attributeData) => parser.TryParse(recorder, attributeData);
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task NonExsitingAttribute_False_NotRecorded(ISemanticAttributeParser parser)
+    public async Task NonExsitingAttribute_FalseAndNotRecorded(ISemanticAttributeParser parser)
     {
         var source = """
             [NonExisting]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
         await FalseAndNotRecorded(parser, source);
@@ -24,11 +33,11 @@ public sealed class TryParse_Params
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task NonExsitingConstructor_False_NotRecorded(ISemanticAttributeParser parser)
+    public async Task NonExsitingConstructor_FalseAndNotRecorded(ISemanticAttributeParser parser)
     {
         var source = """
             [Params(nonExisting: 4)]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
         await FalseAndNotRecorded(parser, source);
@@ -36,11 +45,11 @@ public sealed class TryParse_Params
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task ErrorParamsArgument_False_NotRecorded(ISemanticAttributeParser parser)
+    public async Task ErrorParamsArgument_FalseAndNotRecorded(ISemanticAttributeParser parser)
     {
         var source = """
             [Params((string)4)]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
         await FalseAndNotRecorded(parser, source);
@@ -48,27 +57,28 @@ public sealed class TryParse_Params
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task ErrorArrayArgument_False_NotRecorded(ISemanticAttributeParser parser)
+    public async Task ErrorArrayArgument_FalseAndNotRecorded(ISemanticAttributeParser parser)
     {
         var source = """
             [Params((object[])4)]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
         await FalseAndNotRecorded(parser, source);
     }
 
     [AssertionMethod]
-    private static async Task FalseAndNotRecorded(ISemanticAttributeParser parser, string source)
+    private async Task FalseAndNotRecorded(ISemanticAttributeParser parser, string source)
     {
-        SemanticParamsAttributeRecorder recorder = new();
+        var recorder = RecorderFactory.Create();
 
         var (_, attributeData, _) = await CompilationStore.GetComponents(source, "Foo");
 
-        var result = Target(parser, recorder, attributeData);
+        var outcome = Target(parser, recorder, attributeData);
+        var result = recorder.GetResult();
 
-        Assert.False(result);
+        Assert.False(outcome);
 
-        Assert.False(recorder.ValueRecorded);
+        Assert.False(result.ValueRecorded);
     }
 }

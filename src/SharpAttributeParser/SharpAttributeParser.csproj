@@ -19,12 +19,14 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" PrivateAssets="all" />
+    </ItemGroup>
+    
+    <ItemGroup>
         <PackageReference Include="OneOf" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\SharpAttributeParser.Abstractions\SharpAttributeParser.Abstractions.csproj" />
-        <ProjectReference Include="..\SharpAttributeParser.Core\SharpAttributeParser.Core.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,0 +1,13 @@
+﻿namespace SharpAttributeParser.Recording;
+
+using Microsoft.CodeAnalysis;
+
+using System.Collections.Generic;
+
+public interface IExampleAttributeData
+{
+    public abstract ITypeSymbol T { get; }
+    public abstract IReadOnlyList<int> Sequence { get; }
+    public abstract string Name { get; }
+    public abstract int? Answer { get; }
+}

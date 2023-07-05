@@ -6,18 +6,34 @@ using System;
 public sealed class SemanticAttributeRecorderFactory : ISemanticAttributeRecorderFactory
 {
     /// <inheritdoc/>
-    public ISemanticAttributeRecorder Create<TData>(ISemanticAttributeMapper<TData> argumentMapper, TData data)
+    public ISemanticAttributeRecorder<TData> Create<TData>(ISemanticAttributeMapper<TData> argumentMapper, TData dataRecord)
     {
         if (argumentMapper is null)
         {
             throw new ArgumentNullException(nameof(argumentMapper));
         }
 
-        if (data is null)
+        if (dataRecord is null)
         {
-            throw new ArgumentNullException(nameof(data));
+            throw new ArgumentNullException(nameof(dataRecord));
         }
 
-        return new SemanticAttributeRecorder<TData>(argumentMapper, data);
+        return new SemanticAttributeRecorder<TData>(argumentMapper, dataRecord);
+    }
+
+    /// <inheritdoc/>
+    public ISemanticAttributeRecorder<TData> Create<TData, TDataBuilder>(ISemanticAttributeMapper<TDataBuilder> argumentMapper, TDataBuilder dataBuilder) where TDataBuilder : IAttributeDataBuilder<TData>
+    {
+        if (argumentMapper is null)
+        {
+            throw new ArgumentNullException(nameof(argumentMapper));
+        }
+
+        if (dataBuilder is null)
+        {
+            throw new ArgumentNullException(nameof(dataBuilder));
+        }
+
+        return new SemanticAttributeRecorder<TData, TDataBuilder>(argumentMapper, dataBuilder);
     }
 }

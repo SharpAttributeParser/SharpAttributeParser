@@ -21,7 +21,7 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
             throw new ArgumentNullException(nameof(attributeData));
         }
 
-        if (attributeData.AttributeClass is not INamedTypeSymbol attributeType || attributeType.TypeKind is TypeKind.Error || attributeData.AttributeConstructor is not IMethodSymbol attributeConstructor)
+        if (attributeData.AttributeClass is not INamedTypeSymbol attributeType || attributeType.TypeKind is TypeKind.Error || attributeData.AttributeConstructor is not IMethodSymbol targetConstructor)
         {
             return false;
         }
@@ -31,7 +31,7 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
             return false;
         }
 
-        if (TryParseConstructorArguments(recorder, attributeData, attributeConstructor) is false)
+        if (TryParseConstructorArguments(recorder, attributeData, targetConstructor) is false)
         {
             return false;
         }
