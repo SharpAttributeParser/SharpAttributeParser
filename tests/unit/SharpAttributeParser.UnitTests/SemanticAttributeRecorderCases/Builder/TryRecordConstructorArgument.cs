@@ -22,7 +22,7 @@ public sealed class TryRecordConstructorArgument
     [Fact]
     public void NullParameter_ArgumentNullException()
     {
-        var recorder = RecorderFactory.Create<string, IAttributeDataBuilder<string>>(Mock.Of<ISemanticAttributeMapper<IAttributeDataBuilder<string>>>(), Mock.Of<IAttributeDataBuilder<string>>());
+        var recorder = RecorderFactory.Create<string, IRecordBuilder<string>>(Mock.Of<ISemanticAttributeMapper<IRecordBuilder<string>>>(), Mock.Of<IRecordBuilder<string>>());
 
         var exception = Record.Exception(() => Target(recorder, null!, null));
 
@@ -32,7 +32,7 @@ public sealed class TryRecordConstructorArgument
     [Fact]
     public void NullReturningMapper_ReturnsFalse()
     {
-        var recorder = RecorderFactory.Create<string, IAttributeDataBuilder<string>>(Mock.Of<ISemanticAttributeMapper<IAttributeDataBuilder<string>>>(), Mock.Of<IAttributeDataBuilder<string>>());
+        var recorder = RecorderFactory.Create<string, IRecordBuilder<string>>(Mock.Of<ISemanticAttributeMapper<IRecordBuilder<string>>>(), Mock.Of<IRecordBuilder<string>>());
 
         var outcome = Target(recorder, Mock.Of<IParameterSymbol>(), null);
 
@@ -48,13 +48,13 @@ public sealed class TryRecordConstructorArgument
     [AssertionMethod]
     private void DelegateReturningMapper_UsesProvidedDelegateAndPropagatesValue(bool returnValue)
     {
-        Mock<ISemanticAttributeMapper<IAttributeDataBuilder<string>>> mapperMock = new();
+        Mock<ISemanticAttributeMapper<IRecordBuilder<string>>> mapperMock = new();
 
         var argumentRecorded = false;
 
-        mapperMock.Setup(static (mapper) => mapper.TryMapConstructorParameter(It.IsAny<IAttributeDataBuilder<string>>(), It.IsAny<IParameterSymbol>())).Returns(recorderDelegate);
+        mapperMock.Setup(static (mapper) => mapper.TryMapConstructorParameter(It.IsAny<IParameterSymbol>(), It.IsAny<IRecordBuilder<string>>())).Returns(tryMapConstructorParameter);
 
-        var recorder = RecorderFactory.Create(mapperMock.Object, Mock.Of<IAttributeDataBuilder<string>>());
+        var recorder = RecorderFactory.Create(mapperMock.Object, Mock.Of<IRecordBuilder<string>>());
 
         var outcome = Target(recorder, Mock.Of<IParameterSymbol>(), null);
 
@@ -62,11 +62,11 @@ public sealed class TryRecordConstructorArgument
 
         Assert.True(argumentRecorded);
 
-        bool recorderDelegate(object? argument)
+        ISemanticAttributeArgumentRecorder? tryMapConstructorParameter() => new SemanticAttributeArgumentRecorder((object? argument) =>
         {
             argumentRecorded = true;
 
             return returnValue;
-        }
+        });
     }
 }

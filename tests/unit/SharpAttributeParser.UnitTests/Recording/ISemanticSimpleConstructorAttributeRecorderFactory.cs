@@ -2,5 +2,5 @@
 
 public interface ISemanticSimpleConstructorAttributeRecorderFactory
 {
-    public abstract ISemanticAttributeRecorder<ISimpleConstructorAttributeData> Create();
+    public abstract ISemanticAttributeRecorder<ISemanticSimpleConstructorAttributeRecord> Create();
 }

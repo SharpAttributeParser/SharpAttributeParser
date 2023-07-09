@@ -6,7 +6,7 @@ using System;
 public sealed class SemanticAttributeRecorderFactory : ISemanticAttributeRecorderFactory
 {
     /// <inheritdoc/>
-    public ISemanticAttributeRecorder<TData> Create<TData>(ISemanticAttributeMapper<TData> argumentMapper, TData dataRecord)
+    public ISemanticAttributeRecorder<TRecord> Create<TRecord>(ISemanticAttributeMapper<TRecord> argumentMapper, TRecord dataRecord)
     {
         if (argumentMapper is null)
         {
@@ -18,22 +18,22 @@ public sealed class SemanticAttributeRecorderFactory : ISemanticAttributeRecorde
             throw new ArgumentNullException(nameof(dataRecord));
         }
 
-        return new SemanticAttributeRecorder<TData>(argumentMapper, dataRecord);
+        return new SemanticAttributeRecorder<TRecord>(argumentMapper, dataRecord);
     }
 
     /// <inheritdoc/>
-    public ISemanticAttributeRecorder<TData> Create<TData, TDataBuilder>(ISemanticAttributeMapper<TDataBuilder> argumentMapper, TDataBuilder dataBuilder) where TDataBuilder : IAttributeDataBuilder<TData>
+    public ISemanticAttributeRecorder<TRecord> Create<TRecord, TRecordBuilder>(ISemanticAttributeMapper<TRecordBuilder> argumentMapper, TRecordBuilder recordBuilder) where TRecordBuilder : IRecordBuilder<TRecord>
     {
         if (argumentMapper is null)
         {
             throw new ArgumentNullException(nameof(argumentMapper));
         }
 
-        if (dataBuilder is null)
+        if (recordBuilder is null)
         {
-            throw new ArgumentNullException(nameof(dataBuilder));
+            throw new ArgumentNullException(nameof(recordBuilder));
         }
 
-        return new SemanticAttributeRecorder<TData, TDataBuilder>(argumentMapper, dataBuilder);
+        return new SemanticAttributeRecorder<TRecord, TRecordBuilder>(argumentMapper, recordBuilder);
     }
 }

@@ -22,4 +22,8 @@
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
     </ItemGroup>
 
+    <ItemGroup>
+        <PackageReference Include="OneOf" />
+    </ItemGroup>
+
 </Project>

@@ -75,7 +75,7 @@ public sealed class TryParse_Params
         var (_, attributeData, _) = await CompilationStore.GetComponents(source, "Foo");
 
         var outcome = Target(parser, recorder, attributeData);
-        var result = recorder.GetResult();
+        var result = recorder.GetRecord();
 
         Assert.False(outcome);
 

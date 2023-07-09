@@ -52,7 +52,7 @@ public sealed class TryRecordConstructorArgument
 
         var argumentRecorded = false;
 
-        mapperMock.Setup(static (mapper) => mapper.TryMapConstructorParameter(It.IsAny<string>(), It.IsAny<IParameterSymbol>())).Returns(recorderDelegate);
+        mapperMock.Setup(static (mapper) => mapper.TryMapConstructorParameter(It.IsAny<IParameterSymbol>(), It.IsAny<string>())).Returns(tryMapConstructorParameter());
 
         var recorder = RecorderFactory.Create(mapperMock.Object, string.Empty);
 
@@ -62,11 +62,11 @@ public sealed class TryRecordConstructorArgument
 
         Assert.True(argumentRecorded);
 
-        bool recorderDelegate(object? argument)
+        ISemanticAttributeArgumentRecorder? tryMapConstructorParameter() => new SemanticAttributeArgumentRecorder((object? argument) =>
         {
             argumentRecorded = true;
 
             return returnValue;
-        }
+        });
     }
 }

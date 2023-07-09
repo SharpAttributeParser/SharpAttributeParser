@@ -1,7 +1,5 @@
 ﻿namespace SharpAttributeParser.Recording;
 
-using Microsoft.CodeAnalysis;
-
 using SharpAttributeParser;
 
 using System.Diagnostics.CodeAnalysis;
@@ -10,34 +8,32 @@ using System.Diagnostics.CodeAnalysis;
 internal sealed class SemanticSimpleConstructorAttributeRecorderFactory : ISemanticSimpleConstructorAttributeRecorderFactory
 {
     private ISemanticAttributeRecorderFactory Factory { get; }
-    private ISemanticAttributeMapper<ISimpleConstructorAttributeDataBuilder> ArgumentMapper { get; }
+    private ISemanticAttributeMapper<ISemanticSimpleConstructorAttributeRecordBuilder> ArgumentMapper { get; }
 
-    public SemanticSimpleConstructorAttributeRecorderFactory(ISemanticAttributeRecorderFactory factory, ISemanticAttributeMapper<ISimpleConstructorAttributeDataBuilder> argumentMapper)
+    public SemanticSimpleConstructorAttributeRecorderFactory(ISemanticAttributeRecorderFactory factory, ISemanticAttributeMapper<ISemanticSimpleConstructorAttributeRecordBuilder> argumentMapper)
     {
         Factory = factory;
         ArgumentMapper = argumentMapper;
     }
 
-    ISemanticAttributeRecorder<ISimpleConstructorAttributeData> ISemanticSimpleConstructorAttributeRecorderFactory.Create() => Factory.Create<ISimpleConstructorAttributeData, ISimpleConstructorAttributeDataBuilder>(ArgumentMapper, new SimpleConstructorAttributeDataBuilder());
+    ISemanticAttributeRecorder<ISemanticSimpleConstructorAttributeRecord> ISemanticSimpleConstructorAttributeRecorderFactory.Create() => Factory.Create<ISemanticSimpleConstructorAttributeRecord, ISemanticSimpleConstructorAttributeRecordBuilder>(ArgumentMapper, new SimpleConstructorAttributeDataBuilder());
 
-    private sealed class SimpleConstructorAttributeDataBuilder : ISimpleConstructorAttributeDataBuilder
+    private sealed class SimpleConstructorAttributeDataBuilder : ISemanticSimpleConstructorAttributeRecordBuilder
     {
         private SimpleConstructorAttributeData Target { get; } = new();
 
-        ISimpleConstructorAttributeData IAttributeDataBuilder<ISimpleConstructorAttributeData>.Build() => Target;
+        ISemanticSimpleConstructorAttributeRecord IRecordBuilder<ISemanticSimpleConstructorAttributeRecord>.Build() => Target;
 
-        void ISimpleConstructorAttributeDataBuilder.WithValue(object? value, Location location)
+        void ISemanticSimpleConstructorAttributeRecordBuilder.WithValue(object? value)
         {
             Target.Value = value;
             Target.ValueRecorded = true;
-            Target.ValueLocation = location;
         }
 
-        private sealed class SimpleConstructorAttributeData : ISimpleConstructorAttributeData
+        private sealed class SimpleConstructorAttributeData : ISemanticSimpleConstructorAttributeRecord
         {
             public object? Value { get; set; }
             public bool ValueRecorded { get; set; }
-            public Location ValueLocation { get; set; } = Location.None;
         }
     }
 }

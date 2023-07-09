@@ -6,12 +6,12 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "Used through DI.")]
-internal sealed class SemanticParamsAttributeMapper : ASemanticAttributeMapper<IParamsAttributeDataBuilder>
+internal sealed class SemanticParamsAttributeMapper : ASemanticAttributeMapper<ISemanticParamsAttributeRecordBuilder>
 {
-    protected override IEnumerable<(string, DSemanticAttributeArgumentRecorder)> AddParameterMappings()
+    protected override IEnumerable<(string, DArgumentRecorder)> AddParameterMappings()
     {
         yield return (nameof(ArrayConstructorAttribute.Value), Adapters.Collection.ForNullable<object>(RecordValue));
     }
 
-    private void RecordValue(IParamsAttributeDataBuilder builder, IReadOnlyList<object?>? value) => builder.WithValue(value, CollectionLocation.None);
+    private void RecordValue(ISemanticParamsAttributeRecordBuilder builder, IReadOnlyList<object?>? value) => builder.WithValue(value);
 }

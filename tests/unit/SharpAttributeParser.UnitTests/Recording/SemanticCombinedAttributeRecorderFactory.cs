@@ -11,100 +11,86 @@ using System.Diagnostics.CodeAnalysis;
 internal sealed class SemanticCombinedAttributeRecorderFactory : ISemanticCombinedAttributeRecorderFactory
 {
     private ISemanticAttributeRecorderFactory Factory { get; }
-    private ISemanticAttributeMapper<ICombinedAttributeDataBuilder> ArgumentMapper { get; }
+    private ISemanticAttributeMapper<ISemanticCombinedAttributeRecordBuilder> ArgumentMapper { get; }
 
-    public SemanticCombinedAttributeRecorderFactory(ISemanticAttributeRecorderFactory factory, ISemanticAttributeMapper<ICombinedAttributeDataBuilder> argumentMapper)
+    public SemanticCombinedAttributeRecorderFactory(ISemanticAttributeRecorderFactory factory, ISemanticAttributeMapper<ISemanticCombinedAttributeRecordBuilder> argumentMapper)
     {
         Factory = factory;
         ArgumentMapper = argumentMapper;
     }
 
-    ISemanticAttributeRecorder<ICombinedAttributeData> ISemanticCombinedAttributeRecorderFactory.Create() => Factory.Create<ICombinedAttributeData, ICombinedAttributeDataBuilder>(ArgumentMapper, new CombinedAttributeDataBuilder());
+    ISemanticAttributeRecorder<ISemanticCombinedAttributeRecord> ISemanticCombinedAttributeRecorderFactory.Create() => Factory.Create<ISemanticCombinedAttributeRecord, ISemanticCombinedAttributeRecordBuilder>(ArgumentMapper, new CombinedAttributeDataBuilder());
 
-    private sealed class CombinedAttributeDataBuilder : ICombinedAttributeDataBuilder
+    private sealed class CombinedAttributeDataBuilder : ISemanticCombinedAttributeRecordBuilder
     {
         private CombinedAttributeData Target { get; } = new();
 
-        ICombinedAttributeData IAttributeDataBuilder<ICombinedAttributeData>.Build() => Target;
+        ISemanticCombinedAttributeRecord IRecordBuilder<ISemanticCombinedAttributeRecord>.Build() => Target;
 
-        void ICombinedAttributeDataBuilder.WithT1(ITypeSymbol t1, Location location)
+        void ISemanticCombinedAttributeRecordBuilder.WithT1(ITypeSymbol t1)
         {
             Target.T1 = t1;
             Target.T1Recorded = true;
-            Target.T1Location = location;
         }
 
-        void ICombinedAttributeDataBuilder.WithT2(ITypeSymbol t2, Location location)
+        void ISemanticCombinedAttributeRecordBuilder.WithT2(ITypeSymbol t2)
         {
             Target.T2 = t2;
             Target.T2Recorded = true;
-            Target.T2Location = location;
         }
 
-        void ICombinedAttributeDataBuilder.WithSimpleValue(object? value, Location location)
+        void ISemanticCombinedAttributeRecordBuilder.WithSimpleValue(object? value)
         {
             Target.SimpleValue = value;
             Target.SimpleValueRecorded = true;
-            Target.SimpleValueLocation = location;
         }
 
-        void ICombinedAttributeDataBuilder.WithArrayValue(IReadOnlyList<object?>? value, CollectionLocation location)
+        void ISemanticCombinedAttributeRecordBuilder.WithArrayValue(IReadOnlyList<object?>? value)
         {
             Target.ArrayValue = value;
             Target.ArrayValueRecorded = true;
-            Target.ArrayValueLocation = location;
         }
 
-        void ICombinedAttributeDataBuilder.WithParamsValue(IReadOnlyList<object?>? value, CollectionLocation location)
+        void ISemanticCombinedAttributeRecordBuilder.WithParamsValue(IReadOnlyList<object?>? value)
         {
             Target.ParamsValue = value;
             Target.ParamsValueRecorded = true;
-            Target.ParamsValueLocation = location;
         }
 
-        void ICombinedAttributeDataBuilder.WithSimpleNamedValue(object? value, Location location)
+        void ISemanticCombinedAttributeRecordBuilder.WithSimpleNamedValue(object? value)
         {
             Target.SimpleNamedValue = value;
             Target.SimpleNamedValueRecorded = true;
-            Target.SimpleNamedValueLocation = location;
         }
 
-        void ICombinedAttributeDataBuilder.WithArrayNamedValue(IReadOnlyList<object?>? value, CollectionLocation location)
+        void ISemanticCombinedAttributeRecordBuilder.WithArrayNamedValue(IReadOnlyList<object?>? value)
         {
             Target.ArrayNamedValue = value;
             Target.ArrayNamedValueRecorded = true;
-            Target.ArrayNamedValueLocation = location;
         }
 
-        private sealed class CombinedAttributeData : ICombinedAttributeData
+        private sealed class CombinedAttributeData : ISemanticCombinedAttributeRecord
         {
             public ITypeSymbol? T1 { get; set; }
             public bool T1Recorded { get; set; }
-            public Location T1Location { get; set; } = Location.None;
 
             public ITypeSymbol? T2 { get; set; }
             public bool T2Recorded { get; set; }
-            public Location T2Location { get; set; } = Location.None;
 
             public object? SimpleValue { get; set; }
             public bool SimpleValueRecorded { get; set; }
-            public Location SimpleValueLocation { get; set; } = Location.None;
 
             public IReadOnlyList<object?>? ArrayValue { get; set; }
             public bool ArrayValueRecorded { get; set; }
-            public CollectionLocation ArrayValueLocation { get; set; } = CollectionLocation.None;
 
             public IReadOnlyList<object?>? ParamsValue { get; set; }
             public bool ParamsValueRecorded { get; set; }
-            public CollectionLocation ParamsValueLocation { get; set; } = CollectionLocation.None;
 
             public object? SimpleNamedValue { get; set; }
             public bool SimpleNamedValueRecorded { get; set; }
-            public Location SimpleNamedValueLocation { get; set; } = Location.None;
 
             public IReadOnlyList<object?>? ArrayNamedValue { get; set; }
             public bool ArrayNamedValueRecorded { get; set; }
-            public CollectionLocation ArrayNamedValueLocation { get; set; } = CollectionLocation.None;
         }
     }
 }

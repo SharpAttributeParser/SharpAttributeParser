@@ -94,7 +94,7 @@ public sealed class TryParse
         var expected = expectedDelegate(compilation);
 
         var outcome = Target(parser, recorder, attributeData);
-        var result = recorder.GetResult();
+        var result = recorder.GetRecord();
 
         Assert.True(outcome);
 
@@ -113,7 +113,7 @@ public sealed class TryParse
         var (_, attributeData, _) = await CompilationStore.GetComponents(source, "Foo");
 
         var outcome = Target(parser, recorder, attributeData);
-        var result = recorder.GetResult();
+        var result = recorder.GetRecord();
 
         Assert.False(outcome);
 

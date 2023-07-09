@@ -2,5 +2,5 @@
 
 public interface ISemanticExampleAttributeRecorderFactory
 {
-    public abstract ISemanticAttributeRecorder<IExampleAttributeData> Create();
+    public abstract ISemanticAttributeRecorder<ISemanticExampleAttributeRecord> Create();
 }

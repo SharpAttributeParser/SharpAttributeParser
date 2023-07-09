@@ -1,7 +1,5 @@
 ﻿namespace SharpAttributeParser.Recording;
 
-using Microsoft.CodeAnalysis;
-
 using SharpAttributeParser;
 
 using System.Collections.Generic;
@@ -11,45 +9,41 @@ using System.Diagnostics.CodeAnalysis;
 internal sealed class SemanticNamedAttributeRecorderFactory : ISemanticNamedAttributeRecorderFactory
 {
     private ISemanticAttributeRecorderFactory Factory { get; }
-    private ISemanticAttributeMapper<INamedAttributeDataBuilder> ArgumentMapper { get; }
+    private ISemanticAttributeMapper<ISemanticNamedAttributeRecordBuilder> ArgumentMapper { get; }
 
-    public SemanticNamedAttributeRecorderFactory(ISemanticAttributeRecorderFactory factory, ISemanticAttributeMapper<INamedAttributeDataBuilder> argumentMapper)
+    public SemanticNamedAttributeRecorderFactory(ISemanticAttributeRecorderFactory factory, ISemanticAttributeMapper<ISemanticNamedAttributeRecordBuilder> argumentMapper)
     {
         Factory = factory;
         ArgumentMapper = argumentMapper;
     }
 
-    ISemanticAttributeRecorder<INamedAttributeData> ISemanticNamedAttributeRecorderFactory.Create() => Factory.Create<INamedAttributeData, INamedAttributeDataBuilder>(ArgumentMapper, new NamedAttributeDataBuilder());
+    ISemanticAttributeRecorder<ISemanticNamedAttributeRecord> ISemanticNamedAttributeRecorderFactory.Create() => Factory.Create<ISemanticNamedAttributeRecord, ISemanticNamedAttributeRecordBuilder>(ArgumentMapper, new NamedAttributeDataBuilder());
 
-    private sealed class NamedAttributeDataBuilder : INamedAttributeDataBuilder
+    private sealed class NamedAttributeDataBuilder : ISemanticNamedAttributeRecordBuilder
     {
         private NamedAttributeData Target { get; } = new();
 
-        INamedAttributeData IAttributeDataBuilder<INamedAttributeData>.Build() => Target;
+        ISemanticNamedAttributeRecord IRecordBuilder<ISemanticNamedAttributeRecord>.Build() => Target;
 
-        void INamedAttributeDataBuilder.WithSimpleValue(object? value, Location location)
+        void ISemanticNamedAttributeRecordBuilder.WithSimpleValue(object? value)
         {
             Target.SimpleValue = value;
             Target.SimpleValueRecorded = true;
-            Target.SimpleValueLocation = location;
         }
 
-        void INamedAttributeDataBuilder.WithArrayValue(IReadOnlyList<object?>? value, CollectionLocation location)
+        void ISemanticNamedAttributeRecordBuilder.WithArrayValue(IReadOnlyList<object?>? value)
         {
             Target.ArrayValue = value;
             Target.ArrayValueRecorded = true;
-            Target.ArrayValueLocation = location;
         }
 
-        private sealed class NamedAttributeData : INamedAttributeData
+        private sealed class NamedAttributeData : ISemanticNamedAttributeRecord
         {
             public object? SimpleValue { get; set; }
             public bool SimpleValueRecorded { get; set; }
-            public Location SimpleValueLocation { get; set; } = Location.None;
 
             public IReadOnlyList<object?>? ArrayValue { get; set; }
             public bool ArrayValueRecorded { get; set; }
-            public CollectionLocation ArrayValueLocation { get; set; } = CollectionLocation.None;
         }
     }
 }

@@ -2,5 +2,5 @@
 
 public interface ISemanticParamsAttributeRecorderFactory
 {
-    public abstract ISemanticAttributeRecorder<IParamsAttributeData> Create();
+    public abstract ISemanticAttributeRecorder<ISemanticParamsAttributeRecord> Create();
 }

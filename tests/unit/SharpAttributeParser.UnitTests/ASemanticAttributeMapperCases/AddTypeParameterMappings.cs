@@ -19,7 +19,7 @@ public sealed class AddTypeParameterMappings
     {
         UnmodifiedMapper mapper = new();
 
-        var recorder = mapper.TryMapTypeParameter(new Data(), Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == string.Empty));
+        var recorder = mapper.TryMapTypeParameter(Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == string.Empty), new Data());
 
         Assert.Null(recorder);
     }
@@ -39,7 +39,7 @@ public sealed class AddTypeParameterMappings
     {
         EmptyMappingsCollectionMapper mapper = new();
 
-        var recorder = mapper.TryMapTypeParameter(new Data(), Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == string.Empty));
+        var recorder = mapper.TryMapTypeParameter(Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == string.Empty), new Data());
 
         Assert.Null(recorder);
     }
@@ -109,7 +109,7 @@ public sealed class AddTypeParameterMappings
     {
         NameMapper mapper = new();
 
-        var recorder = mapper.TryMapTypeParameter(new Data(), Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == NameMapper.ParameterName));
+        var recorder = mapper.TryMapTypeParameter(Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == NameMapper.ParameterName), new Data());
 
         Assert.NotNull(recorder);
     }
@@ -119,7 +119,7 @@ public sealed class AddTypeParameterMappings
     {
         NameMapper mapper = new();
 
-        var recorder = mapper.TryMapTypeParameter(new Data(), Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == NameMapper.DifferentParameterName));
+        var recorder = mapper.TryMapTypeParameter(Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == NameMapper.DifferentParameterName), new Data());
 
         Assert.Null(recorder);
     }
@@ -129,7 +129,7 @@ public sealed class AddTypeParameterMappings
     {
         IndexMapper mapper = new();
 
-        var recorder = mapper.TryMapTypeParameter(new Data(), Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == string.Empty && symbol.Ordinal == IndexMapper.ParameterIndex));
+        var recorder = mapper.TryMapTypeParameter(Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == string.Empty && symbol.Ordinal == IndexMapper.ParameterIndex), new Data());
 
         Assert.NotNull(recorder);
     }
@@ -139,7 +139,7 @@ public sealed class AddTypeParameterMappings
     {
         IndexMapper mapper = new();
 
-        var recorder = mapper.TryMapTypeParameter(new Data(), Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == string.Empty && symbol.Ordinal == IndexMapper.DifferentParameterIndex));
+        var recorder = mapper.TryMapTypeParameter(Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == string.Empty && symbol.Ordinal == IndexMapper.DifferentParameterIndex), new Data());
 
         Assert.Null(recorder);
     }
@@ -150,19 +150,19 @@ public sealed class AddTypeParameterMappings
     {
         public void Initialize() => InitializeMapper();
 
-        protected override IEnumerable<(OneOf<int, string>, DSemanticAttributeTypeArgumentRecorder)> AddTypeParameterMappings() => null!;
+        protected override IEnumerable<(OneOf<int, string>, DTypeArgumentRecorder)> AddTypeParameterMappings() => null!;
     }
 
     private sealed class EmptyMappingsCollectionMapper : ASemanticAttributeMapper<Data>
     {
-        protected override IEnumerable<(OneOf<int, string>, DSemanticAttributeTypeArgumentRecorder)> AddTypeParameterMappings() => Enumerable.Empty<(OneOf<int, string>, DSemanticAttributeTypeArgumentRecorder)>();
+        protected override IEnumerable<(OneOf<int, string>, DTypeArgumentRecorder)> AddTypeParameterMappings() => Enumerable.Empty<(OneOf<int, string>, DTypeArgumentRecorder)>();
     }
 
     private sealed class NullNameMapper : ASemanticAttributeMapper<Data>
     {
         public void Initialize() => InitializeMapper();
 
-        protected override IEnumerable<(OneOf<int, string>, DSemanticAttributeTypeArgumentRecorder)> AddTypeParameterMappings()
+        protected override IEnumerable<(OneOf<int, string>, DTypeArgumentRecorder)> AddTypeParameterMappings()
         {
             yield return (null!, RecordValue);
         }
@@ -174,7 +174,7 @@ public sealed class AddTypeParameterMappings
     {
         public void Initialize() => InitializeMapper();
 
-        protected override IEnumerable<(OneOf<int, string>, DSemanticAttributeTypeArgumentRecorder)> AddTypeParameterMappings()
+        protected override IEnumerable<(OneOf<int, string>, DTypeArgumentRecorder)> AddTypeParameterMappings()
         {
             yield return (-1, RecordValue);
         }
@@ -186,7 +186,7 @@ public sealed class AddTypeParameterMappings
     {
         public void Initialize() => InitializeMapper();
 
-        protected override IEnumerable<(OneOf<int, string>, DSemanticAttributeTypeArgumentRecorder)> AddTypeParameterMappings()
+        protected override IEnumerable<(OneOf<int, string>, DTypeArgumentRecorder)> AddTypeParameterMappings()
         {
             yield return (0, null!);
         }
@@ -196,7 +196,7 @@ public sealed class AddTypeParameterMappings
     {
         public void Initialize() => InitializeMapper();
 
-        protected override IEnumerable<(OneOf<int, string>, DSemanticAttributeTypeArgumentRecorder)> AddTypeParameterMappings()
+        protected override IEnumerable<(OneOf<int, string>, DTypeArgumentRecorder)> AddTypeParameterMappings()
         {
             yield return (string.Empty, RecordValue);
             yield return (string.Empty, RecordValue);
@@ -211,7 +211,7 @@ public sealed class AddTypeParameterMappings
 
         protected override IEqualityComparer<string> GetComparer() => StringComparer.OrdinalIgnoreCase;
 
-        protected override IEnumerable<(OneOf<int, string>, DSemanticAttributeTypeArgumentRecorder)> AddTypeParameterMappings()
+        protected override IEnumerable<(OneOf<int, string>, DTypeArgumentRecorder)> AddTypeParameterMappings()
         {
             yield return ("A", RecordValue);
             yield return ("a", RecordValue);
@@ -224,7 +224,7 @@ public sealed class AddTypeParameterMappings
     {
         public void Initialize() => InitializeMapper();
 
-        protected override IEnumerable<(OneOf<int, string>, DSemanticAttributeTypeArgumentRecorder)> AddTypeParameterMappings()
+        protected override IEnumerable<(OneOf<int, string>, DTypeArgumentRecorder)> AddTypeParameterMappings()
         {
             yield return (0, RecordValue);
             yield return (0, RecordValue);
@@ -238,7 +238,7 @@ public sealed class AddTypeParameterMappings
         public static string ParameterName => string.Empty;
         public static string DifferentParameterName => $"{ParameterName} ";
 
-        protected override IEnumerable<(OneOf<int, string>, DSemanticAttributeTypeArgumentRecorder)> AddTypeParameterMappings()
+        protected override IEnumerable<(OneOf<int, string>, DTypeArgumentRecorder)> AddTypeParameterMappings()
         {
             yield return (ParameterName, RecordValue);
         }
@@ -251,7 +251,7 @@ public sealed class AddTypeParameterMappings
         public static int ParameterIndex => 0;
         public static int DifferentParameterIndex => ParameterIndex + 1;
 
-        protected override IEnumerable<(OneOf<int, string>, DSemanticAttributeTypeArgumentRecorder)> AddTypeParameterMappings()
+        protected override IEnumerable<(OneOf<int, string>, DTypeArgumentRecorder)> AddTypeParameterMappings()
         {
             yield return (ParameterIndex, RecordValue);
         }

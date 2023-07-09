@@ -9,34 +9,32 @@ using System.Diagnostics.CodeAnalysis;
 internal sealed class SemanticArrayConstructorAttributeRecorderFactory : ISemanticArrayConstructorAttributeRecorderFactory
 {
     private ISemanticAttributeRecorderFactory Factory { get; }
-    private ISemanticAttributeMapper<IArrayConstructorAttributeDataBuilder> ArgumentMapper { get; }
+    private ISemanticAttributeMapper<ISemanticArrayConstructorAttributeRecordBuilder> ArgumentMapper { get; }
 
-    public SemanticArrayConstructorAttributeRecorderFactory(ISemanticAttributeRecorderFactory factory, ISemanticAttributeMapper<IArrayConstructorAttributeDataBuilder> argumentMapper)
+    public SemanticArrayConstructorAttributeRecorderFactory(ISemanticAttributeRecorderFactory factory, ISemanticAttributeMapper<ISemanticArrayConstructorAttributeRecordBuilder> argumentMapper)
     {
         Factory = factory;
         ArgumentMapper = argumentMapper;
     }
 
-    ISemanticAttributeRecorder<IArrayConstructorAttributeData> ISemanticArrayConstructorAttributeRecorderFactory.Create() => Factory.Create<IArrayConstructorAttributeData, IArrayConstructorAttributeDataBuilder>(ArgumentMapper, new ArrayConstructorAttributeDataBuilder());
+    ISemanticAttributeRecorder<ISemanticArrayConstructorAttributeRecord> ISemanticArrayConstructorAttributeRecorderFactory.Create() => Factory.Create<ISemanticArrayConstructorAttributeRecord, ISemanticArrayConstructorAttributeRecordBuilder>(ArgumentMapper, new ArrayConstructorAttributeDataBuilder());
 
-    private sealed class ArrayConstructorAttributeDataBuilder : IArrayConstructorAttributeDataBuilder
+    private sealed class ArrayConstructorAttributeDataBuilder : ISemanticArrayConstructorAttributeRecordBuilder
     {
         private ArrayConstructorAttributeData Target { get; } = new();
 
-        IArrayConstructorAttributeData IAttributeDataBuilder<IArrayConstructorAttributeData>.Build() => Target;
+        ISemanticArrayConstructorAttributeRecord IRecordBuilder<ISemanticArrayConstructorAttributeRecord>.Build() => Target;
 
-        void IArrayConstructorAttributeDataBuilder.WithValue(IReadOnlyList<object?>? value, CollectionLocation location)
+        void ISemanticArrayConstructorAttributeRecordBuilder.WithValue(IReadOnlyList<object?>? value)
         {
             Target.Value = value;
             Target.ValueRecorded = true;
-            Target.ValueLocation = location;
         }
 
-        private sealed class ArrayConstructorAttributeData : IArrayConstructorAttributeData
+        private sealed class ArrayConstructorAttributeData : ISemanticArrayConstructorAttributeRecord
         {
             public IReadOnlyList<object?>? Value { get; set; }
             public bool ValueRecorded { get; set; }
-            public CollectionLocation ValueLocation { get; set; } = CollectionLocation.None;
         }
     }
 }

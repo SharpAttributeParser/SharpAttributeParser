@@ -11,7 +11,7 @@ using Xunit;
 
 public sealed class TryMapConstructorParameter
 {
-    private static DSemanticAttributeArgumentRecorder? Target<TData>(ISemanticAttributeMapper<TData> mapper, TData dataRecord, IParameterSymbol parameter) => mapper.TryMapConstructorParameter(dataRecord, parameter);
+    private static ISemanticAttributeArgumentRecorder? Target<TData>(ISemanticAttributeMapper<TData> mapper, TData dataRecord, IParameterSymbol parameter) => mapper.TryMapConstructorParameter(parameter, dataRecord);
 
     [Fact]
     public void NullData_ArgumentNullException()
@@ -45,7 +45,7 @@ public sealed class TryMapConstructorParameter
 
         var recorder = Target(new Mapper(), dataRecord, Mock.Of<IParameterSymbol>((symbol) => symbol.Name == Mapper.NameValueA));
 
-        var outcome = recorder!(argument);
+        var outcome = recorder!.RecordArgument(argument);
 
         Assert.True(outcome);
 
@@ -63,7 +63,7 @@ public sealed class TryMapConstructorParameter
 
         var recorder = Target(new Mapper(), dataRecord, Mock.Of<IParameterSymbol>((parameter) => parameter.Name == Mapper.NameValueB));
 
-        var outcome = recorder!(argument);
+        var outcome = recorder!.RecordArgument(argument);
 
         Assert.True(outcome);
 

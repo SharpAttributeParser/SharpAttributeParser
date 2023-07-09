@@ -2,5 +2,5 @@
 
 public interface ISemanticQualifiedGenericAttributeRecorderFactory
 {
-    public abstract ISemanticAttributeRecorder<IQualifiedGenericAttributeData> Create();
+    public abstract ISemanticAttributeRecorder<ISemanticQualifiedGenericAttributeRecord> Create();
 }

@@ -4,24 +4,24 @@ using Microsoft.CodeAnalysis;
 
 using System;
 
-/// <inheritdoc cref="ISemanticAttributeRecorder{TData}"/>
-internal sealed class SemanticAttributeRecorder<TData> : ISemanticAttributeRecorder<TData>
+/// <inheritdoc cref="ISemanticAttributeRecorder{TRecord}"/>
+internal sealed class SemanticAttributeRecorder<TRecord> : ISemanticAttributeRecorder<TRecord>
 {
-    private ISemanticAttributeMapper<TData> ArgumentMapper { get; }
-    private TData AttributeData { get; }
+    private ISemanticAttributeMapper<TRecord> ArgumentMapper { get; }
+    private TRecord DataRecord { get; }
 
-    /// <summary>Instantiates a <see cref="SemanticAttributeRecorder{TData}"/>, recording the parsed of an attribute.</summary>
-    /// <param name="argumentMapper"><inheritdoc cref="ISemanticAttributeMapper{TData}" path="/summary"/></param>
-    /// <param name="attributeData">The <typeparamref name="TData"/> representing the recorded arguments.</param>
+    /// <summary>Instantiates a <see cref="SemanticAttributeRecorder{TRecord}"/>, recording the arguments of an attribute.</summary>
+    /// <param name="argumentMapper"><inheritdoc cref="ISemanticAttributeMapper{TRecord}" path="/summary"/></param>
+    /// <param name="attributeData">The <typeparamref name="TRecord"/> to which the arguments are recorded.</param>
     /// <exception cref="ArgumentNullException"/>
-    public SemanticAttributeRecorder(ISemanticAttributeMapper<TData> argumentMapper, TData attributeData)
+    public SemanticAttributeRecorder(ISemanticAttributeMapper<TRecord> argumentMapper, TRecord attributeData)
     {
         ArgumentMapper = argumentMapper ?? throw new ArgumentNullException(nameof(argumentMapper));
-        AttributeData = attributeData ?? throw new ArgumentNullException(nameof(attributeData));
+        DataRecord = attributeData ?? throw new ArgumentNullException(nameof(attributeData));
     }
 
     /// <inheritdoc/>
-    public TData GetResult() => AttributeData;
+    public TRecord GetRecord() => DataRecord;
 
     /// <inheritdoc/>
     public bool TryRecordTypeArgument(ITypeParameterSymbol parameter, ITypeSymbol argument)
@@ -36,12 +36,12 @@ internal sealed class SemanticAttributeRecorder<TData> : ISemanticAttributeRecor
             throw new ArgumentNullException(nameof(argument));
         }
 
-        if (ArgumentMapper.TryMapTypeParameter(AttributeData, parameter) is not DSemanticAttributeArgumentRecorder recordDelegate)
+        if (ArgumentMapper.TryMapTypeParameter(parameter, DataRecord) is not ISemanticAttributeArgumentRecorder argumentRecorder)
         {
             return false;
         }
 
-        return recordDelegate(argument);
+        return argumentRecorder.RecordArgument(argument);
     }
 
     /// <inheritdoc/>
@@ -52,12 +52,12 @@ internal sealed class SemanticAttributeRecorder<TData> : ISemanticAttributeRecor
             throw new ArgumentNullException(nameof(parameter));
         }
 
-        if (ArgumentMapper.TryMapConstructorParameter(AttributeData, parameter) is not DSemanticAttributeArgumentRecorder recorderDelegate)
+        if (ArgumentMapper.TryMapConstructorParameter(parameter, DataRecord) is not ISemanticAttributeArgumentRecorder argumentRecorder)
         {
             return false;
         }
 
-        return recorderDelegate(argument);
+        return argumentRecorder.RecordArgument(argument);
     }
 
     /// <inheritdoc/>
@@ -68,35 +68,35 @@ internal sealed class SemanticAttributeRecorder<TData> : ISemanticAttributeRecor
             throw new ArgumentNullException(nameof(parameterName));
         }
 
-        if (ArgumentMapper.TryMapNamedParameter(AttributeData, parameterName) is not DSemanticAttributeArgumentRecorder recorderDelegate)
+        if (ArgumentMapper.TryMapNamedParameter(parameterName, DataRecord) is not ISemanticAttributeArgumentRecorder argumentRecorder)
         {
             return false;
         }
 
-        return recorderDelegate(argument);
+        return argumentRecorder.RecordArgument(argument);
     }
 }
 
-/// <summary><inheritdoc cref="ISemanticAttributeRecorder{TData}" path="/summary"/></summary>
-/// <typeparam name="TData">The type representing the recorded attribute arguments, when built by a <typeparamref name="TDataBuilder"/>.</typeparam>
-/// <typeparam name="TDataBuilder">The type to which the <see cref="ISemanticAttributeRecorder"/> records attribute arguments, and which can build a <typeparamref name="TData"/>.</typeparam>
-internal sealed class SemanticAttributeRecorder<TData, TDataBuilder> : ISemanticAttributeRecorder<TData> where TDataBuilder : IAttributeDataBuilder<TData>
+/// <summary><inheritdoc cref="ISemanticAttributeRecorder{TRecord}" path="/summary"/></summary>
+/// <typeparam name="TRecord">The type representing the recorded attribute arguments, when built by a <typeparamref name="TRecordBuilder"/>.</typeparam>
+/// <typeparam name="TRecordBuilder">The type to which the arguments are recorded, and which can build a <typeparamref name="TRecord"/>.</typeparam>
+internal sealed class SemanticAttributeRecorder<TRecord, TRecordBuilder> : ISemanticAttributeRecorder<TRecord> where TRecordBuilder : IRecordBuilder<TRecord>
 {
-    private ISemanticAttributeMapper<TDataBuilder> ArgumentMapper { get; }
-    private TDataBuilder AttributeDataBuilder { get; }
+    private ISemanticAttributeMapper<TRecordBuilder> ArgumentMapper { get; }
+    private TRecordBuilder AttributeDataBuilder { get; }
 
-    /// <summary>Instantiates a <see cref="SemanticAttributeRecorder{TData, TDataBuilder}"/>, recording the parsed of an attribute.</summary>
-    /// <param name="argumentMapper"><inheritdoc cref="ISemanticAttributeMapper{TData}" path="/summary"/></param>
-    /// <param name="attributeDataBuilder">The <typeparamref name="TDataBuilder"/> to which the produced <see cref="ISemanticAttributeRecorder"/> records attribute arguments, and which can build a <typeparamref name="TData"/>.</param>
+    /// <summary>Instantiates a <see cref="SemanticAttributeRecorder{TRecord, TRecordBuilder}"/>, recording the parsed of an attribute.</summary>
+    /// <param name="argumentMapper"><inheritdoc cref="ISemanticAttributeMapper{TRecord}" path="/summary"/></param>
+    /// <param name="attributeDataBuilder">The <typeparamref name="TRecordBuilder"/> to which the produced <see cref="ISemanticAttributeRecorder"/> records attribute arguments, and which can build a <typeparamref name="TRecord"/>.</param>
     /// <exception cref="ArgumentNullException"/>
-    public SemanticAttributeRecorder(ISemanticAttributeMapper<TDataBuilder> argumentMapper, TDataBuilder attributeDataBuilder)
+    public SemanticAttributeRecorder(ISemanticAttributeMapper<TRecordBuilder> argumentMapper, TRecordBuilder attributeDataBuilder)
     {
         ArgumentMapper = argumentMapper ?? throw new ArgumentNullException(nameof(argumentMapper));
         AttributeDataBuilder = attributeDataBuilder ?? throw new ArgumentNullException(nameof(attributeDataBuilder));
     }
 
     /// <inheritdoc/>
-    public TData GetResult() => AttributeDataBuilder.Build();
+    public TRecord GetRecord() => AttributeDataBuilder.Build();
 
     /// <inheritdoc/>
     public bool TryRecordTypeArgument(ITypeParameterSymbol parameter, ITypeSymbol argument)
@@ -111,12 +111,12 @@ internal sealed class SemanticAttributeRecorder<TData, TDataBuilder> : ISemantic
             throw new ArgumentNullException(nameof(argument));
         }
 
-        if (ArgumentMapper.TryMapTypeParameter(AttributeDataBuilder, parameter) is not DSemanticAttributeArgumentRecorder recordDelegate)
+        if (ArgumentMapper.TryMapTypeParameter(parameter, AttributeDataBuilder) is not ISemanticAttributeArgumentRecorder argumentRecorder)
         {
             return false;
         }
 
-        return recordDelegate(argument);
+        return argumentRecorder.RecordArgument(argument);
     }
 
     /// <inheritdoc/>
@@ -127,12 +127,12 @@ internal sealed class SemanticAttributeRecorder<TData, TDataBuilder> : ISemantic
             throw new ArgumentNullException(nameof(parameter));
         }
 
-        if (ArgumentMapper.TryMapConstructorParameter(AttributeDataBuilder, parameter) is not DSemanticAttributeArgumentRecorder recorderDelegate)
+        if (ArgumentMapper.TryMapConstructorParameter(parameter, AttributeDataBuilder) is not ISemanticAttributeArgumentRecorder argumentRecorder)
         {
             return false;
         }
 
-        return recorderDelegate(argument);
+        return argumentRecorder.RecordArgument(argument);
     }
 
     /// <inheritdoc/>
@@ -143,11 +143,11 @@ internal sealed class SemanticAttributeRecorder<TData, TDataBuilder> : ISemantic
             throw new ArgumentNullException(nameof(parameterName));
         }
 
-        if (ArgumentMapper.TryMapNamedParameter(AttributeDataBuilder, parameterName) is not DSemanticAttributeArgumentRecorder recorderDelegate)
+        if (ArgumentMapper.TryMapNamedParameter(parameterName, AttributeDataBuilder) is not ISemanticAttributeArgumentRecorder argumentRecorder)
         {
             return false;
         }
 
-        return recorderDelegate(argument);
+        return argumentRecorder.RecordArgument(argument);
     }
 }

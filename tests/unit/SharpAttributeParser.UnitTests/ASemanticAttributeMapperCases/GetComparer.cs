@@ -30,7 +30,7 @@ public sealed class GetComparer
 
         ComparerMapper mapper = new(comparerMock.Object);
 
-        var recorder = mapper.TryMapTypeParameter(new Data(), Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == string.Empty));
+        var recorder = mapper.TryMapTypeParameter(Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == string.Empty), new Data());
 
         Assert.NotNull(recorder);
 
@@ -44,7 +44,7 @@ public sealed class GetComparer
 
         ComparerMapper mapper = new(comparerMock.Object);
 
-        var recorder = mapper.TryMapConstructorParameter(new Data(), Mock.Of<IParameterSymbol>((symbol) => symbol.Name == string.Empty));
+        var recorder = mapper.TryMapConstructorParameter(Mock.Of<IParameterSymbol>((symbol) => symbol.Name == string.Empty), new Data());
 
         Assert.NotNull(recorder);
 
@@ -58,7 +58,7 @@ public sealed class GetComparer
 
         ComparerMapper mapper = new(comparerMock.Object);
 
-        var recorder = mapper.TryMapNamedParameter(new Data(), string.Empty);
+        var recorder = mapper.TryMapNamedParameter(string.Empty, new Data());
 
         Assert.NotNull(recorder);
 
@@ -78,12 +78,12 @@ public sealed class GetComparer
 
         protected override IEqualityComparer<string> GetComparer() => Comparer;
 
-        protected override IEnumerable<(OneOf<int, string> Index, DSemanticAttributeTypeArgumentRecorder Mapping)> AddTypeParameterMappings()
+        protected override IEnumerable<(OneOf<int, string> Index, DTypeArgumentRecorder Mapping)> AddTypeParameterMappings()
         {
             yield return (string.Empty, RecordT);
         }
 
-        protected override IEnumerable<(string Name, DSemanticAttributeArgumentRecorder Mapping)> AddParameterMappings()
+        protected override IEnumerable<(string Name, DArgumentRecorder Mapping)> AddParameterMappings()
         {
             yield return (string.Empty, RecordValue);
         }

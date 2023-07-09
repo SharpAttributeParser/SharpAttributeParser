@@ -139,7 +139,7 @@ public sealed class TryParse_Combined
         var expected = expectedDelegate(compilation);
 
         var outcome = Target(parser, recorder, attributeData);
-        var result = recorder.GetResult();
+        var result = recorder.GetRecord();
 
         Assert.True(outcome);
 

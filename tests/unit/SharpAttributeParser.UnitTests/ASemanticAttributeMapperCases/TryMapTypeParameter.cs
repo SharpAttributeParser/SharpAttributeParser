@@ -11,7 +11,7 @@ using Xunit;
 
 public sealed class TryMapTypeParameter
 {
-    private static DSemanticAttributeArgumentRecorder? Target<TData>(ISemanticAttributeMapper<TData> mapper, TData dataRecord, ITypeParameterSymbol parameter) => mapper.TryMapTypeParameter(dataRecord, parameter);
+    private static ISemanticAttributeArgumentRecorder? Target<TData>(ISemanticAttributeMapper<TData> mapper, TData dataRecord, ITypeParameterSymbol parameter) => mapper.TryMapTypeParameter(parameter, dataRecord);
 
     [Fact]
     public void NullData_ArgumentNullException()
@@ -44,7 +44,7 @@ public sealed class TryMapTypeParameter
 
         var recorder = Target(new Mapper(), dataRecord, Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == Mapper.TypeNameT1));
 
-        var outcome = recorder!(null);
+        var outcome = recorder!.RecordArgument(null);
 
         Assert.False(outcome);
 
@@ -58,7 +58,7 @@ public sealed class TryMapTypeParameter
 
         var recorder = Target(new Mapper(), dataRecord, Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == Mapper.TypeNameT1));
 
-        var outcome = recorder!(string.Empty);
+        var outcome = recorder!.RecordArgument(string.Empty);
 
         Assert.False(outcome);
 
@@ -73,7 +73,7 @@ public sealed class TryMapTypeParameter
 
         var recorder = Target(new Mapper(), dataRecord, Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == Mapper.TypeNameNone && symbol.Ordinal == Mapper.IndexT1));
 
-        var outcome = recorder!(argument);
+        var outcome = recorder!.RecordArgument(argument);
 
         Assert.True(outcome);
 
@@ -88,7 +88,7 @@ public sealed class TryMapTypeParameter
 
         var recorder = Target(new Mapper(), dataRecord, Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == Mapper.TypeNameT1));
 
-        var outcome = recorder!(argument);
+        var outcome = recorder!.RecordArgument(argument);
 
         Assert.True(outcome);
 
@@ -103,7 +103,7 @@ public sealed class TryMapTypeParameter
 
         var recorder = Target(new Mapper(), dataRecord, Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == Mapper.TypeNameT1 && symbol.Ordinal == Mapper.IndexT1));
 
-        var outcome = recorder!(argument);
+        var outcome = recorder!.RecordArgument(argument);
 
         Assert.True(outcome);
 
@@ -118,7 +118,7 @@ public sealed class TryMapTypeParameter
 
         var recorder = Target(new Mapper(), dataRecord, Mock.Of<ITypeParameterSymbol>((symol) => symol.Name == Mapper.TypeNameNone && symol.Ordinal == Mapper.IndexT2));
 
-        var outcome = recorder!(argument);
+        var outcome = recorder!.RecordArgument(argument);
 
         Assert.True(outcome);
 
@@ -133,7 +133,7 @@ public sealed class TryMapTypeParameter
 
         var recorder = Target(new Mapper(), dataRecord, Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == Mapper.TypeNameT2));
 
-        var outcome = recorder!(argument);
+        var outcome = recorder!.RecordArgument(argument);
 
         Assert.True(outcome);
 

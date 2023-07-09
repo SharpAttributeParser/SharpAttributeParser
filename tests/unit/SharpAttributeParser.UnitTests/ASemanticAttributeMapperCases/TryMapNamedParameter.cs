@@ -9,7 +9,7 @@ using Xunit;
 
 public sealed class TryMapNamedParameter
 {
-    private static DSemanticAttributeArgumentRecorder? Target<TData>(ISemanticAttributeMapper<TData> mapper, TData dataRecord, string parameterName) => mapper.TryMapNamedParameter(dataRecord, parameterName);
+    private static ISemanticAttributeArgumentRecorder? Target<TData>(ISemanticAttributeMapper<TData> mapper, TData dataRecord, string parameterName) => mapper.TryMapNamedParameter(parameterName, dataRecord);
 
     [Fact]
     public void NullData_ArgumentNullException()
@@ -43,7 +43,7 @@ public sealed class TryMapNamedParameter
 
         var recorder = Target(new Mapper(), dataRecord, Mapper.NameValueA);
 
-        var outcome = recorder!(argument);
+        var outcome = recorder!.RecordArgument(argument);
 
         Assert.True(outcome);
 
@@ -61,7 +61,7 @@ public sealed class TryMapNamedParameter
 
         var recorder = Target(new Mapper(), dataRecord, Mapper.NameValueB);
 
-        var outcome = recorder!(argument);
+        var outcome = recorder!.RecordArgument(argument);
 
         Assert.True(outcome);
 

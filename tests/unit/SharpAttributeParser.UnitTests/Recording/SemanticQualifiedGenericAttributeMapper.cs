@@ -10,14 +10,14 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "Used through DI.")]
-internal sealed class SemanticQualifiedGenericAttributeMapper : ASemanticAttributeMapper<IQualifiedGenericAttributeDataBuilder>
+internal sealed class SemanticQualifiedGenericAttributeMapper : ASemanticAttributeMapper<ISemanticQualifiedGenericAttributeRecordBuilder>
 {
-    protected override IEnumerable<(OneOf<int, string>, DSemanticAttributeTypeArgumentRecorder)> AddTypeParameterMappings()
+    protected override IEnumerable<(OneOf<int, string>, DTypeArgumentRecorder)> AddTypeParameterMappings()
     {
         yield return (0, Adapters.Type.For(RecordT1));
         yield return (1, Adapters.Type.For(RecordT2));
     }
 
-    private void RecordT1(IQualifiedGenericAttributeDataBuilder builder, ITypeSymbol value) => builder.WithT1(value, Location.None);
-    private void RecordT2(IQualifiedGenericAttributeDataBuilder builder, ITypeSymbol value) => builder.WithT2(value, Location.None);
+    private void RecordT1(ISemanticQualifiedGenericAttributeRecordBuilder builder, ITypeSymbol value) => builder.WithT1(value);
+    private void RecordT2(ISemanticQualifiedGenericAttributeRecordBuilder builder, ITypeSymbol value) => builder.WithT2(value);
 }

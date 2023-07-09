@@ -14,18 +14,18 @@ using System.Linq;
 /// <item><see cref="AddTypeParameterMappings"/></item>
 /// <item><see cref="AddParameterMappings"/></item>
 /// </list></summary>
-/// <typeparam name="TData">The type to which the produced <see cref="SharpAttributeParser.DSemanticAttributeArgumentRecorder"/> records the arguments of attribute parameters.</typeparam>
-public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper<TData>
+/// <typeparam name="TRecord">The type to which the arguments of the mapped parameters are recorded.</typeparam>
+public abstract class ASemanticAttributeMapper<TRecord> : ISemanticAttributeMapper<TRecord>
 {
     /// <summary>Provides adapters that may be applied to parsed arguments before they are recorded.</summary>
-    [SuppressMessage("Major Code Smell", "S2743: Static fields should not be used in generic types", Justification = "ISemanticArgumentAdapter uses TData.")]
+    [SuppressMessage("Major Code Smell", "S2743: Static fields should not be used in generic types", Justification = "ISemanticArgumentAdapter uses TRecord.")]
     protected static ISemanticArgumentAdapterProvider Adapters { get; } = new SemanticArgumentAdapterProvider();
 
     private bool IsInitialized { get; set; }
 
-    private IReadOnlyDictionary<int, DSemanticAttributeTypeArgumentRecorder> IndexedTypeParameterMappings { get; set; } = null!;
-    private IReadOnlyDictionary<string, DSemanticAttributeTypeArgumentRecorder> NamedTypeParameterMappings { get; set; } = null!;
-    private IReadOnlyDictionary<string, DSemanticAttributeArgumentRecorder> ParameterMappings { get; set; } = null!;
+    private IReadOnlyDictionary<int, DTypeArgumentRecorder> IndexedTypeParameterMappings { get; set; } = null!;
+    private IReadOnlyDictionary<string, DTypeArgumentRecorder> NamedTypeParameterMappings { get; set; } = null!;
+    private IReadOnlyDictionary<string, DArgumentRecorder> ParameterMappings { get; set; } = null!;
 
     /// <summary>Initializes the mapper. If not invoked, initialization will occur when the mapper is first used.</summary>
     /// <exception cref="InvalidOperationException"/>
@@ -41,9 +41,9 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
         var typeParameterMappings = AddTypeParameterMappings() ?? throw new InvalidOperationException("The provided collection of type-parameter mappings was null.");
         var parameterMappings = AddParameterMappings() ?? throw new InvalidOperationException("The provided collection of parameter mappings was null.");
 
-        Dictionary<int, DSemanticAttributeTypeArgumentRecorder> indexedTypeParameterMappingsDictionary = new();
-        Dictionary<string, DSemanticAttributeTypeArgumentRecorder> namedTypeParameterMappingsDictionary = new(comparer);
-        Dictionary<string, DSemanticAttributeArgumentRecorder> parameterMappingsDictionary = new(comparer);
+        Dictionary<int, DTypeArgumentRecorder> indexedTypeParameterMappingsDictionary = new();
+        Dictionary<string, DTypeArgumentRecorder> namedTypeParameterMappingsDictionary = new(comparer);
+        Dictionary<string, DArgumentRecorder> parameterMappingsDictionary = new(comparer);
 
         PopulateTypeMappingsDictionaries(indexedTypeParameterMappingsDictionary, namedTypeParameterMappingsDictionary, typeParameterMappings);
         PopulateMappingsDictionary(parameterMappingsDictionary, parameterMappings);
@@ -55,7 +55,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
         IsInitialized = true;
     }
 
-    private static void PopulateMappingsDictionary(IDictionary<string, DSemanticAttributeArgumentRecorder> dictionary, IEnumerable<(string, DSemanticAttributeArgumentRecorder)> mappings)
+    private static void PopulateMappingsDictionary(IDictionary<string, DArgumentRecorder> dictionary, IEnumerable<(string, DArgumentRecorder)> mappings)
     {
         foreach (var (parameterName, mapping) in mappings)
         {
@@ -80,7 +80,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
         }
     }
 
-    private static void PopulateTypeMappingsDictionaries(IDictionary<int, DSemanticAttributeTypeArgumentRecorder> indexedDictionary, IDictionary<string, DSemanticAttributeTypeArgumentRecorder> namedDictionary, IEnumerable<(OneOf<int, string>, DSemanticAttributeTypeArgumentRecorder)> mappings)
+    private static void PopulateTypeMappingsDictionaries(IDictionary<int, DTypeArgumentRecorder> indexedDictionary, IDictionary<string, DTypeArgumentRecorder> namedDictionary, IEnumerable<(OneOf<int, string>, DTypeArgumentRecorder)> mappings)
     {
         foreach (var (parameter, mapping) in mappings)
         {
@@ -89,7 +89,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
                 throw new InvalidOperationException("An element in the provided collection of mappings was null.");
             }
 
-            var dictionaryDelegate = parameter.Match<Action<DSemanticAttributeTypeArgumentRecorder>>
+            var dictionaryDelegate = parameter.Match<Action<DTypeArgumentRecorder>>
             (
                 (index) =>
                 {
@@ -127,14 +127,14 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
 
     /// <summary>Maps the indices of type-parameters to recorders, responsible for recording the argument of the parameter.</summary>
     /// <returns>The mappings from type-parameter index to recorder.</returns>
-    protected virtual IEnumerable<(OneOf<int, string> Index, DSemanticAttributeTypeArgumentRecorder Mapping)> AddTypeParameterMappings() => Enumerable.Empty<(OneOf<int, string>, DSemanticAttributeTypeArgumentRecorder)>();
+    protected virtual IEnumerable<(OneOf<int, string> Index, DTypeArgumentRecorder Mapping)> AddTypeParameterMappings() => Enumerable.Empty<(OneOf<int, string>, DTypeArgumentRecorder)>();
 
     /// <summary>Maps the names of constructor or named parameters to recorders, responsible for recording the argument of the parameter.</summary>
     /// <returns>The mappings from parameter name to recorder.</returns>
-    protected virtual IEnumerable<(string Name, DSemanticAttributeArgumentRecorder Mapping)> AddParameterMappings() => Enumerable.Empty<(string, DSemanticAttributeArgumentRecorder)>();
+    protected virtual IEnumerable<(string Name, DArgumentRecorder Mapping)> AddParameterMappings() => Enumerable.Empty<(string, DArgumentRecorder)>();
 
     /// <inheritdoc/>
-    public SharpAttributeParser.DSemanticAttributeArgumentRecorder? TryMapTypeParameter(TData dataRecord, ITypeParameterSymbol parameter)
+    public ISemanticAttributeArgumentRecorder? TryMapTypeParameter(ITypeParameterSymbol parameter, TRecord dataRecord)
     {
         if (dataRecord is null)
         {
@@ -148,14 +148,14 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
 
         InitializeMapper();
 
-        if (TryGetTypeParameterMapping(parameter) is not DSemanticAttributeTypeArgumentRecorder mapping)
+        if (TryGetTypeParameterMapping(parameter) is not DTypeArgumentRecorder mapping)
         {
             return null;
         }
 
-        return mappingWrapper;
+        return new AttributeArgumentRecorder(dataRecord, typeCheckedMapping);
 
-        bool mappingWrapper(object? argument)
+        bool typeCheckedMapping(TRecord dataRecord, object? argument)
         {
             if (argument is not ITypeSymbol typeArgument)
             {
@@ -167,7 +167,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
     }
 
     /// <inheritdoc/>
-    public SharpAttributeParser.DSemanticAttributeArgumentRecorder? TryMapConstructorParameter(TData dataRecord, IParameterSymbol parameter)
+    public ISemanticAttributeArgumentRecorder? TryMapConstructorParameter(IParameterSymbol parameter, TRecord dataRecord)
     {
         if (dataRecord is null)
         {
@@ -179,11 +179,11 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             throw new ArgumentNullException(nameof(parameter));
         }
 
-        return TryMapNamedParameter(dataRecord, parameter.Name);
+        return TryMapNamedParameter(parameter.Name, dataRecord);
     }
 
     /// <inheritdoc/>
-    public SharpAttributeParser.DSemanticAttributeArgumentRecorder? TryMapNamedParameter(TData dataRecord, string parameterName)
+    public ISemanticAttributeArgumentRecorder? TryMapNamedParameter(string parameterName, TRecord dataRecord)
     {
         if (dataRecord is null)
         {
@@ -202,12 +202,10 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             return null;
         }
 
-        return mappingWrapper;
-
-        bool mappingWrapper(object? argument) => mapping(dataRecord, argument);
+        return new AttributeArgumentRecorder(dataRecord, mapping);
     }
 
-    private DSemanticAttributeTypeArgumentRecorder? TryGetTypeParameterMapping(ITypeParameterSymbol parameter)
+    private DTypeArgumentRecorder? TryGetTypeParameterMapping(ITypeParameterSymbol parameter)
     {
         var hasIndexedMapping = IndexedTypeParameterMappings.TryGetValue(parameter.Ordinal, out var indexedMapping);
         var hasNamedMapping = NamedTypeParameterMappings.TryGetValue(parameter.Name, out var namedMapping);
@@ -220,7 +218,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             (true, true) => attemptToResolveConflictingMappings(indexedMapping, namedMapping)
         };
 
-        static DSemanticAttributeTypeArgumentRecorder? attemptToResolveConflictingMappings(DSemanticAttributeTypeArgumentRecorder indexedMapping, DSemanticAttributeTypeArgumentRecorder namedMapping)
+        static DTypeArgumentRecorder? attemptToResolveConflictingMappings(DTypeArgumentRecorder indexedMapping, DTypeArgumentRecorder namedMapping)
         {
             if (Equals(indexedMapping, namedMapping))
             {
@@ -232,18 +230,18 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
     }
 
     /// <summary>Responsible for recording the semantically parsed argument of a type-parameter.</summary>
-    /// <param name="dataRecord">The <typeparamref name="TData"/> to which the argument is recorded.</param>
+    /// <param name="dataRecord">The <typeparamref name="TRecord"/> to which the argument is recorded.</param>
     /// <param name="argument">The argument of the type-parameter.</param>
     /// <returns>A <see cref="bool"/> indicating whether the argument was successfully recorded.</returns>
     /// <exception cref="ArgumentNullException"/>
-    protected delegate bool DSemanticAttributeTypeArgumentRecorder(TData dataRecord, ITypeSymbol argument);
+    protected delegate bool DTypeArgumentRecorder(TRecord dataRecord, ITypeSymbol argument);
 
     /// <summary>Responsible for recording the semantically parsed argument of a parameter.</summary>
-    /// <param name="dataRecord">The <typeparamref name="TData"/> to which the argument is recorded.</param>
+    /// <param name="dataRecord">The <typeparamref name="TRecord"/> to which the argument is recorded.</param>
     /// <param name="argument">The argument of the parameter.</param>
     /// <returns>A <see cref="bool"/> indicating whether the argument was successfully recorded.</returns>
     /// <exception cref="ArgumentNullException"/>
-    protected delegate bool DSemanticAttributeArgumentRecorder(TData dataRecord, object? argument);
+    protected delegate bool DArgumentRecorder(TRecord dataRecord, object? argument);
 
     /// <summary>Provides adapters that may be applied to parsed attribute arguments before they are recorded.</summary>
     protected interface ISemanticArgumentAdapterProvider
@@ -265,7 +263,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
         /// <param name="recorder">Responsible for recording the argument of a type-parameter.</param>
         /// <returns>A recorder which wraps the provided recorder, and always returns <see langword="true"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract DSemanticAttributeTypeArgumentRecorder For(Action<TData, ITypeSymbol> recorder);
+        public abstract DTypeArgumentRecorder For(Action<TRecord, ITypeSymbol> recorder);
     }
 
     /// <summary>Provides adapters that may be applied to parsed attribute arguments before they are recorded.</summary>
@@ -276,42 +274,42 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
         /// <param name="recorder">Responsible for recording the argument, if it is of type <typeparamref name="T"/>.</param>
         /// <returns>A mapping from some parameter to the produced recorder.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract DSemanticAttributeArgumentRecorder For<T>(Func<TData, T, bool> recorder) where T : notnull;
+        public abstract DArgumentRecorder For<T>(Func<TRecord, T, bool> recorder) where T : notnull;
 
         /// <summary>Produces a recorder which ensures that the argument is of type <typeparamref name="T"/> before attempting to record it - and which returns <see langword="true"/> if this is the case.</summary>
         /// <typeparam name="T">The expected type of the argument.</typeparam>
         /// <param name="recorder">Responsible for recording the argument, if it is of type <typeparamref name="T"/>.</param>
         /// <returns>A mapping from some parameter to the produced recorder.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract DSemanticAttributeArgumentRecorder For<T>(Action<TData, T> recorder) where T : notnull;
+        public abstract DArgumentRecorder For<T>(Action<TRecord, T> recorder) where T : notnull;
 
         /// <summary>Produces a recorder which ensures that the argument is of type <typeparamref name="T"/>, or <see langword="null"/>, before attempting to record it.</summary>
         /// <typeparam name="T">The expected type of the argument.</typeparam>
         /// <param name="recorder">Responsible for recording the argument, if it is of type <typeparamref name="T"/> or <see langword="null"/>.</param>
         /// <returns>A mapping from some parameter to the produced recorder.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract DSemanticAttributeArgumentRecorder ForNullable<T>(Func<TData, T?, bool> recorder) where T : class;
+        public abstract DArgumentRecorder ForNullable<T>(Func<TRecord, T?, bool> recorder) where T : class;
 
         /// <summary>Produces a recorder which ensures that the argument is of type <typeparamref name="T"/>, or <see langword="null"/>, before attempting to record it - and which returns <see langword="true"/> if this is the case.</summary>
         /// <typeparam name="T">The expected type of the argument.</typeparam>
         /// <param name="recorder">Responsible for recording the argument, if it is of type <typeparamref name="T"/> or <see langword="null"/>.</param>
         /// <returns>A mapping from some parameter to the produced recorder.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract DSemanticAttributeArgumentRecorder ForNullable<T>(Action<TData, T?> recorder) where T : class;
+        public abstract DArgumentRecorder ForNullable<T>(Action<TRecord, T?> recorder) where T : class;
 
         /// <summary>Produces a recorder which ensures that the argument is of type <typeparamref name="T"/>, or <see langword="null"/>, before attempting to record it.</summary>
         /// <typeparam name="T">The expected type of the argument.</typeparam>
         /// <param name="recorder">Responsible for recording the argument, if it is of type <typeparamref name="T"/> or <see langword="null"/>.</param>
         /// <returns>A mapping from some parameter to the produced recorder.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract DSemanticAttributeArgumentRecorder ForNullable<T>(Func<TData, T?, bool> recorder) where T : struct;
+        public abstract DArgumentRecorder ForNullable<T>(Func<TRecord, T?, bool> recorder) where T : struct;
 
         /// <summary>Produces a recorder which ensures that the argument is of type <typeparamref name="T"/>, or <see langword="null"/>, before attempting to record it - and which returns <see langword="true"/> if this is the case.</summary>
         /// <typeparam name="T">The expected type of the argument.</typeparam>
         /// <param name="recorder">Responsible for recording the argument, if it is of type <typeparamref name="T"/> or <see langword="null"/>.</param>
         /// <returns>A mapping from some parameter to the produced recorder.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract DSemanticAttributeArgumentRecorder ForNullable<T>(Action<TData, T?> recorder) where T : struct;
+        public abstract DArgumentRecorder ForNullable<T>(Action<TRecord, T?> recorder) where T : struct;
     }
 
     /// <summary>Provides adapters that may be applied to parsed array-valued attribute arguments before they are recorded.</summary>
@@ -322,84 +320,98 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
         /// <param name="recorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>.</param>
         /// <returns>A mapping from some parameter to the produced recorder.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract DSemanticAttributeArgumentRecorder For<T>(Func<TData, IReadOnlyList<T>, bool> recorder) where T : notnull;
+        public abstract DArgumentRecorder For<T>(Func<TRecord, IReadOnlyList<T>, bool> recorder) where T : notnull;
 
         /// <summary>Produces a recorder which ensures that the argument is a collection with elements of type <typeparamref name="T"/> before attempting to record it - and which returns <see langword="true"/> if this is the case.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="recorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>.</param>
         /// <returns>A mapping from some parameter to the produced recorder.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract DSemanticAttributeArgumentRecorder For<T>(Action<TData, IReadOnlyList<T>> recorder) where T : notnull;
+        public abstract DArgumentRecorder For<T>(Action<TRecord, IReadOnlyList<T>> recorder) where T : notnull;
 
         /// <summary>Produces a recorder which ensures that the argument is a collection with elements of type <typeparamref name="T"/> before attempting to record it.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="recorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>.</param>
         /// <returns>A mapping from some parameter to the produced recorder.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract DSemanticAttributeArgumentRecorder ForNullableCollection<T>(Func<TData, IReadOnlyList<T>?, bool> recorder) where T : notnull;
+        public abstract DArgumentRecorder ForNullableCollection<T>(Func<TRecord, IReadOnlyList<T>?, bool> recorder) where T : notnull;
 
         /// <summary>Produces a recorder which ensures that the argument is a collection with elements of type <typeparamref name="T"/> before attempting to record it - and which returns <see langword="true"/> if this is the case.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="recorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>.</param>
         /// <returns>A mapping from some parameter to the produced recorder.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract DSemanticAttributeArgumentRecorder ForNullableCollection<T>(Action<TData, IReadOnlyList<T>?> recorder) where T : notnull;
+        public abstract DArgumentRecorder ForNullableCollection<T>(Action<TRecord, IReadOnlyList<T>?> recorder) where T : notnull;
 
         /// <summary>Produces a recorder which ensures that the argument is a collection with elements of type <typeparamref name="T"/> before attempting to record it.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="recorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>.</param>
         /// <returns>A mapping from some parameter to the produced recorder.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract DSemanticAttributeArgumentRecorder ForNullable<T>(Func<TData, IReadOnlyList<T?>?, bool> recorder) where T : class;
+        public abstract DArgumentRecorder ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, bool> recorder) where T : class;
 
         /// <summary>Produces a recorder which ensures that the argument is a collection with elements of type <typeparamref name="T"/> before attempting to record it - and which returns <see langword="true"/> if this is the case.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="recorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>.</param>
         /// <returns>A mapping from some parameter to the produced recorder.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract DSemanticAttributeArgumentRecorder ForNullable<T>(Action<TData, IReadOnlyList<T?>?> recorder) where T : class;
+        public abstract DArgumentRecorder ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?> recorder) where T : class;
 
         /// <summary>Produces a recorder which ensures that the argument is a collection with elements of type <typeparamref name="T"/> before attempting to record it.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="recorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>.</param>
         /// <returns>A mapping from some parameter to the produced recorder.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract DSemanticAttributeArgumentRecorder ForNullable<T>(Func<TData, IReadOnlyList<T?>?, bool> recorder) where T : struct;
+        public abstract DArgumentRecorder ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, bool> recorder) where T : struct;
 
         /// <summary>Produces a recorder which ensures that the argument is a collection with elements of type <typeparamref name="T"/> before attempting to record it - and which returns <see langword="true"/> if this is the case.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="recorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>.</param>
         /// <returns>A mapping from some parameter to the produced recorder.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract DSemanticAttributeArgumentRecorder ForNullable<T>(Action<TData, IReadOnlyList<T?>?> recorder) where T : struct;
+        public abstract DArgumentRecorder ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?> recorder) where T : struct;
 
         /// <summary>Produces a recorder which ensures that the argument is a collection with elements of type <typeparamref name="T"/> before attempting to record it.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="recorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>.</param>
         /// <returns>A mapping from some parameter to the produced recorder.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract DSemanticAttributeArgumentRecorder ForNullableElements<T>(Func<TData, IReadOnlyList<T?>, bool> recorder) where T : class;
+        public abstract DArgumentRecorder ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, bool> recorder) where T : class;
 
         /// <summary>Produces a recorder which ensures that the argument is a collection with elements of type <typeparamref name="T"/> before attempting to record it - and which returns <see langword="true"/> if this is the case.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="recorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>.</param>
         /// <returns>A mapping from some parameter to the produced recorder.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract DSemanticAttributeArgumentRecorder ForNullableElements<T>(Action<TData, IReadOnlyList<T?>> recorder) where T : class;
+        public abstract DArgumentRecorder ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>> recorder) where T : class;
 
         /// <summary>Produces a recorder which ensures that the argument is a collection with elements of type <typeparamref name="T"/> before attempting to record it.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="recorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>.</param>
         /// <returns>A mapping from some parameter to the produced recorder.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract DSemanticAttributeArgumentRecorder ForNullableElements<T>(Func<TData, IReadOnlyList<T?>, bool> recorder) where T : struct;
+        public abstract DArgumentRecorder ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, bool> recorder) where T : struct;
 
         /// <summary>Produces a recorder which ensures that the argument is a collection with elements of type <typeparamref name="T"/> before attempting to record it - and which returns <see langword="true"/> if this is the case.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="recorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>.</param>
         /// <returns>A mapping from some parameter to the produced recorder.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract DSemanticAttributeArgumentRecorder ForNullableElements<T>(Action<TData, IReadOnlyList<T?>> recorder) where T : struct;
+        public abstract DArgumentRecorder ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>> recorder) where T : struct;
+    }
+
+    private sealed class AttributeArgumentRecorder : ISemanticAttributeArgumentRecorder
+    {
+        private TRecord DataRecord { get; }
+        private DArgumentRecorder Recorder { get; }
+
+        public AttributeArgumentRecorder(TRecord dataRecord, DArgumentRecorder recorder)
+        {
+            DataRecord = dataRecord;
+            Recorder = recorder;
+        }
+
+        bool ISemanticAttributeArgumentRecorder.RecordArgument(object? argument) => Recorder(DataRecord, argument);
     }
 
     private sealed class SemanticArgumentAdapterProvider : ISemanticArgumentAdapterProvider
@@ -411,7 +423,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
 
     private sealed class SemanticTypeArgumentAdapter : ISemanticTypeArgumentAdapter
     {
-        DSemanticAttributeTypeArgumentRecorder ISemanticTypeArgumentAdapter.For(Action<TData, ITypeSymbol> recorder)
+        DTypeArgumentRecorder ISemanticTypeArgumentAdapter.For(Action<TRecord, ITypeSymbol> recorder)
         {
             if (recorder is null)
             {
@@ -420,7 +432,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
 
             return wrapper;
 
-            bool wrapper(TData data, ITypeSymbol argument)
+            bool wrapper(TRecord data, ITypeSymbol argument)
             {
                 recorder(data, argument);
 
@@ -431,7 +443,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
 
     private sealed class SemanticSimpleArgumentAdapter : ISemanticSimpleArgumentAdapter
     {
-        DSemanticAttributeArgumentRecorder ISemanticSimpleArgumentAdapter.For<T>(Func<TData, T, bool> recorder)
+        DArgumentRecorder ISemanticSimpleArgumentAdapter.For<T>(Func<TRecord, T, bool> recorder)
         {
             if (recorder is null)
             {
@@ -441,7 +453,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             return For(recorder);
         }
 
-        DSemanticAttributeArgumentRecorder ISemanticSimpleArgumentAdapter.For<T>(Action<TData, T> recorder)
+        DArgumentRecorder ISemanticSimpleArgumentAdapter.For<T>(Action<TRecord, T> recorder)
         {
             if (recorder is null)
             {
@@ -450,7 +462,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
 
             return For<T>(wrapper);
 
-            bool wrapper(TData data, T argument)
+            bool wrapper(TRecord data, T argument)
             {
                 recorder(data, argument);
 
@@ -458,7 +470,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             }
         }
 
-        DSemanticAttributeArgumentRecorder ISemanticSimpleArgumentAdapter.ForNullable<T>(Func<TData, T?, bool> recorder) where T : class
+        DArgumentRecorder ISemanticSimpleArgumentAdapter.ForNullable<T>(Func<TRecord, T?, bool> recorder) where T : class
         {
             if (recorder is null)
             {
@@ -468,7 +480,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             return ForNullable(recorder);
         }
 
-        DSemanticAttributeArgumentRecorder ISemanticSimpleArgumentAdapter.ForNullable<T>(Action<TData, T?> recorder) where T : class
+        DArgumentRecorder ISemanticSimpleArgumentAdapter.ForNullable<T>(Action<TRecord, T?> recorder) where T : class
         {
             if (recorder is null)
             {
@@ -477,7 +489,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
 
             return ForNullable<T>(wrapper);
 
-            bool wrapper(TData data, T? argument)
+            bool wrapper(TRecord data, T? argument)
             {
                 recorder(data, argument);
 
@@ -485,7 +497,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             }
         }
 
-        DSemanticAttributeArgumentRecorder ISemanticSimpleArgumentAdapter.ForNullable<T>(Func<TData, T?, bool> recorder) where T : struct
+        DArgumentRecorder ISemanticSimpleArgumentAdapter.ForNullable<T>(Func<TRecord, T?, bool> recorder) where T : struct
         {
             if (recorder is null)
             {
@@ -495,7 +507,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             return ForNullable(recorder);
         }
 
-        DSemanticAttributeArgumentRecorder ISemanticSimpleArgumentAdapter.ForNullable<T>(Action<TData, T?> recorder) where T : struct
+        DArgumentRecorder ISemanticSimpleArgumentAdapter.ForNullable<T>(Action<TRecord, T?> recorder) where T : struct
         {
             if (recorder is null)
             {
@@ -504,7 +516,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
 
             return ForNullable<T>(wrapper);
 
-            bool wrapper(TData data, T? argument)
+            bool wrapper(TRecord data, T? argument)
             {
                 recorder(data, argument);
 
@@ -512,11 +524,11 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             }
         }
 
-        private static DSemanticAttributeArgumentRecorder For<T>(Func<TData, T, bool> recorder)
+        private static DArgumentRecorder For<T>(Func<TRecord, T, bool> recorder)
         {
             return wrapper;
 
-            bool wrapper(TData data, object? argument)
+            bool wrapper(TRecord data, object? argument)
             {
                 if (argument is null)
                 {
@@ -532,11 +544,11 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             }
         }
 
-        private static DSemanticAttributeArgumentRecorder ForNullable<T>(Func<TData, T?, bool> recorder) where T : class
+        private static DArgumentRecorder ForNullable<T>(Func<TRecord, T?, bool> recorder) where T : class
         {
             return wrapper;
 
-            bool wrapper(TData data, object? argument)
+            bool wrapper(TRecord data, object? argument)
             {
                 if (argument is null)
                 {
@@ -552,11 +564,11 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             }
         }
 
-        private static DSemanticAttributeArgumentRecorder ForNullable<T>(Func<TData, T?, bool> recorder) where T : struct
+        private static DArgumentRecorder ForNullable<T>(Func<TRecord, T?, bool> recorder) where T : struct
         {
             return wrapper;
 
-            bool wrapper(TData data, object? argument)
+            bool wrapper(TRecord data, object? argument)
             {
                 if (argument is null)
                 {
@@ -575,7 +587,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
 
     private sealed class SemanticCollectionArgumentAdapter : ISemanticCollectionArgumentAdapter
     {
-        DSemanticAttributeArgumentRecorder ISemanticCollectionArgumentAdapter.For<T>(Func<TData, IReadOnlyList<T>, bool> recorder)
+        DArgumentRecorder ISemanticCollectionArgumentAdapter.For<T>(Func<TRecord, IReadOnlyList<T>, bool> recorder)
         {
             if (recorder is null)
             {
@@ -585,7 +597,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             return For(recorder);
         }
 
-        DSemanticAttributeArgumentRecorder ISemanticCollectionArgumentAdapter.For<T>(Action<TData, IReadOnlyList<T>> recorder)
+        DArgumentRecorder ISemanticCollectionArgumentAdapter.For<T>(Action<TRecord, IReadOnlyList<T>> recorder)
         {
             if (recorder is null)
             {
@@ -594,7 +606,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
 
             return For<T>(wrapper);
 
-            bool wrapper(TData data, IReadOnlyList<T> argument)
+            bool wrapper(TRecord data, IReadOnlyList<T> argument)
             {
                 recorder(data, argument);
 
@@ -602,7 +614,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             }
         }
 
-        DSemanticAttributeArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullable<T>(Func<TData, IReadOnlyList<T?>?, bool> recorder) where T : class
+        DArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, bool> recorder) where T : class
         {
             if (recorder is null)
             {
@@ -612,7 +624,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             return ForNullable(recorder);
         }
 
-        DSemanticAttributeArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullable<T>(Action<TData, IReadOnlyList<T?>?> recorder) where T : class
+        DArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?> recorder) where T : class
         {
             if (recorder is null)
             {
@@ -621,7 +633,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
 
             return ForNullable<T>(wrapper);
 
-            bool wrapper(TData data, IReadOnlyList<T?>? argument)
+            bool wrapper(TRecord data, IReadOnlyList<T?>? argument)
             {
                 recorder(data, argument);
 
@@ -629,7 +641,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             }
         }
 
-        DSemanticAttributeArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullable<T>(Func<TData, IReadOnlyList<T?>?, bool> recorder)
+        DArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, bool> recorder)
         {
             if (recorder is null)
             {
@@ -639,7 +651,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             return ForNullable(recorder);
         }
 
-        DSemanticAttributeArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullable<T>(Action<TData, IReadOnlyList<T?>?> recorder)
+        DArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?> recorder)
         {
             if (recorder is null)
             {
@@ -648,7 +660,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
 
             return ForNullable<T>(wrapper);
 
-            bool wrapper(TData data, IReadOnlyList<T?>? argument)
+            bool wrapper(TRecord data, IReadOnlyList<T?>? argument)
             {
                 recorder(data, argument);
 
@@ -656,7 +668,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             }
         }
 
-        DSemanticAttributeArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullableCollection<T>(Func<TData, IReadOnlyList<T>?, bool> recorder)
+        DArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullableCollection<T>(Func<TRecord, IReadOnlyList<T>?, bool> recorder)
         {
             if (recorder is null)
             {
@@ -666,7 +678,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             return ForNullableCollection(recorder);
         }
 
-        DSemanticAttributeArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullableCollection<T>(Action<TData, IReadOnlyList<T>?> recorder)
+        DArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullableCollection<T>(Action<TRecord, IReadOnlyList<T>?> recorder)
         {
             if (recorder is null)
             {
@@ -675,7 +687,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
 
             return ForNullableCollection<T>(wrapper);
 
-            bool wrapper(TData data, IReadOnlyList<T>? argument)
+            bool wrapper(TRecord data, IReadOnlyList<T>? argument)
             {
                 recorder(data, argument);
 
@@ -683,7 +695,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             }
         }
 
-        DSemanticAttributeArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullableElements<T>(Func<TData, IReadOnlyList<T?>, bool> recorder) where T : class
+        DArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, bool> recorder) where T : class
         {
             if (recorder is null)
             {
@@ -693,7 +705,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             return ForNullableElements(recorder);
         }
 
-        DSemanticAttributeArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullableElements<T>(Action<TData, IReadOnlyList<T?>> recorder) where T : class
+        DArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>> recorder) where T : class
         {
             if (recorder is null)
             {
@@ -702,7 +714,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
 
             return ForNullableElements<T>(wrapper);
 
-            bool wrapper(TData data, IReadOnlyList<T?> argument)
+            bool wrapper(TRecord data, IReadOnlyList<T?> argument)
             {
                 recorder(data, argument);
 
@@ -710,7 +722,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             }
         }
 
-        DSemanticAttributeArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullableElements<T>(Func<TData, IReadOnlyList<T?>, bool> recorder)
+        DArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, bool> recorder)
         {
             if (recorder is null)
             {
@@ -720,7 +732,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             return ForNullableElements(recorder);
         }
 
-        DSemanticAttributeArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullableElements<T>(Action<TData, IReadOnlyList<T?>> recorder)
+        DArgumentRecorder ISemanticCollectionArgumentAdapter.ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>> recorder)
         {
             if (recorder is null)
             {
@@ -729,7 +741,7 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
 
             return ForNullableElements<T>(wrapper);
 
-            bool wrapper(TData data, IReadOnlyList<T?> argument)
+            bool wrapper(TRecord data, IReadOnlyList<T?> argument)
             {
                 recorder(data, argument);
 
@@ -737,11 +749,11 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             }
         }
 
-        private static DSemanticAttributeArgumentRecorder For<T>(Func<TData, IReadOnlyList<T>, bool> recorder)
+        private static DArgumentRecorder For<T>(Func<TRecord, IReadOnlyList<T>, bool> recorder)
         {
             return wrapper;
 
-            bool wrapper(TData data, object? argument)
+            bool wrapper(TRecord data, object? argument)
             {
                 if (argument is null)
                 {
@@ -784,11 +796,11 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             }
         }
 
-        private static DSemanticAttributeArgumentRecorder ForNullable<T>(Func<TData, IReadOnlyList<T?>?, bool> recorder) where T : class
+        private static DArgumentRecorder ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, bool> recorder) where T : class
         {
             return wrapper;
 
-            bool wrapper(TData data, object? argument)
+            bool wrapper(TRecord data, object? argument)
             {
                 if (argument is null)
                 {
@@ -828,11 +840,11 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             }
         }
 
-        private static DSemanticAttributeArgumentRecorder ForNullable<T>(Func<TData, IReadOnlyList<T?>?, bool> recorder) where T : struct
+        private static DArgumentRecorder ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, bool> recorder) where T : struct
         {
             return wrapper;
 
-            bool wrapper(TData data, object? argument)
+            bool wrapper(TRecord data, object? argument)
             {
                 if (argument is null)
                 {
@@ -872,11 +884,11 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             }
         }
 
-        private static DSemanticAttributeArgumentRecorder ForNullableElements<T>(Func<TData, IReadOnlyList<T?>, bool> recorder) where T : class
+        private static DArgumentRecorder ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, bool> recorder) where T : class
         {
             return ForNullable<T>(wrapper);
 
-            bool wrapper(TData data, IReadOnlyList<T?>? argument)
+            bool wrapper(TRecord data, IReadOnlyList<T?>? argument)
             {
                 if (argument is null)
                 {
@@ -887,11 +899,11 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             }
         }
 
-        private static DSemanticAttributeArgumentRecorder ForNullableElements<T>(Func<TData, IReadOnlyList<T?>, bool> recorder) where T : struct
+        private static DArgumentRecorder ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, bool> recorder) where T : struct
         {
             return ForNullable<T>(wrapper);
 
-            bool wrapper(TData data, IReadOnlyList<T?>? argument)
+            bool wrapper(TRecord data, IReadOnlyList<T?>? argument)
             {
                 if (argument is null)
                 {
@@ -902,11 +914,11 @@ public abstract class ASemanticAttributeMapper<TData> : ISemanticAttributeMapper
             }
         }
 
-        private static DSemanticAttributeArgumentRecorder ForNullableCollection<T>(Func<TData, IReadOnlyList<T>?, bool> recorder)
+        private static DArgumentRecorder ForNullableCollection<T>(Func<TRecord, IReadOnlyList<T>?, bool> recorder)
         {
             return wrapper;
 
-            bool wrapper(TData data, object? argument)
+            bool wrapper(TRecord data, object? argument)
             {
                 if (argument is null)
                 {

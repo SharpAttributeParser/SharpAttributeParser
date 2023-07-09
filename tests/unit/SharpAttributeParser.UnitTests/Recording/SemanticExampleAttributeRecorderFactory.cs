@@ -11,27 +11,27 @@ using System.Diagnostics.CodeAnalysis;
 internal sealed class SemanticExampleAttributeRecorderFactory : ISemanticExampleAttributeRecorderFactory
 {
     private ISemanticAttributeRecorderFactory Factory { get; }
-    private ISemanticAttributeMapper<IExampleAttributeDataBuilder> ArgumentMapper { get; }
+    private ISemanticAttributeMapper<ISemanticExampleAttributeRecordBuilder> ArgumentMapper { get; }
 
-    public SemanticExampleAttributeRecorderFactory(ISemanticAttributeRecorderFactory factory, ISemanticAttributeMapper<IExampleAttributeDataBuilder> argumentMapper)
+    public SemanticExampleAttributeRecorderFactory(ISemanticAttributeRecorderFactory factory, ISemanticAttributeMapper<ISemanticExampleAttributeRecordBuilder> argumentMapper)
     {
         Factory = factory;
         ArgumentMapper = argumentMapper;
     }
 
-    ISemanticAttributeRecorder<IExampleAttributeData> ISemanticExampleAttributeRecorderFactory.Create() => Factory.Create<IExampleAttributeData, IExampleAttributeDataBuilder>(ArgumentMapper, new ExampleAttributeDataBuilder());
+    ISemanticAttributeRecorder<ISemanticExampleAttributeRecord> ISemanticExampleAttributeRecorderFactory.Create() => Factory.Create<ISemanticExampleAttributeRecord, ISemanticExampleAttributeRecordBuilder>(ArgumentMapper, new ExampleAttributeDataBuilder());
 
-    private sealed class ExampleAttributeDataBuilder : IExampleAttributeDataBuilder
+    private sealed class ExampleAttributeDataBuilder : ISemanticExampleAttributeRecordBuilder
     {
         private ExampleAttributeData Target { get; } = new();
 
         private bool HasBeenBuilt { get; set; }
 
-        IExampleAttributeData IAttributeDataBuilder<IExampleAttributeData>.Build()
+        ISemanticExampleAttributeRecord IRecordBuilder<ISemanticExampleAttributeRecord>.Build()
         {
             if (Target.T is null || Target.Sequence is null || Target.Name is null)
             {
-                throw new InvalidOperationException($"The {nameof(IExampleAttributeData)} has not yet been fully constructed.");
+                throw new InvalidOperationException($"The {nameof(ISemanticExampleAttributeRecord)} has not yet been fully constructed.");
             }
 
             HasBeenBuilt = true;
@@ -71,11 +71,11 @@ internal sealed class SemanticExampleAttributeRecorderFactory : ISemanticExample
         {
             if (HasBeenBuilt)
             {
-                throw new InvalidOperationException($"The {nameof(IExampleAttributeData)} has been built, and may not be modified.");
+                throw new InvalidOperationException($"The {nameof(ISemanticExampleAttributeRecord)} has been built, and may not be modified.");
             }
         }
 
-        private sealed class ExampleAttributeData : IExampleAttributeData
+        private sealed class ExampleAttributeData : ISemanticExampleAttributeRecord
         {
             public ITypeSymbol T { get; set; } = null!;
             public IReadOnlyList<int> Sequence { get; set; } = null!;

@@ -62,7 +62,7 @@ public sealed class TryRecordTypeArgument
 
         var argumentRecorded = false;
 
-        mapperMock.Setup(static (mapper) => mapper.TryMapTypeParameter(It.IsAny<string>(), It.IsAny<ITypeParameterSymbol>())).Returns(recorderDelegate);
+        mapperMock.Setup(static (mapper) => mapper.TryMapTypeParameter(It.IsAny<ITypeParameterSymbol>(), It.IsAny<string>())).Returns(tryMapTypeParameter());
 
         var recorder = RecorderFactory.Create(mapperMock.Object, string.Empty);
 
@@ -72,11 +72,11 @@ public sealed class TryRecordTypeArgument
 
         Assert.True(argumentRecorded);
 
-        bool recorderDelegate(object? argument)
+        ISemanticAttributeArgumentRecorder? tryMapTypeParameter() => new SemanticAttributeArgumentRecorder((object? argument) =>
         {
             argumentRecorded = true;
 
             return returnValue;
-        }
+        });
     }
 }

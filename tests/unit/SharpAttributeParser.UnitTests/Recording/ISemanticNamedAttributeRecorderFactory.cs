@@ -2,5 +2,5 @@
 
 public interface ISemanticNamedAttributeRecorderFactory
 {
-    public abstract ISemanticAttributeRecorder<INamedAttributeData> Create();
+    public abstract ISemanticAttributeRecorder<ISemanticNamedAttributeRecord> Create();
 }

@@ -36,7 +36,7 @@ public sealed class ReadmeExamples
         var typeType = compilation.GetTypeByMetadataName("System.Type");
 
         var outcome = Target(Parser, recorder, attributeData);
-        var result = recorder.GetResult();
+        var result = recorder.GetRecord();
 
         Assert.True(outcome);
 

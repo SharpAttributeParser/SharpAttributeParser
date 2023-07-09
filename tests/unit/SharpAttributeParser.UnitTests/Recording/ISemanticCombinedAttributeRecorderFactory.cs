@@ -2,5 +2,5 @@
 
 public interface ISemanticCombinedAttributeRecorderFactory
 {
-    public abstract ISemanticAttributeRecorder<ICombinedAttributeData> Create();
+    public abstract ISemanticAttributeRecorder<ISemanticCombinedAttributeRecord> Create();
 }

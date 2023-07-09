@@ -48,9 +48,9 @@ public sealed class Create_Data
 
         Mock<ISemanticAttributeMapper<DataRecord>> mapperMock = new();
 
-        mapperMock.Setup(static (mapper) => mapper.TryMapTypeParameter(It.IsAny<DataRecord>(), It.IsAny<ITypeParameterSymbol>())).Returns<DataRecord, ITypeParameterSymbol>(tryMapTypeParameter);
-        mapperMock.Setup(static (mapper) => mapper.TryMapConstructorParameter(It.IsAny<DataRecord>(), It.IsAny<IParameterSymbol>())).Returns<DataRecord, IParameterSymbol>(tryMapConstructorParameter);
-        mapperMock.Setup(static (mapper) => mapper.TryMapNamedParameter(It.IsAny<DataRecord>(), It.IsAny<string>())).Returns<DataRecord, string>(tryMapNamedParameter);
+        mapperMock.Setup(static (mapper) => mapper.TryMapTypeParameter(It.IsAny<ITypeParameterSymbol>(), It.IsAny<DataRecord>())).Returns<ITypeParameterSymbol, DataRecord>(tryMapTypeParameter);
+        mapperMock.Setup(static (mapper) => mapper.TryMapConstructorParameter(It.IsAny<IParameterSymbol>(), It.IsAny<DataRecord>())).Returns<IParameterSymbol, DataRecord>(tryMapConstructorParameter);
+        mapperMock.Setup(static (mapper) => mapper.TryMapNamedParameter(It.IsAny<string>(), It.IsAny<DataRecord>())).Returns<string, DataRecord>(tryMapNamedParameter);
 
         var recorder = Target(factory, mapperMock.Object, dataRecord);
 
@@ -58,38 +58,38 @@ public sealed class Create_Data
         recorder.TryRecordConstructorArgument(constructorParameter, constructorArgument);
         recorder.TryRecordNamedArgument(namedParameter, namedArgument);
 
-        var result = recorder.GetResult();
+        var result = recorder.GetRecord();
 
         Assert.Equal(dataRecord, result);
 
-        mapperMock.Verify((mapper) => mapper.TryMapTypeParameter(dataRecord, typeParameter), Times.AtLeastOnce);
-        mapperMock.Verify((mapper) => mapper.TryMapConstructorParameter(dataRecord, constructorParameter), Times.AtLeastOnce);
-        mapperMock.Verify((mapper) => mapper.TryMapNamedParameter(dataRecord, namedParameter), Times.AtLeastOnce);
+        mapperMock.Verify((mapper) => mapper.TryMapTypeParameter(typeParameter, dataRecord), Times.AtLeastOnce);
+        mapperMock.Verify((mapper) => mapper.TryMapConstructorParameter(constructorParameter, dataRecord), Times.AtLeastOnce);
+        mapperMock.Verify((mapper) => mapper.TryMapNamedParameter(namedParameter, dataRecord), Times.AtLeastOnce);
 
         Assert.Equal(typeArgument, result.TypeArgument, ReferenceEqualityComparer.Instance);
         Assert.Equal(constructorArgument, result.ConstructorArgument, ReferenceEqualityComparer.Instance);
         Assert.Equal(namedArgument, result.NamedArgument, ReferenceEqualityComparer.Instance);
 
-        DSemanticAttributeArgumentRecorder? tryMapTypeParameter(DataRecord dataRecord, ITypeParameterSymbol parameter) => (argument) =>
+        ISemanticAttributeArgumentRecorder? tryMapTypeParameter(ITypeParameterSymbol parameter, DataRecord dataRecord) => new SemanticAttributeArgumentRecorder((argument) =>
         {
             dataRecord.TypeArgument = argument;
 
             return true;
-        };
+        });
 
-        DSemanticAttributeArgumentRecorder? tryMapConstructorParameter(DataRecord dataRecord, IParameterSymbol parameter) => (argument) =>
+        ISemanticAttributeArgumentRecorder? tryMapConstructorParameter(IParameterSymbol parameter, DataRecord dataRecord) => new SemanticAttributeArgumentRecorder((argument) =>
         {
             dataRecord.ConstructorArgument = argument;
 
             return true;
-        };
+        });
 
-        DSemanticAttributeArgumentRecorder? tryMapNamedParameter(DataRecord dataRecord, string parameterName) => (argument) =>
+        ISemanticAttributeArgumentRecorder? tryMapNamedParameter(string parameterName, DataRecord dataRecord) => new SemanticAttributeArgumentRecorder((argument) =>
         {
             dataRecord.NamedArgument = argument;
 
             return true;
-        };
+        });
     }
 
     [SuppressMessage("Design", "CA1034: Nested types should not be visible", Justification = "Type should not be used elsewhere, but Moq requires it to be public.")]

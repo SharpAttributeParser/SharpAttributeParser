@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 
 using System.Collections.Generic;
 
-public interface IExampleAttributeData
+public interface ISemanticExampleAttributeRecord
 {
     public abstract ITypeSymbol T { get; }
     public abstract IReadOnlyList<int> Sequence { get; }

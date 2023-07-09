@@ -12,13 +12,13 @@ using Xunit;
 
 public sealed class Create_Data_DataBuilder
 {
-    private static ISemanticAttributeRecorder<TData> Target<TData, TDataBuilder>(ISemanticAttributeRecorderFactory factory, ISemanticAttributeMapper<TDataBuilder> mapper, TDataBuilder dataBuilder) where TDataBuilder : IAttributeDataBuilder<TData> => factory.Create<TData, TDataBuilder>(mapper, dataBuilder);
+    private static ISemanticAttributeRecorder<TData> Target<TData, TDataBuilder>(ISemanticAttributeRecorderFactory factory, ISemanticAttributeMapper<TDataBuilder> mapper, TDataBuilder dataBuilder) where TDataBuilder : IRecordBuilder<TData> => factory.Create<TData, TDataBuilder>(mapper, dataBuilder);
 
     [Theory]
     [ClassData(typeof(FactorySources))]
     public void NullMapper_ArgumentNullException(ISemanticAttributeRecorderFactory factory)
     {
-        var exception = Record.Exception(() => Target<string, IAttributeDataBuilder<string>>(factory, null!, Mock.Of<IAttributeDataBuilder<string>>()));
+        var exception = Record.Exception(() => Target<string, IRecordBuilder<string>>(factory, null!, Mock.Of<IRecordBuilder<string>>()));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -27,7 +27,7 @@ public sealed class Create_Data_DataBuilder
     [ClassData(typeof(FactorySources))]
     public void NullDataRecord_ArgumentNullException(ISemanticAttributeRecorderFactory factory)
     {
-        var exception = Record.Exception(() => Target<string, IAttributeDataBuilder<string>>(factory, Mock.Of<ISemanticAttributeMapper<IAttributeDataBuilder<string>>>(), null!));
+        var exception = Record.Exception(() => Target<string, IRecordBuilder<string>>(factory, Mock.Of<ISemanticAttributeMapper<IRecordBuilder<string>>>(), null!));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -49,9 +49,9 @@ public sealed class Create_Data_DataBuilder
 
         Mock<ISemanticAttributeMapper<DataRecordBuilder>> mapperMock = new();
 
-        mapperMock.Setup(static (mapper) => mapper.TryMapTypeParameter(It.IsAny<DataRecordBuilder>(), It.IsAny<ITypeParameterSymbol>())).Returns<DataRecordBuilder, ITypeParameterSymbol>(tryMapTypeParameter);
-        mapperMock.Setup(static (mapper) => mapper.TryMapConstructorParameter(It.IsAny<DataRecordBuilder>(), It.IsAny<IParameterSymbol>())).Returns<DataRecordBuilder, IParameterSymbol>(tryMapConstructorParameter);
-        mapperMock.Setup(static (mapper) => mapper.TryMapNamedParameter(It.IsAny<DataRecordBuilder>(), It.IsAny<string>())).Returns<DataRecordBuilder, string>(tryMapNamedParameter);
+        mapperMock.Setup(static (mapper) => mapper.TryMapTypeParameter(It.IsAny<ITypeParameterSymbol>(), It.IsAny<DataRecordBuilder>())).Returns<ITypeParameterSymbol, DataRecordBuilder>(tryMapTypeParameter);
+        mapperMock.Setup(static (mapper) => mapper.TryMapConstructorParameter(It.IsAny<IParameterSymbol>(), It.IsAny<DataRecordBuilder>())).Returns<IParameterSymbol, DataRecordBuilder>(tryMapConstructorParameter);
+        mapperMock.Setup(static (mapper) => mapper.TryMapNamedParameter(It.IsAny<string>(), It.IsAny<DataRecordBuilder>())).Returns<string, DataRecordBuilder>(tryMapNamedParameter);
 
         var recorder = Target<DataRecord, DataRecordBuilder>(factory, mapperMock.Object, dataRecordBuilder);
 
@@ -59,38 +59,38 @@ public sealed class Create_Data_DataBuilder
         recorder.TryRecordConstructorArgument(constructorParameter, constructorArgument);
         recorder.TryRecordNamedArgument(namedParameter, namedArgument);
 
-        var result = recorder.GetResult();
+        var result = recorder.GetRecord();
 
         Assert.Equal(dataRecord, result);
 
-        mapperMock.Verify((mapper) => mapper.TryMapTypeParameter(dataRecordBuilder, typeParameter), Times.AtLeastOnce);
-        mapperMock.Verify((mapper) => mapper.TryMapConstructorParameter(dataRecordBuilder, constructorParameter), Times.AtLeastOnce);
-        mapperMock.Verify((mapper) => mapper.TryMapNamedParameter(dataRecordBuilder, namedParameter), Times.AtLeastOnce);
+        mapperMock.Verify((mapper) => mapper.TryMapTypeParameter(typeParameter, dataRecordBuilder), Times.AtLeastOnce);
+        mapperMock.Verify((mapper) => mapper.TryMapConstructorParameter(constructorParameter, dataRecordBuilder), Times.AtLeastOnce);
+        mapperMock.Verify((mapper) => mapper.TryMapNamedParameter(namedParameter, dataRecordBuilder), Times.AtLeastOnce);
 
         Assert.Equal(typeArgument, result.TypeArgument, ReferenceEqualityComparer.Instance);
         Assert.Equal(constructorArgument, result.ConstructorArgument, ReferenceEqualityComparer.Instance);
         Assert.Equal(namedArgument, result.NamedArgument, ReferenceEqualityComparer.Instance);
 
-        DSemanticAttributeArgumentRecorder? tryMapTypeParameter(DataRecordBuilder dataBuilder, ITypeParameterSymbol parameter) => (argument) =>
+        ISemanticAttributeArgumentRecorder? tryMapTypeParameter(ITypeParameterSymbol parameter, DataRecordBuilder dataBuilder) => new SemanticAttributeArgumentRecorder((argument) =>
         {
             dataBuilder.WithTypeArgument(argument);
 
             return true;
-        };
+        });
 
-        DSemanticAttributeArgumentRecorder? tryMapConstructorParameter(DataRecordBuilder dataBuilder, IParameterSymbol parameter) => (argument) =>
+        ISemanticAttributeArgumentRecorder? tryMapConstructorParameter(IParameterSymbol parameter, DataRecordBuilder dataBuilder) => new SemanticAttributeArgumentRecorder((argument) =>
         {
             dataBuilder.WithConstructorArgument(argument);
 
             return true;
-        };
+        });
 
-        DSemanticAttributeArgumentRecorder? tryMapNamedParameter(DataRecordBuilder dataBuilder, string parameterName) => (argument) =>
+        ISemanticAttributeArgumentRecorder? tryMapNamedParameter(string parameterName, DataRecordBuilder dataBuilder) => new SemanticAttributeArgumentRecorder((argument) =>
         {
             dataBuilder.WithNamedArgument(argument);
 
             return true;
-        };
+        });
     }
 
     [SuppressMessage("Design", "CA1034: Nested types should not be visible", Justification = "Type should not be used elsewhere, but Moq requires it to be public.")]
@@ -102,7 +102,7 @@ public sealed class Create_Data_DataBuilder
     }
 
     [SuppressMessage("Design", "CA1034: Nested types should not be visible", Justification = "Type should not be used elsewhere, but Moq requires it to be public.")]
-    public sealed class DataRecordBuilder : IAttributeDataBuilder<DataRecord>
+    public sealed class DataRecordBuilder : IRecordBuilder<DataRecord>
     {
         private DataRecord BuildTarget { get; }
 
@@ -115,6 +115,6 @@ public sealed class Create_Data_DataBuilder
         public void WithConstructorArgument(object? typeArgument) => BuildTarget.ConstructorArgument = typeArgument;
         public void WithNamedArgument(object? typeArgument) => BuildTarget.NamedArgument = typeArgument;
 
-        DataRecord IAttributeDataBuilder<DataRecord>.Build() => BuildTarget;
+        DataRecord IRecordBuilder<DataRecord>.Build() => BuildTarget;
     }
 }

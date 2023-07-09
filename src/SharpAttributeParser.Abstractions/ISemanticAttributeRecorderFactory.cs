@@ -2,23 +2,23 @@
 
 using System;
 
-/// <summary>Handles production of <see cref="ISemanticAttributeRecorder"/> using <see cref="ISemanticAttributeMapper{TData}"/>.</summary>
+/// <summary>Handles production of <see cref="ISemanticAttributeRecorder"/>.</summary>
 public interface ISemanticAttributeRecorderFactory
 {
-    /// <summary>Produces a <see cref="ISemanticAttributeRecorder"/>, recording attribute arguments to the provided <typeparamref name="TData"/>.</summary>
-    /// <typeparam name="TData">The type to which the produced <see cref="ISemanticAttributeRecorder"/> records attribute arguments.</typeparam>
-    /// <param name="argumentMapper"><inheritdoc cref="ISemanticAttributeMapper{TData}" path="/summary"/></param>
-    /// <param name="dataRecord">The <typeparamref name="TData"/> to which the produced <see cref="ISemanticAttributeRecorder"/> records attribute arguments.</param>
+    /// <summary>Produces a <see cref="ISemanticAttributeRecorder"/>, recording attribute arguments to the provided <typeparamref name="TRecord"/>.</summary>
+    /// <typeparam name="TRecord">The type to which the produced <see cref="ISemanticAttributeRecorder"/> records attribute arguments.</typeparam>
+    /// <param name="argumentMapper">Maps the attribute parameters to <see cref="ISemanticAttributeArgumentRecorder"/>, responsible for recording the arguments of that parameter.</param>
+    /// <param name="dataRecord">The <typeparamref name="TRecord"/> to which the produced <see cref="ISemanticAttributeRecorder"/> records attribute arguments.</param>
     /// <returns>The produced <see cref="ISemanticAttributeRecorder"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public abstract ISemanticAttributeRecorder<TData> Create<TData>(ISemanticAttributeMapper<TData> argumentMapper, TData dataRecord);
+    public abstract ISemanticAttributeRecorder<TRecord> Create<TRecord>(ISemanticAttributeMapper<TRecord> argumentMapper, TRecord dataRecord);
 
-    /// <summary>Produces a <see cref="ISemanticAttributeRecorder"/>, recording attribute arguments using the provided <typeparamref name="TDataBuilder"/>.</summary>
-    /// <typeparam name="TData">The type representing the recorded attribute arguments, when built by the provided <typeparamref name="TDataBuilder"/>.</typeparam>
-    /// <typeparam name="TDataBuilder">The type to which the produced <see cref="ISemanticAttributeRecorder"/> records attribute arguments, and which can build a <typeparamref name="TData"/>.</typeparam>
-    /// <param name="argumentMapper"><inheritdoc cref="ISemanticAttributeMapper{TData}" path="/summary"/></param>
-    /// <param name="dataBuilder">The <typeparamref name="TDataBuilder"/> to which the produced <see cref="ISemanticAttributeRecorder"/> records attribute arguments, and which can build a <typeparamref name="TData"/>.</param>
+    /// <summary>Produces a <see cref="ISemanticAttributeRecorder"/>, recording attribute arguments through the provided <typeparamref name="TRecordBuild"/>.</summary>
+    /// <typeparam name="TRecord">The type representing the recorded attribute arguments.</typeparam>
+    /// <typeparam name="TRecordBuild">The type through which the produced <see cref="ISemanticAttributeRecorder"/> records attribute arguments.</typeparam>
+    /// <param name="argumentMapper">Maps the attribute parameters to <see cref="ISemanticAttributeArgumentRecorder"/>, responsible for recording the arguments of that parameter.</param>
+    /// <param name="recordBuilder">The <typeparamref name="TRecordBuild"/> through which the produced <see cref="ISemanticAttributeRecorder"/> records attribute arguments, and which can build a <typeparamref name="TRecord"/>.</param>
     /// <returns>The produced <see cref="ISemanticAttributeRecorder"/>.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public abstract ISemanticAttributeRecorder<TData> Create<TData, TDataBuilder>(ISemanticAttributeMapper<TDataBuilder> argumentMapper, TDataBuilder dataBuilder) where TDataBuilder : IAttributeDataBuilder<TData>;
+    public abstract ISemanticAttributeRecorder<TRecord> Create<TRecord, TRecordBuild>(ISemanticAttributeMapper<TRecordBuild> argumentMapper, TRecordBuild recordBuilder) where TRecordBuild : IRecordBuilder<TRecord>;
 }

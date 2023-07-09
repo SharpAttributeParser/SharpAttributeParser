@@ -17,7 +17,7 @@ public sealed class AddParameterMappings
     {
         UnmodifiedMapper mapper = new();
 
-        var recorder = mapper.TryMapConstructorParameter(new Data(), Mock.Of<IParameterSymbol>((symbol) => symbol.Name == string.Empty));
+        var recorder = mapper.TryMapConstructorParameter(Mock.Of<IParameterSymbol>((symbol) => symbol.Name == string.Empty), new Data());
 
         Assert.Null(recorder);
     }
@@ -27,7 +27,7 @@ public sealed class AddParameterMappings
     {
         UnmodifiedMapper mapper = new();
 
-        var recorder = mapper.TryMapNamedParameter(new Data(), string.Empty);
+        var recorder = mapper.TryMapNamedParameter(string.Empty, new Data());
 
         Assert.Null(recorder);
     }
@@ -47,7 +47,7 @@ public sealed class AddParameterMappings
     {
         EmptyMappingsCollectionMapper mapper = new();
 
-        var recorder = mapper.TryMapConstructorParameter(new Data(), Mock.Of<IParameterSymbol>((symbol) => symbol.Name == string.Empty));
+        var recorder = mapper.TryMapConstructorParameter(Mock.Of<IParameterSymbol>((symbol) => symbol.Name == string.Empty), new Data());
 
         Assert.Null(recorder);
     }
@@ -57,7 +57,7 @@ public sealed class AddParameterMappings
     {
         EmptyMappingsCollectionMapper mapper = new();
 
-        var recorder = mapper.TryMapNamedParameter(new Data(), string.Empty);
+        var recorder = mapper.TryMapNamedParameter(string.Empty, new Data());
 
         Assert.Null(recorder);
     }
@@ -107,7 +107,7 @@ public sealed class AddParameterMappings
     {
         NameMapper mapper = new();
 
-        var recorder = mapper.TryMapConstructorParameter(new Data(), Mock.Of<IParameterSymbol>((symbol) => symbol.Name == NameMapper.ParameterName));
+        var recorder = mapper.TryMapConstructorParameter(Mock.Of<IParameterSymbol>((symbol) => symbol.Name == NameMapper.ParameterName), new Data());
 
         Assert.NotNull(recorder);
     }
@@ -117,7 +117,7 @@ public sealed class AddParameterMappings
     {
         NameMapper mapper = new();
 
-        var recorder = mapper.TryMapNamedParameter(new Data(), NameMapper.ParameterName);
+        var recorder = mapper.TryMapNamedParameter(NameMapper.ParameterName, new Data());
 
         Assert.NotNull(recorder);
     }
@@ -127,7 +127,7 @@ public sealed class AddParameterMappings
     {
         NameMapper mapper = new();
 
-        var recorder = mapper.TryMapConstructorParameter(new Data(), Mock.Of<IParameterSymbol>((symbol) => symbol.Name == NameMapper.DifferentParameterName));
+        var recorder = mapper.TryMapConstructorParameter(Mock.Of<IParameterSymbol>((symbol) => symbol.Name == NameMapper.DifferentParameterName), new Data());
 
         Assert.Null(recorder);
     }
@@ -137,7 +137,7 @@ public sealed class AddParameterMappings
     {
         NameMapper mapper = new();
 
-        var recorder = mapper.TryMapNamedParameter(new Data(), NameMapper.DifferentParameterName);
+        var recorder = mapper.TryMapNamedParameter(NameMapper.DifferentParameterName, new Data());
 
         Assert.Null(recorder);
     }
@@ -148,19 +148,19 @@ public sealed class AddParameterMappings
     {
         public void Initialize() => InitializeMapper();
 
-        protected override IEnumerable<(string, DSemanticAttributeArgumentRecorder)> AddParameterMappings() => null!;
+        protected override IEnumerable<(string, DArgumentRecorder)> AddParameterMappings() => null!;
     }
 
     private sealed class EmptyMappingsCollectionMapper : ASemanticAttributeMapper<Data>
     {
-        protected override IEnumerable<(string, DSemanticAttributeArgumentRecorder)> AddParameterMappings() => Enumerable.Empty<(string, DSemanticAttributeArgumentRecorder)>();
+        protected override IEnumerable<(string, DArgumentRecorder)> AddParameterMappings() => Enumerable.Empty<(string, DArgumentRecorder)>();
     }
 
     private sealed class NullNameMapper : ASemanticAttributeMapper<Data>
     {
         public void Initialize() => InitializeMapper();
 
-        protected override IEnumerable<(string, DSemanticAttributeArgumentRecorder)> AddParameterMappings()
+        protected override IEnumerable<(string, DArgumentRecorder)> AddParameterMappings()
         {
             yield return (null!, RecordValue);
         }
@@ -172,7 +172,7 @@ public sealed class AddParameterMappings
     {
         public void Initialize() => InitializeMapper();
 
-        protected override IEnumerable<(string, DSemanticAttributeArgumentRecorder)> AddParameterMappings()
+        protected override IEnumerable<(string, DArgumentRecorder)> AddParameterMappings()
         {
             yield return (string.Empty, null!);
         }
@@ -182,7 +182,7 @@ public sealed class AddParameterMappings
     {
         public void Initialize() => InitializeMapper();
 
-        protected override IEnumerable<(string, DSemanticAttributeArgumentRecorder)> AddParameterMappings()
+        protected override IEnumerable<(string, DArgumentRecorder)> AddParameterMappings()
         {
             yield return (string.Empty, RecordValue);
             yield return (string.Empty, RecordValue);
@@ -197,7 +197,7 @@ public sealed class AddParameterMappings
 
         protected override IEqualityComparer<string> GetComparer() => StringComparer.OrdinalIgnoreCase;
 
-        protected override IEnumerable<(string, DSemanticAttributeArgumentRecorder)> AddParameterMappings()
+        protected override IEnumerable<(string, DArgumentRecorder)> AddParameterMappings()
         {
             yield return ("A", RecordValue);
             yield return ("a", RecordValue);
@@ -211,7 +211,7 @@ public sealed class AddParameterMappings
         public static string ParameterName => string.Empty;
         public static string DifferentParameterName => $"{ParameterName} ";
 
-        protected override IEnumerable<(string, DSemanticAttributeArgumentRecorder)> AddParameterMappings()
+        protected override IEnumerable<(string, DArgumentRecorder)> AddParameterMappings()
         {
             yield return (ParameterName, RecordValue);
         }
