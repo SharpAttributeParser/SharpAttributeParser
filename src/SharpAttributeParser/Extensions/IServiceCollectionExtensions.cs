@@ -11,8 +11,10 @@ public static class IServiceCollectionExtensions
     public static IServiceCollection AddSharpAttributeParser(this IServiceCollection services)
     {
         services.AddSingleton<ISemanticAttributeParser, SemanticAttributeParser>();
+        services.AddSingleton<ISyntacticAttributeParser, SyntacticAttributeParser>();
 
         services.AddSingleton<ISemanticAttributeRecorderFactory, SemanticAttributeRecorderFactory>();
+        services.AddSingleton<ISyntacticAttributeRecorderFactory, SyntacticAttributeRecorderFactory>();
 
         return services;
     }

@@ -18,6 +18,16 @@ public sealed class ForNullableCollection_Func
     }
 
     [Fact]
+    public void ValidRecorder_NullDataRecord_ArgumentNullExceptionWhenUsed()
+    {
+        var recorder = Mapper<int>.Target(Data<int>.TrueRecorder);
+
+        var exception = Record.Exception(() => recorder(null!, new[] { 3, 4 }));
+
+        Assert.IsType<ArgumentNullException>(exception);
+    }
+
+    [Fact]
     public void Enum_NotArrayType_FalseAndNotRecorded()
     {
         var value = "3";
@@ -167,6 +177,7 @@ public sealed class ForNullableCollection_Func
         Assert.False(outcome);
 
         Assert.Equal(value, data.Value);
+        Assert.True(data.ValueRecorded);
     }
 
     [AssertionMethod]
@@ -181,6 +192,7 @@ public sealed class ForNullableCollection_Func
         Assert.True(outcome);
 
         Assert.Equal<IEnumerable<T1>>(expected, data.Value);
+        Assert.True(data.ValueRecorded);
     }
 
     [AssertionMethod]

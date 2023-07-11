@@ -93,7 +93,7 @@ public sealed class Create_Data_DataBuilder
         });
     }
 
-    [SuppressMessage("Design", "CA1034: Nested types should not be visible", Justification = "Type should not be used elsewhere, but Moq requires it to be public.")]
+    [SuppressMessage("Design", "CA1034: Nested types should not be visible", Justification = "Type should not be used elsewhere, but DataRecordBuilder requires it to be public.")]
     public sealed class DataRecord
     {
         public object? TypeArgument { get; set; }

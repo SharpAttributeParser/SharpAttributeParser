@@ -23,7 +23,7 @@ public sealed class TryParse_Combined
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task Params_TrueAndRecorded(ISemanticAttributeParser parser)
+    public async Task ParamsWithNamed_TrueAndRecorded(ISemanticAttributeParser parser)
     {
         var source = """
             [Combined<string, int>("42", new object[0], "42", 42, SimpleNamedValue = typeof(int), ArrayNamedValue = new object[] { 42, "42" })]
@@ -50,7 +50,32 @@ public sealed class TryParse_Combined
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task EmptyParams_TrueAndRecorded(ISemanticAttributeParser parser)
+    public async Task ParamsWithoutNamed_TrueAndRecorded(ISemanticAttributeParser parser)
+    {
+        var source = """
+            [Combined<string, int>("42", new object[0], "42", 42)]
+            public class Foo { }
+            """;
+
+        await TrueAndRecordedAsExpected(parser, source, expectedResult);
+
+        static ExpectedResult expectedResult(Compilation compilation)
+        {
+            var stringType = compilation.GetSpecialType(SpecialType.System_String);
+            var intType = compilation.GetSpecialType(SpecialType.System_Int32);
+
+            return new ExpectedResult(stringType, intType)
+            {
+                SimpleValue = "42",
+                ArrayValue = Array.Empty<object>(),
+                ParamsValue = new object[] { "42", 42 }
+            };
+        }
+    }
+
+    [Theory]
+    [ClassData(typeof(ParserSources))]
+    public async Task EmptyParamsWithNamed_TrueAndRecorded(ISemanticAttributeParser parser)
     {
         var source = """
             [Combined<string, int>("42", new object[0], SimpleNamedValue = typeof(int), ArrayNamedValue = new object[] { 42, "42" })]
@@ -71,6 +96,31 @@ public sealed class TryParse_Combined
                 ParamsValue = Array.Empty<object>(),
                 SimpleNamedValue = intType,
                 ArrayNamedValue = new object[] { 42, "42" }
+            };
+        }
+    }
+
+    [Theory]
+    [ClassData(typeof(ParserSources))]
+    public async Task EmptyParamsWithoutNamed_TrueAndRecorded(ISemanticAttributeParser parser)
+    {
+        var source = """
+            [Combined<string, int>("42", new object[0])]
+            public class Foo { }
+            """;
+
+        await TrueAndRecordedAsExpected(parser, source, expectedResult);
+
+        static ExpectedResult expectedResult(Compilation compilation)
+        {
+            var stringType = compilation.GetSpecialType(SpecialType.System_String);
+            var intType = compilation.GetSpecialType(SpecialType.System_Int32);
+
+            return new ExpectedResult(stringType, intType)
+            {
+                SimpleValue = "42",
+                ArrayValue = Array.Empty<object>(),
+                ParamsValue = Array.Empty<object>()
             };
         }
     }
@@ -104,7 +154,7 @@ public sealed class TryParse_Combined
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task Array_TrueAndRecorded(ISemanticAttributeParser parser)
+    public async Task ArrayWithNamed_TrueAndRecorded(ISemanticAttributeParser parser)
     {
         var source = """
             [Combined<string, int>("42", new object[0], new object[] { "42", 42 }, SimpleNamedValue = typeof(int), ArrayNamedValue = new object[] { 42, "42" })]
@@ -125,6 +175,31 @@ public sealed class TryParse_Combined
                 ParamsValue = new object[] { "42", 42 },
                 SimpleNamedValue = intType,
                 ArrayNamedValue = new object[] { 42, "42" }
+            };
+        }
+    }
+
+    [Theory]
+    [ClassData(typeof(ParserSources))]
+    public async Task ArrayWithoutNamed_TrueAndRecorded(ISemanticAttributeParser parser)
+    {
+        var source = """
+            [Combined<string, int>("42", new object[0], new object[] { "42", 42 })]
+            public class Foo { }
+            """;
+
+        await TrueAndRecordedAsExpected(parser, source, expectedResult);
+
+        static ExpectedResult expectedResult(Compilation compilation)
+        {
+            var stringType = compilation.GetSpecialType(SpecialType.System_String);
+            var intType = compilation.GetSpecialType(SpecialType.System_Int32);
+
+            return new ExpectedResult(stringType, intType)
+            {
+                SimpleValue = "42",
+                ArrayValue = Array.Empty<object>(),
+                ParamsValue = new object[] { "42", 42 }
             };
         }
     }
@@ -159,10 +234,10 @@ public sealed class TryParse_Combined
         Assert.True(result.ParamsValueRecorded);
 
         Assert.Equal(expected.SimpleNamedValue, result.SimpleNamedValue);
-        Assert.True(result.SimpleNamedValueRecorded);
+        Assert.Equal(expected.SimpleNamedValue is not null, result.SimpleNamedValueRecorded);
 
         Assert.Equal(expected.ArrayNamedValue, result.ArrayNamedValue);
-        Assert.True(result.ArrayNamedValueRecorded);
+        Assert.Equal(expected.ArrayNamedValue is not null, result.ArrayNamedValueRecorded);
     }
 
     private sealed class ExpectedResult

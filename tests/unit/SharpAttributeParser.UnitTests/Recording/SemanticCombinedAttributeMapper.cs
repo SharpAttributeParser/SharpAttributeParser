@@ -24,8 +24,8 @@ internal sealed class SemanticCombinedAttributeMapper : ASemanticAttributeMapper
         yield return (nameof(CombinedAttribute<object, object>.ArrayValue), Adapters.Collection.ForNullable<object>(RecordArrayValue));
         yield return (nameof(CombinedAttribute<object, object>.ParamsValue), Adapters.Collection.ForNullable<object>(RecordParamsValue));
 
-        yield return (nameof(CombinedAttribute<object, object>.SimpleNamedValue), Adapters.Simple.ForNullable<object>(RecordNamedSimpleValue));
-        yield return (nameof(CombinedAttribute<object, object>.ArrayNamedValue), Adapters.Collection.ForNullable<object>(RecordNamedArrayValue));
+        yield return (nameof(CombinedAttribute<object, object>.SimpleNamedValue), Adapters.Simple.ForNullable<object>(RecordSimpleNamedValue));
+        yield return (nameof(CombinedAttribute<object, object>.ArrayNamedValue), Adapters.Collection.ForNullable<object>(RecordArrayNamedValue));
     }
 
     private void RecordT1(ISemanticCombinedAttributeRecordBuilder builder, ITypeSymbol t1) => builder.WithT1(t1);
@@ -35,6 +35,6 @@ internal sealed class SemanticCombinedAttributeMapper : ASemanticAttributeMapper
     private void RecordArrayValue(ISemanticCombinedAttributeRecordBuilder builder, IReadOnlyList<object?>? value) => builder.WithArrayValue(value);
     private void RecordParamsValue(ISemanticCombinedAttributeRecordBuilder builder, IReadOnlyList<object?>? value) => builder.WithParamsValue(value);
 
-    private void RecordNamedSimpleValue(ISemanticCombinedAttributeRecordBuilder builder, object? value) => builder.WithSimpleNamedValue(value);
-    private void RecordNamedArrayValue(ISemanticCombinedAttributeRecordBuilder builder, IReadOnlyList<object?>? value) => builder.WithArrayNamedValue(value);
+    private void RecordSimpleNamedValue(ISemanticCombinedAttributeRecordBuilder builder, object? value) => builder.WithSimpleNamedValue(value);
+    private void RecordArrayNamedValue(ISemanticCombinedAttributeRecordBuilder builder, IReadOnlyList<object?>? value) => builder.WithArrayNamedValue(value);
 }

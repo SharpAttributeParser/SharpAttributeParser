@@ -17,6 +17,16 @@ public sealed class For_Action
     }
 
     [Fact]
+    public void ValidRecorder_NullDataRecord_ArgumentNullExceptionWhenUsed()
+    {
+        var recorder = Mapper<int>.Target(Data<int>.Recorder);
+
+        var exception = Record.Exception(() => recorder(null!, 3));
+
+        Assert.IsType<ArgumentNullException>(exception);
+    }
+
+    [Fact]
     public void Enum_DifferentEnumType_FalseAndNotRecorded()
     {
         var value = StringSplitOptions.TrimEntries;
@@ -158,6 +168,7 @@ public sealed class For_Action
         Assert.True(outcome);
 
         Assert.Equal(expected, data.Value);
+        Assert.True(data.ValueRecorded);
     }
 
     [AssertionMethod]

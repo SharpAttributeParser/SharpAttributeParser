@@ -2,9 +2,11 @@
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+using OneOf;
+
 using System.Collections.Generic;
 
 internal interface ISyntacticParamsAttributeRecordBuilder : IRecordBuilder<ISyntacticParamsAttributeRecord>
 {
-    public abstract void WithValue(IReadOnlyList<object?>? value, IReadOnlyList<ExpressionSyntax> syntax);
+    public abstract void WithValueSyntax(OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax);
 }

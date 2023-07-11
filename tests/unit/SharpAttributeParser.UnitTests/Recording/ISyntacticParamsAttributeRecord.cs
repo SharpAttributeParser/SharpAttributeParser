@@ -2,9 +2,12 @@
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+using OneOf;
+
 using System.Collections.Generic;
 
-public interface ISyntacticParamsAttributeRecord : ISemanticParamsAttributeRecord
+public interface ISyntacticParamsAttributeRecord
 {
-    public abstract IReadOnlyList<ExpressionSyntax> ValueSyntax { get; }
+    public abstract OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> ValueSyntax { get; }
+    public abstract bool ValueSyntaxRecorded { get; }
 }

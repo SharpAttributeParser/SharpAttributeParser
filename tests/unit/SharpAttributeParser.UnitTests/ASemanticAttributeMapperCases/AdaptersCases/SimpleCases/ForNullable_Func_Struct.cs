@@ -16,6 +16,16 @@ public sealed class ForNullable_Func_Struct
     }
 
     [Fact]
+    public void ValidRecorder_NullDataRecord_ArgumentNullExceptionWhenUsed()
+    {
+        var recorder = Mapper<int>.Target(Data<int?>.TrueRecorder);
+
+        var exception = Record.Exception(() => recorder(null!, 3));
+
+        Assert.IsType<ArgumentNullException>(exception);
+    }
+
+    [Fact]
     public void Enum_SameType_TrueAndRecorded()
     {
         var value = StringComparison.OrdinalIgnoreCase;
@@ -109,6 +119,7 @@ public sealed class ForNullable_Func_Struct
         Assert.False(outcome);
 
         Assert.Equal(value, data.Value);
+        Assert.True(data.ValueRecorded);
     }
 
     [AssertionMethod]
@@ -123,6 +134,7 @@ public sealed class ForNullable_Func_Struct
         Assert.True(outcome);
 
         Assert.Equal(expected, data.Value);
+        Assert.True(data.ValueRecorded);
     }
 
     [AssertionMethod]

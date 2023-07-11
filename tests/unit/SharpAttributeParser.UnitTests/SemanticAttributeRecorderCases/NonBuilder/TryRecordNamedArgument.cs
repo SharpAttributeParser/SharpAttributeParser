@@ -3,6 +3,7 @@
 using Moq;
 
 using System;
+using System.Collections.Generic;
 
 using Xunit;
 
@@ -48,21 +49,22 @@ public sealed class TryRecordNamedArgument
     {
         Mock<ISemanticAttributeMapper<string>> mapperMock = new();
 
-        var argumentRecorded = false;
+        object? recordedArgument = null;
+        var argument = Mock.Of<object>();
 
         mapperMock.Setup(static (mapper) => mapper.TryMapNamedParameter(It.IsAny<string>(), It.IsAny<string>())).Returns(tryMapNamedParameter());
 
         var recorder = RecorderFactory.Create(mapperMock.Object, string.Empty);
 
-        var outcome = Target(recorder, string.Empty, null);
+        var outcome = Target(recorder, string.Empty, argument);
 
         Assert.Equal(returnValue, outcome);
 
-        Assert.True(argumentRecorded);
+        Assert.Equal(argument, recordedArgument, ReferenceEqualityComparer.Instance);
 
-        ISemanticAttributeArgumentRecorder? tryMapNamedParameter() => new SemanticAttributeArgumentRecorder((object? argument) =>
+        ISemanticAttributeArgumentRecorder? tryMapNamedParameter() => new SemanticAttributeArgumentRecorder((argument) =>
         {
-            argumentRecorded = true;
+            recordedArgument = argument;
 
             return returnValue;
         });

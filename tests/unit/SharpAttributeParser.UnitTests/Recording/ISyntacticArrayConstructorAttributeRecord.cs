@@ -2,7 +2,8 @@
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-public interface ISyntacticArrayConstructorAttributeRecord : ISemanticArrayConstructorAttributeRecord
+public interface ISyntacticArrayConstructorAttributeRecord
 {
-    public abstract ExpressionSyntax ValueSyntax { get; }
+    public abstract ExpressionSyntax? ValueSyntax { get; }
+    public abstract bool ValueSyntaxRecorded { get; }
 }

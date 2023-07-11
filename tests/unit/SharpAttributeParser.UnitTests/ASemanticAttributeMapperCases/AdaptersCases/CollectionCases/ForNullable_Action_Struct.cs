@@ -10,9 +10,19 @@ using Xunit;
 public sealed class ForNullable_Action_Struct
 {
     [Fact]
-    public void NullDelegate_ArgumentNullExceptionWhenUsed()
+    public void NullDelegate_ArgumentNullException()
     {
         var exception = Record.Exception(() => Mapper<int>.Target(null!));
+
+        Assert.IsType<ArgumentNullException>(exception);
+    }
+
+    [Fact]
+    public void ValidRecorder_NullDataRecord_ArgumentNullExceptionWhenUsed()
+    {
+        var recorder = Mapper<int>.Target(Data<int?>.Recorder);
+
+        var exception = Record.Exception(() => recorder(null!, 3));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -125,6 +135,7 @@ public sealed class ForNullable_Action_Struct
         Assert.True(outcome);
 
         Assert.Equal<IEnumerable<T1?>>(expected, data.Value);
+        Assert.True(data.ValueRecorded);
     }
 
     [AssertionMethod]

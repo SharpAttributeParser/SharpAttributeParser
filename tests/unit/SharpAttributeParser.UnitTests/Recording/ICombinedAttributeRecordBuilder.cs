@@ -1,0 +1,3 @@
+﻿namespace SharpAttributeParser.Recording;
+
+internal interface ICombinedAttributeRecordBuilder : ISemanticCombinedAttributeRecordBuilder, ISyntacticCombinedAttributeRecordBuilder { }

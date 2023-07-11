@@ -1,0 +1,3 @@
+﻿namespace SharpAttributeParser.Recording;
+
+public interface IArrayConstructorAttributeRecord : ISemanticArrayConstructorAttributeRecord, ISyntacticArrayConstructorAttributeRecord { }

@@ -18,6 +18,16 @@ public sealed class ForNullableElements_Action_Class
     }
 
     [Fact]
+    public void ValidRecorder_NullDataRecord_ArgumentNullExceptionWhenUsed()
+    {
+        var recorder = Mapper<string>.Target(Data<string>.Recorder);
+
+        var exception = Record.Exception(() => recorder(null!, new[] { "3", "4" }));
+
+        Assert.IsType<ArgumentNullException>(exception);
+    }
+
+    [Fact]
     public void String_NotArrayType_FalseAndNotRecorded()
     {
         var value = "3";
@@ -69,6 +79,7 @@ public sealed class ForNullableElements_Action_Class
         Assert.True(outcome);
 
         Assert.Equal<IEnumerable<T1?>>(expected, data.Value);
+        Assert.True(data.ValueRecorded);
     }
 
     [AssertionMethod]

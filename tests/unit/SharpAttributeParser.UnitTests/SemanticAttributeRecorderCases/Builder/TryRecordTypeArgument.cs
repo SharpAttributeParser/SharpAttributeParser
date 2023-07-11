@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Moq;
 
 using System;
+using System.Collections.Generic;
 
 using Xunit;
 
@@ -60,21 +61,22 @@ public sealed class TryRecordTypeArgument
     {
         Mock<ISemanticAttributeMapper<IRecordBuilder<string>>> mapperMock = new();
 
-        var argumentRecorded = false;
+        ITypeSymbol? recordedArgument = null;
+        var argument = Mock.Of<ITypeSymbol>();
 
         mapperMock.Setup(static (mapper) => mapper.TryMapTypeParameter(It.IsAny<ITypeParameterSymbol>(), It.IsAny<IRecordBuilder<string>>())).Returns(tryMapTypeParameter());
 
         var recorder = RecorderFactory.Create<string, IRecordBuilder<string>>(mapperMock.Object, Mock.Of<IRecordBuilder<string>>());
 
-        var outcome = Target(recorder, Mock.Of<ITypeParameterSymbol>(), Mock.Of<ITypeSymbol>());
+        var outcome = Target(recorder, Mock.Of<ITypeParameterSymbol>(), argument);
 
         Assert.Equal(returnValue, outcome);
 
-        Assert.True(argumentRecorded);
+        Assert.Equal(argument, recordedArgument, ReferenceEqualityComparer.Instance);
 
-        ISemanticAttributeArgumentRecorder? tryMapTypeParameter() => new SemanticAttributeArgumentRecorder((object? argument) =>
+        ISemanticAttributeArgumentRecorder? tryMapTypeParameter() => new SemanticAttributeArgumentRecorder((argument) =>
         {
-            argumentRecorded = true;
+            recordedArgument = (ITypeSymbol?)argument;
 
             return returnValue;
         });

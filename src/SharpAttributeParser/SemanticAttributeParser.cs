@@ -26,26 +26,16 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
             return false;
         }
 
-        if (TryParseGenericArguments(recorder, attributeType) is false)
-        {
-            return false;
-        }
-
-        if (TryParseConstructorArguments(recorder, attributeData, targetConstructor) is false)
-        {
-            return false;
-        }
-
-        if (TryParseNamedArguments(recorder, attributeData) is false)
-        {
-            return false;
-        }
-
-        return true;
+        return TryParseGenericArguments(recorder, attributeType) && TryParseConstructorArguments(recorder, attributeData, targetConstructor) && TryParseNamedArguments(recorder, attributeData);
     }
 
     private static bool TryParseGenericArguments(ISemanticAttributeRecorder recorder, INamedTypeSymbol attributeType)
     {
+        if (attributeType.TypeParameters.Length != attributeType.TypeArguments.Length)
+        {
+            return false;
+        }
+
         for (var i = 0; i < attributeType.TypeArguments.Length; i++)
         {
             if (attributeType.TypeArguments[i].Kind is SymbolKind.ErrorType)

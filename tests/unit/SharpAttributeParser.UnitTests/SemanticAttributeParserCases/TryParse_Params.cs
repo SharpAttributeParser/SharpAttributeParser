@@ -21,6 +21,28 @@ public sealed class TryParse_Params
 
     [Theory]
     [ClassData(typeof(ParserSources))]
+    public async Task FalseReturningRecorder_FalseAndRecorded(ISemanticAttributeParser parser)
+    {
+        var source = """
+            [Params(4)]
+            public class Foo { }
+            """;
+
+        var recorder = RecorderFactory.Create();
+
+        var (_, attributeData, _) = await CompilationStore.GetComponents(source, "Foo");
+
+        var outcome = Target(parser, recorder, attributeData);
+        var result = recorder.GetRecord();
+
+        Assert.True(outcome);
+
+        Assert.Equal(new object?[] { 4 }, result.Value);
+        Assert.True(result.ValueRecorded);
+    }
+
+    [Theory]
+    [ClassData(typeof(ParserSources))]
     public async Task NonExsitingAttribute_FalseAndNotRecorded(ISemanticAttributeParser parser)
     {
         var source = """

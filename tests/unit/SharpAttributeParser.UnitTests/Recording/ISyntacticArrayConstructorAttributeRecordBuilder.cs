@@ -2,9 +2,7 @@
 
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-using System.Collections.Generic;
-
-internal interface ISyntacticArrayConstructorAttributeRecordBuilder : IRecordBuilder<ISemanticArrayConstructorAttributeRecord>
+internal interface ISyntacticArrayConstructorAttributeRecordBuilder : IRecordBuilder<ISyntacticArrayConstructorAttributeRecord>
 {
-    public abstract void WithValue(IReadOnlyList<object?>? value, ExpressionSyntax syntax);
+    public abstract void WithValueSyntax(ExpressionSyntax syntax);
 }
