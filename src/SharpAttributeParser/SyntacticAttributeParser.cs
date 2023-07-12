@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 /// <inheritdoc cref="ISyntacticAttributeParser"/>
 public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
@@ -33,6 +34,11 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
             return false;
         }
 
+        return TryParseArguments(recorder, attributeData, attributeType, targetConstructor, attributeSyntax);
+    }
+
+    private bool TryParseArguments(ISyntacticAttributeRecorder recorder, AttributeData attributeData, INamedTypeSymbol attributeType, IMethodSymbol targetConstructor, AttributeSyntax attributeSyntax)
+    {
         return TryParseGenericArguments(recorder, attributeType, attributeSyntax) && TryParseConstructorArguments(recorder, attributeData, targetConstructor, attributeSyntax)
             && TryParseNamedArguments(recorder, attributeData, attributeSyntax);
     }
@@ -44,25 +50,12 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
             return true;
         }
 
-        if (attributeType.TypeParameters.Length != genericNameSyntax.TypeArgumentList.Arguments.Count)
+        if (attributeType.TypeParameters.Length != genericNameSyntax.TypeArgumentList.Arguments.Count || attributeType.TypeParameters.Length != attributeType.TypeArguments.Length)
         {
             return false;
         }
 
-        for (var i = 0; i < attributeType.TypeParameters.Length; i++)
-        {
-            if (attributeType.TypeArguments[i].Kind is SymbolKind.ErrorType)
-            {
-                return false;
-            }
-
-            if (recorder.TryRecordTypeArgumentSyntax(attributeType.TypeParameters[i], genericNameSyntax.TypeArgumentList.Arguments[i]) is false)
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return Enumerable.Range(0, attributeType.TypeParameters.Length).All((index) => TryParseGenericArgument(recorder, attributeType.TypeParameters[index], attributeType.TypeArguments[index], genericNameSyntax.TypeArgumentList.Arguments[index]));
 
         GenericNameSyntax? getGenericNameSyntax()
         {
@@ -80,11 +73,26 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
         }
     }
 
+    private static bool TryParseGenericArgument(ISyntacticAttributeRecorder recorder, ITypeParameterSymbol parameter, ITypeSymbol argument, TypeSyntax syntax)
+    {
+        if (argument.Kind is SymbolKind.ErrorType)
+        {
+            return false;
+        }
+
+        return recorder.TryRecordTypeArgumentSyntax(parameter, syntax);
+    }
+
     private bool TryParseConstructorArguments(ISyntacticAttributeRecorder recorder, AttributeData attributeData, IMethodSymbol targetConstructor, AttributeSyntax attributeSyntax)
     {
         if (attributeData.ConstructorArguments.IsEmpty)
         {
             return true;
+        }
+
+        if (targetConstructor.Parameters.Length != attributeData.ConstructorArguments.Length)
+        {
+            return false;
         }
 
         if (attributeSyntax.ArgumentList is null)
@@ -97,30 +105,27 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
             return false;
         }
 
-        for (var i = 0; i < targetConstructor.Parameters.Length; i++)
+        return Enumerable.Range(0, targetConstructor.Parameters.Length).All((index) => TryParseConstructorArgument(recorder, index, attributeData, targetConstructor, attributeSyntax.ArgumentList.Arguments));
+    }
+
+    private static bool TryParseConstructorArgument(ISyntacticAttributeRecorder recorder, int index, AttributeData attributeData, IMethodSymbol targetConstructor, IReadOnlyList<AttributeArgumentSyntax> argumentSyntaxes)
+    {
+        if (attributeData.ConstructorArguments[index].Kind is TypedConstantKind.Error)
         {
-            if (attributeData.ConstructorArguments[i].Kind is TypedConstantKind.Error)
-            {
-                return false;
-            }
-
-            if (targetConstructor.Parameters[i].IsParams)
-            {
-                return TryParseParamsOrArrayArgument(recorder, attributeData, targetConstructor, attributeSyntax.ArgumentList.Arguments);
-            }
-
-            if (attributeSyntax.ArgumentList.Arguments.Count < i + 1)
-            {
-                return false;
-            }
-
-            if (recorder.TryRecordConstructorArgumentSyntax(targetConstructor.Parameters[i], attributeSyntax.ArgumentList.Arguments[i].Expression) is false)
-            {
-                return false;
-            }
+            return false;
         }
 
-        return true;
+        if (targetConstructor.Parameters[index].IsParams)
+        {
+            return TryParseParamsOrArrayArgument(recorder, attributeData, targetConstructor, argumentSyntaxes);
+        }
+
+        if (argumentSyntaxes.Count < index + 1)
+        {
+            return false;
+        }
+
+        return recorder.TryRecordConstructorArgumentSyntax(targetConstructor.Parameters[index], argumentSyntaxes[index].Expression);
     }
 
     private bool TryParseNamedArguments(ISyntacticAttributeRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax)
@@ -130,22 +135,24 @@ public sealed class SyntacticAttributeParser : ISyntacticAttributeParser
             return true;
         }
 
-        for (var i = 0; i < attributeData.NamedArguments.Length; i++)
+        if (attributeSyntax.ArgumentList.Arguments.Count < attributeData.NamedArguments.Length)
         {
-            if (attributeData.NamedArguments[i].Value.Kind is TypedConstantKind.Error)
-            {
-                continue;
-            }
-
-            var expression = attributeSyntax.ArgumentList.Arguments[attributeSyntax.ArgumentList.Arguments.Count - attributeData.NamedArguments.Length + i].Expression;
-
-            if (recorder.TryRecordNamedArgumentSyntax(attributeData.NamedArguments[i].Key, expression) is false)
-            {
-                return false;
-            }
+            return false;
         }
 
-        return true;
+        return Enumerable.Range(0, attributeData.NamedArguments.Length).All((index) => TryParseNamedArgument(recorder, attributeData.NamedArguments[index], getSyntax(index)));
+
+        ExpressionSyntax getSyntax(int index) => attributeSyntax.ArgumentList.Arguments[attributeSyntax.ArgumentList.Arguments.Count - attributeData.NamedArguments.Length + index].Expression;
+    }
+
+    private static bool TryParseNamedArgument(ISyntacticAttributeRecorder recorder, KeyValuePair<string, TypedConstant> argument, ExpressionSyntax syntax)
+    {
+        if (argument.Value.Kind is TypedConstantKind.Error)
+        {
+            return true;
+        }
+
+        return recorder.TryRecordNamedArgumentSyntax(argument.Key, syntax);
     }
 
     private static bool TryParseParamsOrArrayArgument(ISyntacticAttributeRecorder recorder, AttributeData attributeData, IMethodSymbol targetConstructor, IReadOnlyList<AttributeArgumentSyntax> syntacticArguments)

@@ -54,21 +54,6 @@ public sealed class TryMapTypeParameter
     }
 
     [Fact]
-    public void T1ByIndex_Params_FalseAndNotRecorded()
-    {
-        Data dataRecord = new();
-        var syntax = new[] { SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression) };
-
-        var recorder = Target(new Mapper(), dataRecord, Mock.Of<ITypeParameterSymbol>((symbol) => symbol.Name == Mapper.TypeNameNone && symbol.Ordinal == Mapper.IndexT1));
-
-        var outcome = recorder!.RecordParamsArgumentSyntax(syntax);
-
-        Assert.False(outcome);
-
-        IdenticalToExpected(new Data(), dataRecord);
-    }
-
-    [Fact]
     public void T1ByName_RecorderMapsToT1()
     {
         Data dataRecord = new();

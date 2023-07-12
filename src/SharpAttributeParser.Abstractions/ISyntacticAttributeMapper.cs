@@ -15,12 +15,12 @@ public interface ISyntacticAttributeMapper<in TRecord>
     /// <exception cref="ArgumentNullException"/>
     public abstract ISyntacticAttributeArgumentRecorder? TryMapTypeParameter(ITypeParameterSymbol parameter, TRecord dataRecord);
 
-    /// <summary>Attempts to map the provided <see cref="IParameterSymbol"/> to a <see cref="ISyntacticAttributeArgumentRecorder"/>.</summary>
+    /// <summary>Attempts to map the provided <see cref="IParameterSymbol"/> to a <see cref="ISyntacticAttributeConstructorArgumentRecorder"/>.</summary>
     /// <param name="parameter">The <see cref="IParameterSymbol"/> representing the parameter.</param>
-    /// <param name="dataRecord">The <typeparamref name="TRecord"/> to which the mapped <see cref="ISyntacticAttributeArgumentRecorder"/> records syntactical information.</param>
-    /// <returns>The mapped <see cref="ISyntacticAttributeArgumentRecorder"/>, or <see langword="null"/> if the attempt was unsuccessful.</returns>
+    /// <param name="dataRecord">The <typeparamref name="TRecord"/> to which the mapped <see cref="ISyntacticAttributeConstructorArgumentRecorder"/> records syntactical information.</param>
+    /// <returns>The mapped <see cref="ISyntacticAttributeConstructorArgumentRecorder"/>, or <see langword="null"/> if the attempt was unsuccessful.</returns>
     /// <exception cref="ArgumentNullException"/>
-    public abstract ISyntacticAttributeArgumentRecorder? TryMapConstructorParameter(IParameterSymbol parameter, TRecord dataRecord);
+    public abstract ISyntacticAttributeConstructorArgumentRecorder? TryMapConstructorParameter(IParameterSymbol parameter, TRecord dataRecord);
 
     /// <summary>Attempts to map the provided parameter name to a <see cref="ISyntacticAttributeArgumentRecorder"/>.</summary>
     /// <param name="parameterName">The name of the parameter.</param>

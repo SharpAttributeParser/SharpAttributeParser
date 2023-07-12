@@ -1,5 +1,7 @@
 ﻿namespace SharpAttributeParser;
 
+using Microsoft.CodeAnalysis;
+
 using System;
 
 /// <inheritdoc cref="ISemanticAttributeRecorderFactory"/>
@@ -18,7 +20,7 @@ public sealed class SemanticAttributeRecorderFactory : ISemanticAttributeRecorde
             throw new ArgumentNullException(nameof(dataRecord));
         }
 
-        return new SemanticAttributeRecorder<TRecord>(argumentMapper, dataRecord);
+        return new SemanticAttributeRecorder<TRecord, TRecordBuilder<TRecord>>(new TRecordBuilderMapper<TRecord>(argumentMapper), new TRecordBuilder<TRecord>(dataRecord));
     }
 
     /// <inheritdoc/>
@@ -35,5 +37,42 @@ public sealed class SemanticAttributeRecorderFactory : ISemanticAttributeRecorde
         }
 
         return new SemanticAttributeRecorder<TRecord, TRecordBuilder>(argumentMapper, recordBuilder);
+    }
+
+    private sealed class TRecordBuilder<TRecord> : IRecordBuilder<TRecord>
+    {
+        public TRecord Target { get; }
+
+        public TRecordBuilder(TRecord target)
+        {
+            Target = target;
+        }
+
+        TRecord IRecordBuilder<TRecord>.Build() => Target;
+    }
+
+    private sealed class TRecordBuilderMapper<TRecord> : ISemanticAttributeMapper<TRecordBuilder<TRecord>>
+    {
+        private ISemanticAttributeMapper<TRecord> WrappedMapper { get; }
+
+        public TRecordBuilderMapper(ISemanticAttributeMapper<TRecord> wrappedMapper)
+        {
+            WrappedMapper = wrappedMapper;
+        }
+
+        ISemanticAttributeArgumentRecorder? ISemanticAttributeMapper<TRecordBuilder<TRecord>>.TryMapTypeParameter(ITypeParameterSymbol parameter, TRecordBuilder<TRecord> dataRecord)
+        {
+            return WrappedMapper.TryMapTypeParameter(parameter, dataRecord.Target);
+        }
+
+        ISemanticAttributeArgumentRecorder? ISemanticAttributeMapper<TRecordBuilder<TRecord>>.TryMapConstructorParameter(IParameterSymbol parameter, TRecordBuilder<TRecord> dataRecord)
+        {
+            return WrappedMapper.TryMapConstructorParameter(parameter, dataRecord.Target);
+        }
+
+        ISemanticAttributeArgumentRecorder? ISemanticAttributeMapper<TRecordBuilder<TRecord>>.TryMapNamedParameter(string parameterName, TRecordBuilder<TRecord> dataRecord)
+        {
+            return WrappedMapper.TryMapNamedParameter(parameterName, dataRecord.Target);
+        }
     }
 }

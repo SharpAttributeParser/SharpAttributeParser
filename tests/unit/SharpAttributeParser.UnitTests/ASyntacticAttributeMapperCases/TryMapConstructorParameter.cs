@@ -13,7 +13,7 @@ using Xunit;
 
 public sealed class TryMapConstructorParameter
 {
-    private static ISyntacticAttributeArgumentRecorder? Target<TData>(ISyntacticAttributeMapper<TData> mapper, TData dataRecord, IParameterSymbol parameter) => mapper.TryMapConstructorParameter(parameter, dataRecord);
+    private static ISyntacticAttributeConstructorArgumentRecorder? Target<TData>(ISyntacticAttributeMapper<TData> mapper, TData dataRecord, IParameterSymbol parameter) => mapper.TryMapConstructorParameter(parameter, dataRecord);
 
     [Fact]
     public void NullData_ArgumentNullException()

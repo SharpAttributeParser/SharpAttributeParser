@@ -3,6 +3,8 @@
 using Microsoft.CodeAnalysis;
 
 using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 /// <inheritdoc cref="ISemanticAttributeParser"/>
@@ -26,6 +28,11 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
             return false;
         }
 
+        return TryParse(recorder, attributeData, attributeType, targetConstructor);
+    }
+
+    private static bool TryParse(ISemanticAttributeRecorder recorder, AttributeData attributeData, INamedTypeSymbol attributeType, IMethodSymbol targetConstructor)
+    {
         return TryParseGenericArguments(recorder, attributeType) && TryParseConstructorArguments(recorder, attributeData, targetConstructor) && TryParseNamedArguments(recorder, attributeData);
     }
 
@@ -36,20 +43,17 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
             return false;
         }
 
-        for (var i = 0; i < attributeType.TypeArguments.Length; i++)
-        {
-            if (attributeType.TypeArguments[i].Kind is SymbolKind.ErrorType)
-            {
-                return false;
-            }
+        return Enumerable.Range(0, attributeType.TypeParameters.Length).All((index) => TryParseGenericArgument(recorder, attributeType.TypeParameters[index], attributeType.TypeArguments[index]));
+    }
 
-            if (recorder.TryRecordTypeArgument(attributeType.TypeParameters[i], attributeType.TypeArguments[i]) is false)
-            {
-                return false;
-            }
+    private static bool TryParseGenericArgument(ISemanticAttributeRecorder recorder, ITypeParameterSymbol parameter, ITypeSymbol argument)
+    {
+        if (argument.Kind is SymbolKind.ErrorType)
+        {
+            return false;
         }
 
-        return true;
+        return recorder.TryRecordTypeArgument(parameter, argument);
     }
 
     private static bool TryParseConstructorArguments(ISemanticAttributeRecorder recorder, AttributeData attributeData, IMethodSymbol attributeConstructor)
@@ -64,30 +68,22 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
             return false;
         }
 
-        for (var i = 0; i < attributeConstructor.Parameters.Count() && i < attributeData.ConstructorArguments.Length; i++)
+        return Enumerable.Range(0, attributeData.ConstructorArguments.Length).All((index) => TryParseConstructorArgument(recorder, attributeConstructor.Parameters[index], attributeData.ConstructorArguments[index]));
+    }
+
+    private static bool TryParseConstructorArgument(ISemanticAttributeRecorder recorder, IParameterSymbol parameter, TypedConstant argument)
+    {
+        if (argument.Kind is TypedConstantKind.Error)
         {
-            if (attributeData.ConstructorArguments[i].Kind is TypedConstantKind.Error)
-            {
-                return false;
-            }
-
-            if (attributeData.ConstructorArguments[i].Kind is TypedConstantKind.Array)
-            {
-                if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i], CommonAttributeParsing.ArrayArguments(attributeData.ConstructorArguments[i])) is false)
-                {
-                    return false;
-                }
-
-                continue;
-            }
-
-            if (recorder.TryRecordConstructorArgument(attributeConstructor.Parameters[i], CommonAttributeParsing.SingleArgument(attributeData.ConstructorArguments[i])) is false)
-            {
-                return false;
-            }
+            return false;
         }
 
-        return true;
+        if (argument.Kind is TypedConstantKind.Array)
+        {
+            return recorder.TryRecordConstructorArgument(parameter, ParseArrayArguments(argument));
+        }
+
+        return recorder.TryRecordConstructorArgument(parameter, ParseSingleArgument(argument));
     }
 
     private static bool TryParseNamedArguments(ISemanticAttributeRecorder recorder, AttributeData attributeData)
@@ -97,29 +93,54 @@ public sealed class SemanticAttributeParser : ISemanticAttributeParser
             return true;
         }
 
-        for (var i = 0; i < attributeData.NamedArguments.Length; i++)
+        return Enumerable.Range(0, attributeData.NamedArguments.Length).All((index) => TryParseNamedArgument(recorder, attributeData.NamedArguments[index]));
+    }
+
+    private static bool TryParseNamedArgument(ISemanticAttributeRecorder recorder, KeyValuePair<string, TypedConstant> argument)
+    {
+        if (argument.Value.Kind is TypedConstantKind.Error)
         {
-            if (attributeData.NamedArguments[i].Value.Kind is TypedConstantKind.Error)
-            {
-                continue;
-            }
-
-            if (attributeData.NamedArguments[i].Value.Kind is TypedConstantKind.Array)
-            {
-                if (recorder.TryRecordNamedArgument(attributeData.NamedArguments[i].Key, CommonAttributeParsing.ArrayArguments(attributeData.NamedArguments[i].Value)) is false)
-                {
-                    return false;
-                }
-
-                continue;
-            }
-
-            if (recorder.TryRecordNamedArgument(attributeData.NamedArguments[i].Key, CommonAttributeParsing.SingleArgument(attributeData.NamedArguments[i].Value)) is false)
-            {
-                return false;
-            }
+            return true;
         }
 
-        return true;
+        if (argument.Value.Kind is TypedConstantKind.Array)
+        {
+            return recorder.TryRecordNamedArgument(argument.Key, ParseArrayArguments(argument.Value));
+        }
+
+        return recorder.TryRecordNamedArgument(argument.Key, ParseSingleArgument(argument.Value));
+    }
+
+    private static object? ParseSingleArgument(TypedConstant value) => value.Value;
+
+    [SuppressMessage("Major Code Smell", "S1168: Empty arrays and collections should be returned instead of null", Justification = "User-provided value was null.")]
+    private static object?[]? ParseArrayArguments(TypedConstant value)
+    {
+        if (value.IsNull)
+        {
+            return null;
+        }
+
+        if (value.Values.IsEmpty)
+        {
+            return Array.Empty<object?>();
+        }
+
+        var arrayConstants = value.Values;
+        var arrayValues = new object?[arrayConstants.Length];
+
+        for (var i = 0; i < arrayConstants.Length; i++)
+        {
+            if (arrayConstants[i].Kind is TypedConstantKind.Array)
+            {
+                arrayValues[i] = ParseArrayArguments(arrayConstants[i]);
+
+                continue;
+            }
+
+            arrayValues[i] = arrayConstants[i].Value;
+        }
+
+        return arrayValues;
     }
 }

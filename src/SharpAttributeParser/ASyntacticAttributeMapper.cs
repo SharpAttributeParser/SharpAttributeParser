@@ -158,7 +158,7 @@ public abstract class ASyntacticAttributeMapper<TRecord> : ISyntacticAttributeMa
     }
 
     /// <inheritdoc/>
-    public ISyntacticAttributeArgumentRecorder? TryMapConstructorParameter(IParameterSymbol parameter, TRecord dataRecord)
+    public ISyntacticAttributeConstructorArgumentRecorder? TryMapConstructorParameter(IParameterSymbol parameter, TRecord dataRecord)
     {
         if (dataRecord is null)
         {
@@ -170,7 +170,14 @@ public abstract class ASyntacticAttributeMapper<TRecord> : ISyntacticAttributeMa
             throw new ArgumentNullException(nameof(parameter));
         }
 
-        return TryMapNamedParameter(parameter.Name, dataRecord);
+        InitializeMapper();
+
+        if (ParameterMappings.TryGetValue(parameter.Name, out var mapping) is false)
+        {
+            return null;
+        }
+
+        return new AttributeConstructorArgumentRecorder(dataRecord, mapping);
     }
 
     /// <inheritdoc/>
@@ -227,9 +234,9 @@ public abstract class ASyntacticAttributeMapper<TRecord> : ISyntacticAttributeMa
     /// <exception cref="ArgumentNullException"/>
     protected delegate bool DTypeArgumentSyntaxRecorder(TRecord dataRecord, ExpressionSyntax syntax);
 
-    /// <summary>Responsible for recording the syntactical information about the argument of a parameter, which may have been expressed as a <see langword="params"/>-array.</summary>
+    /// <summary>Responsible for recording the syntactical information about the argument of a parameter.</summary>
     /// <param name="dataRecord">The <typeparamref name="TRecord"/> to which the argument is recorded.</param>
-    /// <param name="syntax">The syntactial information about the argument of the parameter - either of a single expression or of each element in a <see langword="params"/>-array.</param>
+    /// <param name="syntax">The <see cref="ExpressionSyntax"/> syntactically describing the argument of the parameter, or each element if expressed as a <see langword="params"/>-array.</param>
     /// <returns>A <see cref="bool"/> indicating whether the syntactical information was successfully recorded.</returns>
     /// <exception cref="ArgumentException"/>
     /// <exception cref="ArgumentNullException"/>
@@ -275,7 +282,6 @@ public abstract class ASyntacticAttributeMapper<TRecord> : ISyntacticAttributeMa
         }
 
         bool ISyntacticAttributeArgumentRecorder.RecordArgumentSyntax(ExpressionSyntax syntax) => Recorder(DataRecord, syntax);
-        bool ISyntacticAttributeArgumentRecorder.RecordParamsArgumentSyntax(IReadOnlyList<ExpressionSyntax> elementSyntax) => false;
     }
 
     private sealed class AttributeArgumentRecorder : ISyntacticAttributeArgumentRecorder
@@ -290,7 +296,21 @@ public abstract class ASyntacticAttributeMapper<TRecord> : ISyntacticAttributeMa
         }
 
         bool ISyntacticAttributeArgumentRecorder.RecordArgumentSyntax(ExpressionSyntax syntax) => Recorder(DataRecord, syntax);
-        bool ISyntacticAttributeArgumentRecorder.RecordParamsArgumentSyntax(IReadOnlyList<ExpressionSyntax> elementSyntax) => Recorder(DataRecord, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>.FromT1(elementSyntax));
+    }
+
+    private sealed class AttributeConstructorArgumentRecorder : ISyntacticAttributeConstructorArgumentRecorder
+    {
+        private TRecord DataRecord { get; }
+        private DArgumentSyntaxRecorder Recorder { get; }
+
+        public AttributeConstructorArgumentRecorder(TRecord dataRecord, DArgumentSyntaxRecorder recorder)
+        {
+            DataRecord = dataRecord;
+            Recorder = recorder;
+        }
+
+        bool ISyntacticAttributeArgumentRecorder.RecordArgumentSyntax(ExpressionSyntax syntax) => Recorder(DataRecord, syntax);
+        bool ISyntacticAttributeConstructorArgumentRecorder.RecordParamsArgumentSyntax(IReadOnlyList<ExpressionSyntax> elementSyntax) => Recorder(DataRecord, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>.FromT1(elementSyntax));
     }
 
     private sealed class SyntaxAdapter : ISyntaxAdapter

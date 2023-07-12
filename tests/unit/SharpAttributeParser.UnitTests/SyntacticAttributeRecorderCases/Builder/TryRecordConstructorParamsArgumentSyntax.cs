@@ -76,7 +76,7 @@ public sealed class TryRecordConstructorParamsArgumentSyntax
 
         Assert.Equal<IReadOnlyList<ExpressionSyntax>>(syntax, recordedSyntax, ReferenceEqualityComparer.Instance);
 
-        ISyntacticAttributeArgumentRecorder? tryMapConstructorParameter() => new SyntacticAttributeArgumentRecorder((syntax) =>
+        ISyntacticAttributeConstructorArgumentRecorder? tryMapConstructorParameter() => new SyntacticAttributeArgumentRecorder((syntax) =>
         {
             recordedSyntax = syntax.AsT1;
 

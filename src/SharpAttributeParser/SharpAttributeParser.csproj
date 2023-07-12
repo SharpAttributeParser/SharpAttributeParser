@@ -20,7 +20,7 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" PrivateAssets="all" />
     </ItemGroup>
-    
+
     <ItemGroup>
         <PackageReference Include="OneOf" />
     </ItemGroup>

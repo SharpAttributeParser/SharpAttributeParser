@@ -1,7 +1,6 @@
 ﻿namespace SharpAttributeParser.ASyntacticAttributeMapperCases;
 
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using System;
 using System.Collections.Generic;
@@ -51,24 +50,6 @@ public sealed class TryMapNamedParameter
         Assert.False(dataRecord.T1SyntaxRecorded);
         Assert.False(dataRecord.T2SyntaxRecorded);
         Assert.Equal(syntax, dataRecord.ValueASyntax.AsT0, ReferenceEqualityComparer.Instance);
-        Assert.False(dataRecord.ValueBSyntaxRecorded);
-    }
-
-    [Fact]
-    public void ValueA_Params_RecorderMapsToValueA()
-    {
-        Data dataRecord = new();
-        var syntax = new[] { SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression) };
-
-        var recorder = Target(new Mapper(), dataRecord, Mapper.NameValueA);
-
-        var outcome = recorder!.RecordParamsArgumentSyntax(syntax);
-
-        Assert.True(outcome);
-
-        Assert.False(dataRecord.T1SyntaxRecorded);
-        Assert.False(dataRecord.T2SyntaxRecorded);
-        Assert.Equal<IReadOnlyList<ExpressionSyntax>>(syntax, dataRecord.ValueASyntax.AsT1, ReferenceEqualityComparer.Instance);
         Assert.False(dataRecord.ValueBSyntaxRecorded);
     }
 

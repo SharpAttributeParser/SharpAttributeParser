@@ -27,9 +27,9 @@ public interface ISyntacticAttributeRecorder
     /// <exception cref="InvalidOperationException"/>
     public abstract bool TryRecordConstructorArgumentSyntax(IParameterSymbol parameter, ExpressionSyntax syntax);
 
-    /// <summary>Attempts to record syntactical information about the <see langword="params"/>-argument of a constructor parameter.</summary>
-    /// <param name="parameter">The <see cref="IParameterSymbol"/> representing the parameter.</param>
-    /// <param name="elementSyntax">The <see cref="ExpressionSyntax"/>, syntactically describing each element in the <see langword="params"/>-argument.</param>
+    /// <summary>Attempts to record syntactical information about the argument of a constructor <see langword="params"/>-parameter.</summary>
+    /// <param name="parameter">The <see cref="IParameterSymbol"/> representing the <see langword="params"/>-parameter.</param>
+    /// <param name="elementSyntax">The <see cref="ExpressionSyntax"/>, syntactically describing each element of the <see langword="params"/>-argument.</param>
     /// <returns>A <see cref="bool"/> indicating whether the syntactical information was successfully recorded.</returns>
     /// <exception cref="ArgumentException"/>
     /// <exception cref="ArgumentNullException"/>

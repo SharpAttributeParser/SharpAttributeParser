@@ -76,7 +76,7 @@ public sealed class TryRecordConstructorArgumentSyntax
 
         Assert.Equal(syntax, recordedSyntax, ReferenceEqualityComparer.Instance);
 
-        ISyntacticAttributeArgumentRecorder? tryMapConstructorParameter() => new SyntacticAttributeArgumentRecorder((syntax) =>
+        ISyntacticAttributeConstructorArgumentRecorder? tryMapConstructorParameter() => new SyntacticAttributeArgumentRecorder((syntax) =>
         {
             recordedSyntax = syntax.AsT0;
 

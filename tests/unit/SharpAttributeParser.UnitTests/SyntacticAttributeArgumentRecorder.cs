@@ -7,7 +7,7 @@ using OneOf;
 using System;
 using System.Collections.Generic;
 
-internal sealed class SyntacticAttributeArgumentRecorder : ISyntacticAttributeArgumentRecorder
+internal sealed class SyntacticAttributeArgumentRecorder : ISyntacticAttributeConstructorArgumentRecorder
 {
     private Func<OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> Recorder { get; }
 
@@ -17,5 +17,5 @@ internal sealed class SyntacticAttributeArgumentRecorder : ISyntacticAttributeAr
     }
 
     bool ISyntacticAttributeArgumentRecorder.RecordArgumentSyntax(ExpressionSyntax syntax) => Recorder(syntax);
-    bool ISyntacticAttributeArgumentRecorder.RecordParamsArgumentSyntax(IReadOnlyList<ExpressionSyntax> elementSyntax) => Recorder(OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>.FromT1(elementSyntax));
+    bool ISyntacticAttributeConstructorArgumentRecorder.RecordParamsArgumentSyntax(IReadOnlyList<ExpressionSyntax> elementSyntax) => Recorder(OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>.FromT1(elementSyntax));
 }

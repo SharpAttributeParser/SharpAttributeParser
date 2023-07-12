@@ -82,7 +82,7 @@ public sealed class Create_Data
             return true;
         });
 
-        ISyntacticAttributeArgumentRecorder? tryMapConstructorParameter(IParameterSymbol parameter, DataRecord dataRecord) => new SyntacticAttributeArgumentRecorder((syntax) =>
+        ISyntacticAttributeConstructorArgumentRecorder? tryMapConstructorParameter(IParameterSymbol parameter, DataRecord dataRecord) => new SyntacticAttributeArgumentRecorder((syntax) =>
         {
             syntax.Switch
             (

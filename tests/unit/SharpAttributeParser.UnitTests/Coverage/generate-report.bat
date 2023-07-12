@@ -20,7 +20,7 @@ fi
 
 echo
 
-reportgenerator -reports:`find Reports/Coverage -name *.cobertura.xml` -targetdir:Reports/Coverage -reporttype:Html_Dark
+reportgenerator -reports:`find Reports/Coverage -name *.cobertura.xml` -targetdir:Reports/Coverage -reporttype:Html_Dark --riskHotspotsAnalysisThresholds:metricThresholdForCyclomaticComplexity=15
 
 start Reports/Coverage/index.html
 
