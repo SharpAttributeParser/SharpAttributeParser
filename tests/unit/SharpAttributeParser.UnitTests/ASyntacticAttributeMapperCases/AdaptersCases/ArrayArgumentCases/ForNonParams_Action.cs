@@ -1,14 +1,17 @@
-﻿namespace SharpAttributeParser.ASyntacticAttributeMapperCases.AdaptersCases;
+﻿namespace SharpAttributeParser.ASyntacticAttributeMapperCases.AdaptersCases.ArrayArgumentCases;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+using OneOf;
+
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 using Xunit;
 
-public sealed class ForType
+public sealed class ForNonParams_Action
 {
     [Fact]
     public void NullDelegate_ArgumentNullException()
@@ -28,21 +31,37 @@ public sealed class ForType
     }
 
     [Fact]
-    public void ValidRecorder_NullSyntax_ArgumentNullExceptionWhenUsed()
+    public void ValidRecorder_NullSyntax_ArgumentExceptionWhenUsed()
     {
         var recorder = Mapper.Target(Data.Recorder);
 
-        var exception = Record.Exception(() => recorder(new Data(), null!));
+        var exception = Record.Exception(() => recorder(new Data(), (ExpressionSyntax)null!));
 
-        Assert.IsType<ArgumentNullException>(exception);
+        Assert.IsType<ArgumentException>(exception);
     }
 
     [Fact]
-    public void ValidRecorder_UsesRecorderAndReturnsTrue()
+    public void ValidRecorder_NullElementSyntax_FalseAndNotRecorded()
+    {
+        var syntax = OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>.FromT1(null!);
+
+        FalseAndNotRecorded(syntax);
+    }
+
+    [Fact]
+    public void Syntax_UsesRecorderAndReturnsTrue()
     {
         var syntax = SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression);
 
         TrueAndRecorded(syntax);
+    }
+
+    [Fact]
+    public void ElementSyntax_FalseAndNotRecorded()
+    {
+        var syntax = OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>.FromT1(new[] { SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression) });
+
+        FalseAndNotRecorded(syntax);
     }
 
     [AssertionMethod]
@@ -60,10 +79,24 @@ public sealed class ForType
         Assert.True(data.SyntaxRecorded);
     }
 
+    [AssertionMethod]
+    private static void FalseAndNotRecorded(OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax)
+    {
+        var recorder = Mapper.Target(Data.Recorder);
+
+        var data = new Data();
+
+        var outcome = recorder(data, syntax);
+
+        Assert.False(outcome);
+
+        Assert.False(data.SyntaxRecorded);
+    }
+
     [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "Used to expose static member of ASyntacticAttributeMapper.")]
     private sealed class Mapper : ASyntacticAttributeMapper<Data>
     {
-        public static Func<Data, ExpressionSyntax, bool> Target(Action<Data, ExpressionSyntax> recorder) => Adapters.ForType(recorder).Invoke;
+        public static Func<Data, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> Target(Action<Data, ExpressionSyntax> recorder) => Adapters.ArrayArgument.ForNonParams(recorder).Invoke;
     }
 
     private sealed class Data

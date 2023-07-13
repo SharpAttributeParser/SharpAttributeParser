@@ -1,4 +1,4 @@
-﻿namespace SharpAttributeParser.ASemanticAttributeMapperCases.AdaptersCases.TypeCases;
+﻿namespace SharpAttributeParser.ASemanticAttributeMapperCases.AdaptersCases.TypeArgumentCases;
 
 using Microsoft.CodeAnalysis;
 
@@ -10,8 +10,7 @@ using System.Diagnostics.CodeAnalysis;
 
 using Xunit;
 
-[SuppressMessage("Naming", "CA1716: Identifiers should not match keywords", Justification = "Type should not be used.")]
-public sealed class For
+public sealed class For_Func
 {
     [Fact]
     public void NullDelegate_ArgumentNullException()
@@ -24,7 +23,7 @@ public sealed class For
     [Fact]
     public void ValidRecorder_NullDataRecord_ArgumentNullExceptionWhenUsed()
     {
-        var recorder = Mapper.Target(Data.Recorder);
+        var recorder = Mapper.Target(Data.TrueRecorder);
 
         var exception = Record.Exception(() => recorder(null!, Mock.Of<ITypeSymbol>()));
 
@@ -34,7 +33,7 @@ public sealed class For
     [Fact]
     public void ValidRecorder_NullArgument_ArgumentNullExceptionWhenUsed()
     {
-        var recorder = Mapper.Target(Data.Recorder);
+        var recorder = Mapper.Target(Data.TrueRecorder);
 
         var exception = Record.Exception(() => recorder(new Data(), null!));
 
@@ -44,7 +43,7 @@ public sealed class For
     [Fact]
     public void ValidRecorder_UsesRecorderAndReturnsTrue()
     {
-        var recorder = Mapper.Target(Data.Recorder);
+        var recorder = Mapper.Target(Data.TrueRecorder);
 
         var data = new Data();
         var argument = Mock.Of<ITypeSymbol>();
@@ -57,19 +56,49 @@ public sealed class For
         Assert.True(data.ValueRecorded);
     }
 
+    [Fact]
+    public void FalseReturningRecorder_FalseAndRecorded()
+    {
+        var recorder = Mapper.Target(Data.FalseRecorder);
+
+        var data = new Data();
+        var argument = Mock.Of<ITypeSymbol>();
+
+        var outcome = recorder(data, argument);
+
+        Assert.False(outcome);
+
+        Assert.Equal(argument, data.Value, ReferenceEqualityComparer.Instance);
+        Assert.True(data.ValueRecorded);
+    }
+
     [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "Used to expose static member of ASemanticAttributeMapper.")]
     private sealed class Mapper : ASemanticAttributeMapper<Data>
     {
-        public static Func<Data, ITypeSymbol, bool> Target(Action<Data, ITypeSymbol> recorder) => Adapters.TypeArgument.For(recorder).Invoke;
+        public static Func<Data, ITypeSymbol, bool> Target(Func<Data, ITypeSymbol, bool> recorder) => Adapters.TypeArgument.For(recorder).Invoke;
     }
 
     private sealed class Data
     {
-        public static Action<Data, ITypeSymbol> Recorder => (dataRecord, argument) =>
+        public static Func<Data, ITypeSymbol, bool> TrueRecorder => (dataRecord, argument) =>
+        {
+            Recorder(dataRecord, argument);
+
+            return true;
+        };
+
+        public static Func<Data, ITypeSymbol, bool> FalseRecorder => (dataRecord, argument) =>
+        {
+            Recorder(dataRecord, argument);
+
+            return false;
+        };
+
+        private static void Recorder(Data dataRecord, ITypeSymbol argument)
         {
             dataRecord.Value = argument;
             dataRecord.ValueRecorded = true;
-        };
+        }
 
         public ITypeSymbol? Value { get; set; }
         public bool ValueRecorded { get; set; }

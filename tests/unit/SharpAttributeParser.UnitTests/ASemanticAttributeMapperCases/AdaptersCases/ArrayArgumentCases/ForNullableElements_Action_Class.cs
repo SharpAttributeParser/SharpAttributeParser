@@ -1,12 +1,13 @@
-﻿namespace SharpAttributeParser.ASemanticAttributeMapperCases.AdaptersCases.SimpleCases;
+﻿namespace SharpAttributeParser.ASemanticAttributeMapperCases.AdaptersCases.ArrayArgumentCases;
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 using Xunit;
 
-public sealed class ForNullable_Action_Class
+public sealed class ForNullableElements_Action_Class
 {
     [Fact]
     public void NullDelegate_ArgumentNullExceptionWhenUsed()
@@ -21,61 +22,53 @@ public sealed class ForNullable_Action_Class
     {
         var recorder = Mapper<string>.Target(Data<string>.Recorder);
 
-        var exception = Record.Exception(() => recorder(null!, "3"));
+        var exception = Record.Exception(() => recorder(null!, new[] { "3", "4" }));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
 
     [Fact]
-    public void NullableIntArray_NullElement_TrueAndRecorded()
-    {
-        var value = new int?[] { 3, null };
-
-        TrueAndRecorded(value, value);
-    }
-
-    [Fact]
-    public void IntArray_NullCollection_TrueAndRecorded()
-    {
-        IReadOnlyList<int?>? value = null;
-
-        TrueAndRecorded(value, value);
-    }
-
-    [Fact]
-    public void String_SameType_TrueAndRecorded()
+    public void String_NotArrayType_FalseAndNotRecorded()
     {
         var value = "3";
-
-        TrueAndRecorded(value, value);
-    }
-
-    [Fact]
-    public void String_StringCastToObject_TrueAndRecorded()
-    {
-        object value = "3";
-
-        TrueAndRecorded((string)value, value);
-    }
-
-    [Fact]
-    public void String_Enum_FalseAndNotRecorded()
-    {
-        var value = StringComparison.OrdinalIgnoreCase;
 
         FalseAndNotRecorded<string>(value);
     }
 
     [Fact]
-    public void String_Null_TrueAndRecorded()
+    public void String_SameType_TrueAndRecorded()
     {
-        string? value = null;
+        var value = new[] { "3", null };
 
         TrueAndRecorded(value, value);
     }
 
+    [Fact]
+    public void String_StringsCastToObjects_TrueAndRecorded()
+    {
+        var value = new object?[] { "1", null };
+
+        TrueAndRecorded(value.Select(static (value) => (string?)value), value);
+    }
+
+    [Fact]
+    public void String_DifferentType_FalseAndNotRecorded()
+    {
+        var value = new object[] { StringComparison.OrdinalIgnoreCase, "2" };
+
+        FalseAndNotRecorded<string>(value);
+    }
+
+    [Fact]
+    public void String_NullCollection_FalseAndNotRecorded()
+    {
+        IReadOnlyList<string>? value = null;
+
+        FalseAndNotRecorded<string>(value);
+    }
+
     [AssertionMethod]
-    private static void TrueAndRecorded<T1>(T1? expected, object? value) where T1 : class
+    private static void TrueAndRecorded<T1>(IEnumerable<T1?>? expected, object? value) where T1 : class
     {
         var recorder = Mapper<T1>.Target(Data<T1>.Recorder);
 
@@ -85,7 +78,7 @@ public sealed class ForNullable_Action_Class
 
         Assert.True(outcome);
 
-        Assert.Equal(expected, data.Value);
+        Assert.Equal<IEnumerable<T1?>>(expected, data.Value);
         Assert.True(data.ValueRecorded);
     }
 
@@ -106,18 +99,18 @@ public sealed class ForNullable_Action_Class
     [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "Used to expose static member of ASemanticAttributeMapper.")]
     private sealed class Mapper<T> : ASemanticAttributeMapper<Data<T>> where T : class
     {
-        public static Func<Data<T>, object?, bool> Target(Action<Data<T>, T?> recorder) => Adapters.SimpleArgument.ForNullable(recorder).Invoke;
+        public static Func<Data<T>, object?, bool> Target(Action<Data<T>, IReadOnlyList<T?>> recorder) => Adapters.ArrayArgument.ForNullableElements(recorder).Invoke;
     }
 
     private sealed class Data<T>
     {
-        public static Action<Data<T>, T?> Recorder => (dataRecord, argument) =>
+        public static Action<Data<T>, IReadOnlyList<T?>> Recorder => (dataRecord, argument) =>
         {
             dataRecord.Value = argument;
             dataRecord.ValueRecorded = true;
         };
 
-        public T? Value { get; set; }
+        public IReadOnlyList<T?>? Value { get; set; }
         public bool ValueRecorded { get; set; }
     }
 }

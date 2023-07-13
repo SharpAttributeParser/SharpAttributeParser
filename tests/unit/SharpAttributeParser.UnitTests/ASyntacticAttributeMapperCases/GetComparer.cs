@@ -79,12 +79,12 @@ public sealed class GetComparer
 
         protected override IEqualityComparer<string> GetComparer() => Comparer;
 
-        protected override IEnumerable<(OneOf<int, string> Index, DTypeArgumentSyntaxRecorder Mapping)> AddTypeParameterMappings()
+        protected override IEnumerable<(OneOf<int, string> IndexOrName, DTypeArgumentSyntaxRecorder Recorder)> AddTypeParameterMappings()
         {
             yield return (string.Empty, RecordT);
         }
 
-        protected override IEnumerable<(string Name, DArgumentSyntaxRecorder Mapping)> AddParameterMappings()
+        protected override IEnumerable<(string Name, DArgumentSyntaxRecorder Recorder)> AddParameterMappings()
         {
             yield return (string.Empty, RecordValue);
         }

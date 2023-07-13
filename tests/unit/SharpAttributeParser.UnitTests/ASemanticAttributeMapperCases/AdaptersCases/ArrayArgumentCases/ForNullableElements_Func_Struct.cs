@@ -1,4 +1,4 @@
-﻿namespace SharpAttributeParser.ASemanticAttributeMapperCases.AdaptersCases.CollectionCases;
+﻿namespace SharpAttributeParser.ASemanticAttributeMapperCases.AdaptersCases.ArrayArgumentCases;
 
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Linq;
 
 using Xunit;
 
-public sealed class ForNullableElements_Action_Struct
+public sealed class ForNullableElements_Func_Struct
 {
     [Fact]
     public void NullDelegate_ArgumentNullExceptionWhenUsed()
@@ -20,7 +20,7 @@ public sealed class ForNullableElements_Action_Struct
     [Fact]
     public void ValidRecorder_NullDataRecord_ArgumentNullExceptionWhenUsed()
     {
-        var recorder = Mapper<int>.Target(Data<int?>.Recorder);
+        var recorder = Mapper<int>.Target(Data<int?>.TrueRecorder);
 
         var exception = Record.Exception(() => recorder(null!, new[] { 3, 4 }));
 
@@ -115,10 +115,27 @@ public sealed class ForNullableElements_Action_Struct
         FalseAndNotRecorded<double>(value);
     }
 
+    [Fact]
+    public void FalseReturningRecorder_FalseAndRecorded()
+    {
+        var recorder = Mapper<int>.Target(Data<int?>.FalseRecorder);
+
+        var value = new int?[] { 3, 4 };
+
+        var data = new Data<int?>();
+
+        var outcome = recorder(data, value);
+
+        Assert.False(outcome);
+
+        Assert.Equal(value, data.Value);
+        Assert.True(data.ValueRecorded);
+    }
+
     [AssertionMethod]
     private static void TrueAndRecorded<T1>(IEnumerable<T1?>? expected, object? value) where T1 : struct
     {
-        var recorder = Mapper<T1>.Target(Data<T1?>.Recorder);
+        var recorder = Mapper<T1>.Target(Data<T1?>.TrueRecorder);
 
         var data = new Data<T1?>();
 
@@ -133,7 +150,7 @@ public sealed class ForNullableElements_Action_Struct
     [AssertionMethod]
     private static void FalseAndNotRecorded<T1>(object? value) where T1 : struct
     {
-        var recorder = Mapper<T1>.Target(Data<T1?>.Recorder);
+        var recorder = Mapper<T1>.Target(Data<T1?>.TrueRecorder);
 
         var data = new Data<T1?>();
 
@@ -147,16 +164,30 @@ public sealed class ForNullableElements_Action_Struct
     [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "Used to expose static member of ASemanticAttributeMapper.")]
     private sealed class Mapper<T> : ASemanticAttributeMapper<Data<T?>> where T : struct
     {
-        public static Func<Data<T?>, object?, bool> Target(Action<Data<T?>, IReadOnlyList<T?>> recorder) => Adapters.ArrayArgument.ForNullableElements(recorder).Invoke;
+        public static Func<Data<T?>, object?, bool> Target(Func<Data<T?>, IReadOnlyList<T?>, bool> recorder) => Adapters.ArrayArgument.ForNullableElements(recorder).Invoke;
     }
 
     private sealed class Data<T>
     {
-        public static Action<Data<T>, IReadOnlyList<T?>> Recorder => (dataRecord, argument) =>
+        public static Func<Data<T>, IReadOnlyList<T?>, bool> TrueRecorder => (dataRecord, argument) =>
+        {
+            Recorder(dataRecord, argument);
+
+            return true;
+        };
+
+        public static Func<Data<T>, IReadOnlyList<T?>, bool> FalseRecorder => (dataRecord, argument) =>
+        {
+            Recorder(dataRecord, argument);
+
+            return false;
+        };
+
+        private static void Recorder(Data<T> dataRecord, IReadOnlyList<T?>? argument)
         {
             dataRecord.Value = argument;
             dataRecord.ValueRecorded = true;
-        };
+        }
 
         public IReadOnlyList<T?>? Value { get; set; }
         public bool ValueRecorded { get; set; }

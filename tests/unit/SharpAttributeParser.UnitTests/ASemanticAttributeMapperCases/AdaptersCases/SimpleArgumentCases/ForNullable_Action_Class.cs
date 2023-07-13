@@ -1,16 +1,15 @@
-﻿namespace SharpAttributeParser.ASemanticAttributeMapperCases.AdaptersCases.CollectionCases;
+﻿namespace SharpAttributeParser.ASemanticAttributeMapperCases.AdaptersCases.SimpleArgumentCases;
 
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 using Xunit;
 
 public sealed class ForNullable_Action_Class
 {
     [Fact]
-    public void NullDelegate_ArgumentNullException()
+    public void NullDelegate_ArgumentNullExceptionWhenUsed()
     {
         var exception = Record.Exception(() => Mapper<string>.Target(null!));
 
@@ -28,47 +27,55 @@ public sealed class ForNullable_Action_Class
     }
 
     [Fact]
-    public void String_NotArrayType_FalseAndNotRecorded()
+    public void NullableIntArray_NullElement_TrueAndRecorded()
     {
-        var value = "3";
+        var value = new int?[] { 3, null };
 
-        FalseAndNotRecorded<string>(value);
+        TrueAndRecorded(value, value);
+    }
+
+    [Fact]
+    public void IntArray_NullCollection_TrueAndRecorded()
+    {
+        IReadOnlyList<int?>? value = null;
+
+        TrueAndRecorded(value, value);
     }
 
     [Fact]
     public void String_SameType_TrueAndRecorded()
     {
-        var value = new[] { "3", null };
+        var value = "3";
 
         TrueAndRecorded(value, value);
     }
 
     [Fact]
-    public void String_StringsCastToObjects_TrueAndRecorded()
+    public void String_StringCastToObject_TrueAndRecorded()
     {
-        var value = new object?[] { "3", null };
+        object value = "3";
 
-        TrueAndRecorded(value.Select(static (value) => (string?)value), value);
+        TrueAndRecorded((string)value, value);
     }
 
     [Fact]
-    public void String_DifferentType_FalseAndNotRecorded()
+    public void String_Enum_FalseAndNotRecorded()
     {
-        var value = new object[] { "3", StringComparison.OrdinalIgnoreCase };
+        var value = StringComparison.OrdinalIgnoreCase;
 
         FalseAndNotRecorded<string>(value);
     }
 
     [Fact]
-    public void String_NullCollection_TrueAndRecorded()
+    public void String_Null_TrueAndRecorded()
     {
-        IReadOnlyList<string>? value = null;
+        string? value = null;
 
         TrueAndRecorded(value, value);
     }
 
     [AssertionMethod]
-    private static void TrueAndRecorded<T1>(IEnumerable<T1?>? expected, object? value) where T1 : class
+    private static void TrueAndRecorded<T1>(T1? expected, object? value) where T1 : class
     {
         var recorder = Mapper<T1>.Target(Data<T1>.Recorder);
 
@@ -78,7 +85,7 @@ public sealed class ForNullable_Action_Class
 
         Assert.True(outcome);
 
-        Assert.Equal<IEnumerable<T1?>>(expected, data.Value);
+        Assert.Equal(expected, data.Value);
         Assert.True(data.ValueRecorded);
     }
 
@@ -99,18 +106,18 @@ public sealed class ForNullable_Action_Class
     [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "Used to expose static member of ASemanticAttributeMapper.")]
     private sealed class Mapper<T> : ASemanticAttributeMapper<Data<T>> where T : class
     {
-        public static Func<Data<T>, object?, bool> Target(Action<Data<T>, IReadOnlyList<T?>?> recorder) => Adapters.ArrayArgument.ForNullable(recorder).Invoke;
+        public static Func<Data<T>, object?, bool> Target(Action<Data<T>, T?> recorder) => Adapters.SimpleArgument.ForNullable(recorder).Invoke;
     }
 
     private sealed class Data<T>
     {
-        public static Action<Data<T>, IReadOnlyList<T?>?> Recorder => (dataRecord, argument) =>
+        public static Action<Data<T>, T?> Recorder => (dataRecord, argument) =>
         {
             dataRecord.Value = argument;
             dataRecord.ValueRecorded = true;
         };
 
-        public IReadOnlyList<T?>? Value { get; set; }
+        public T? Value { get; set; }
         public bool ValueRecorded { get; set; }
     }
 }

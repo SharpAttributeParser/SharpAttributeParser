@@ -14,7 +14,7 @@ internal sealed class SyntacticParamsAttributeMapper : ASyntacticAttributeMapper
 {
     protected override IEnumerable<(string, DArgumentSyntaxRecorder)> AddParameterMappings()
     {
-        yield return (nameof(ParamsAttribute.Value), Adapters.ForParams(RecordValueSyntax));
+        yield return (nameof(ParamsAttribute.Value), Adapters.ArrayArgument.ForParams(RecordValueSyntax));
     }
 
     private void RecordValueSyntax(ISyntacticParamsAttributeRecordBuilder builder, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => builder.WithValueSyntax(syntax);

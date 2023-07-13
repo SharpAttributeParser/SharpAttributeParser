@@ -1,4 +1,4 @@
-﻿namespace SharpAttributeParser.ASyntacticAttributeMapperCases.AdaptersCases;
+﻿namespace SharpAttributeParser.ASyntacticAttributeMapperCases.AdaptersCases.ArrayArgumentCases;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -11,7 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 
 using Xunit;
 
-public sealed class ForParams
+public sealed class ForParams_Action
 {
     [Fact]
     public void NullDelegate_ArgumentNullException()
@@ -84,7 +84,7 @@ public sealed class ForParams
     [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "Used to expose static member of ASyntacticAttributeMapper.")]
     private sealed class Mapper : ASyntacticAttributeMapper<Data>
     {
-        public static Func<Data, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> Target(Action<Data, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> recorder) => Adapters.ForParams(recorder).Invoke;
+        public static Func<Data, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> Target(Action<Data, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> recorder) => Adapters.ArrayArgument.ForParams(recorder).Invoke;
     }
 
     private sealed class Data

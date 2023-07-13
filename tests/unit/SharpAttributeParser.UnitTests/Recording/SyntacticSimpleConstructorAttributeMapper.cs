@@ -12,7 +12,7 @@ internal sealed class SyntacticSimpleConstructorAttributeMapper : ASyntacticAttr
 {
     protected override IEnumerable<(string, DArgumentSyntaxRecorder)> AddParameterMappings()
     {
-        yield return (nameof(SimpleConstructorAttribute.Value), Adapters.ForNonParams(RecordValueSyntax));
+        yield return (nameof(SimpleConstructorAttribute.Value), Adapters.SimpleArgument.For(RecordValueSyntax));
     }
 
     private void RecordValueSyntax(ISyntacticSimpleConstructorAttributeRecordBuilder builder, ExpressionSyntax syntax) => builder.WithValueSyntax(syntax);

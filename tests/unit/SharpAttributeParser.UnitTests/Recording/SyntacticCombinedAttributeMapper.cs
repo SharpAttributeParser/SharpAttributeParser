@@ -14,18 +14,18 @@ internal sealed class SyntacticCombinedAttributeMapper : ASyntacticAttributeMapp
 {
     protected override IEnumerable<(OneOf<int, string>, DTypeArgumentSyntaxRecorder)> AddTypeParameterMappings()
     {
-        yield return (0, Adapters.ForType(RecordT1Syntax));
-        yield return (1, Adapters.ForType(RecordT2Syntax));
+        yield return (0, Adapters.TypeArgument.For(RecordT1Syntax));
+        yield return (1, Adapters.TypeArgument.For(RecordT2Syntax));
     }
 
     protected override IEnumerable<(string, DArgumentSyntaxRecorder)> AddParameterMappings()
     {
-        yield return (nameof(CombinedAttribute<object, object>.SimpleValue), Adapters.ForNonParams(RecordSimpleValueSyntax));
-        yield return (nameof(CombinedAttribute<object, object>.ArrayValue), Adapters.ForNonParams(RecordArrayValueSyntax));
-        yield return (nameof(CombinedAttribute<object, object>.ParamsValue), Adapters.ForParams(RecordParamsValueSyntax));
+        yield return (nameof(CombinedAttribute<object, object>.SimpleValue), Adapters.SimpleArgument.For(RecordSimpleValueSyntax));
+        yield return (nameof(CombinedAttribute<object, object>.ArrayValue), Adapters.ArrayArgument.ForNonParams(RecordArrayValueSyntax));
+        yield return (nameof(CombinedAttribute<object, object>.ParamsValue), Adapters.ArrayArgument.ForParams(RecordParamsValueSyntax));
 
-        yield return (nameof(CombinedAttribute<object, object>.SimpleNamedValue), Adapters.ForNonParams(RecordSimpleNamedValueSyntax));
-        yield return (nameof(CombinedAttribute<object, object>.ArrayNamedValue), Adapters.ForNonParams(RecordArrayNamedValueSyntax));
+        yield return (nameof(CombinedAttribute<object, object>.SimpleNamedValue), Adapters.SimpleArgument.For(RecordSimpleNamedValueSyntax));
+        yield return (nameof(CombinedAttribute<object, object>.ArrayNamedValue), Adapters.ArrayArgument.ForNonParams(RecordArrayNamedValueSyntax));
     }
 
     private void RecordT1Syntax(ISyntacticCombinedAttributeRecordBuilder builder, ExpressionSyntax syntax) => builder.WithT1Syntax(syntax);

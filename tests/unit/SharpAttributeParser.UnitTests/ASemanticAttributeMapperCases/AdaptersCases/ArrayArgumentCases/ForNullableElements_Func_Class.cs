@@ -1,4 +1,4 @@
-﻿namespace SharpAttributeParser.ASemanticAttributeMapperCases.AdaptersCases.CollectionCases;
+﻿namespace SharpAttributeParser.ASemanticAttributeMapperCases.AdaptersCases.ArrayArgumentCases;
 
 using System;
 using System.Collections.Generic;
@@ -7,10 +7,10 @@ using System.Linq;
 
 using Xunit;
 
-public sealed class ForNullable_Func_Class
+public sealed class ForNullableElements_Func_Class
 {
     [Fact]
-    public void NullDelegate_ArgumentNullException()
+    public void NullDelegate_ArgumentNullExceptionWhenUsed()
     {
         var exception = Record.Exception(() => Mapper<string>.Target(null!));
 
@@ -22,7 +22,7 @@ public sealed class ForNullable_Func_Class
     {
         var recorder = Mapper<string>.Target(Data<string>.TrueRecorder);
 
-        var exception = Record.Exception(() => recorder(null!, "3"));
+        var exception = Record.Exception(() => recorder(null!, new[] { "3", "4" }));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -60,11 +60,11 @@ public sealed class ForNullable_Func_Class
     }
 
     [Fact]
-    public void String_NullCollection_TrueAndRecorded()
+    public void String_NullCollection_FalseAndNotRecorded()
     {
         IReadOnlyList<string>? value = null;
 
-        TrueAndRecorded(value, value);
+        FalseAndNotRecorded<string>(value);
     }
 
     [Fact]
@@ -116,19 +116,19 @@ public sealed class ForNullable_Func_Class
     [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "Used to expose static member of ASemanticAttributeMapper.")]
     private sealed class Mapper<T> : ASemanticAttributeMapper<Data<T>> where T : class
     {
-        public static Func<Data<T>, object?, bool> Target(Func<Data<T>, IReadOnlyList<T?>?, bool> recorder) => Adapters.ArrayArgument.ForNullable(recorder).Invoke;
+        public static Func<Data<T>, object?, bool> Target(Func<Data<T>, IReadOnlyList<T?>, bool> recorder) => Adapters.ArrayArgument.ForNullableElements(recorder).Invoke;
     }
 
     private sealed class Data<T>
     {
-        public static Func<Data<T>, IReadOnlyList<T?>?, bool> TrueRecorder => (dataRecord, argument) =>
+        public static Func<Data<T>, IReadOnlyList<T?>, bool> TrueRecorder => (dataRecord, argument) =>
         {
             Recorder(dataRecord, argument);
 
             return true;
         };
 
-        public static Func<Data<T>, IReadOnlyList<T?>?, bool> FalseRecorder => (dataRecord, argument) =>
+        public static Func<Data<T>, IReadOnlyList<T?>, bool> FalseRecorder => (dataRecord, argument) =>
         {
             Recorder(dataRecord, argument);
 

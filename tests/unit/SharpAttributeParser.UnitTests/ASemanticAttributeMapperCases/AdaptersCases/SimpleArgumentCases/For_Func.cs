@@ -1,4 +1,4 @@
-﻿namespace SharpAttributeParser.ASemanticAttributeMapperCases.AdaptersCases.SimpleCases;
+﻿namespace SharpAttributeParser.ASemanticAttributeMapperCases.AdaptersCases.SimpleArgumentCases;
 
 using System;
 using System.Collections.Generic;

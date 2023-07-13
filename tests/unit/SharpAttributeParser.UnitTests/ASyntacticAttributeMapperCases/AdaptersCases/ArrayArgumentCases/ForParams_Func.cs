@@ -1,4 +1,4 @@
-﻿namespace SharpAttributeParser.ASyntacticAttributeMapperCases.AdaptersCases;
+﻿namespace SharpAttributeParser.ASyntacticAttributeMapperCases.AdaptersCases.ArrayArgumentCases;
 
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -11,7 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 
 using Xunit;
 
-public sealed class ForNonParams_Func
+public sealed class ForParams_Func
 {
     [Fact]
     public void NullDelegate_ArgumentNullException()
@@ -41,11 +41,13 @@ public sealed class ForNonParams_Func
     }
 
     [Fact]
-    public void ValidRecorder_NullElementSyntax_FalseAndNotRecorded()
+    public void ValidRecorder_NullElementSyntax_ArgumentExceptionWhenUsed()
     {
-        var syntax = OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>.FromT1(null!);
+        var recorder = Mapper.Target(Data.TrueRecorder);
 
-        FalseAndNotRecorded(syntax);
+        var exception = Record.Exception(() => recorder(new Data(), OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>.FromT1(null!)));
+
+        Assert.IsType<ArgumentException>(exception);
     }
 
     [Fact]
@@ -57,20 +59,20 @@ public sealed class ForNonParams_Func
     }
 
     [Fact]
-    public void ElementSyntax_FalseAndNotRecorded()
+    public void ElementSyntax_UsesRecorderAndReturnsTrue()
     {
         var syntax = OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>.FromT1(new[] { SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression) });
 
-        FalseAndNotRecorded(syntax);
+        TrueAndRecorded(syntax);
     }
 
     [Fact]
     public void FalseReturningRecorder_FalseAndRecorded()
     {
         var recorder = Mapper.Target(Data.FalseRecorder);
-        var data = new Data();
 
-        var syntax = SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression);
+        var data = new Data();
+        var syntax = OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>.FromT1(new[] { SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression) });
 
         var outcome = recorder(data, syntax);
 
@@ -81,7 +83,7 @@ public sealed class ForNonParams_Func
     }
 
     [AssertionMethod]
-    private static void TrueAndRecorded(ExpressionSyntax syntax)
+    private static void TrueAndRecorded(OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax)
     {
         var recorder = Mapper.Target(Data.TrueRecorder);
 
@@ -95,49 +97,35 @@ public sealed class ForNonParams_Func
         Assert.True(data.SyntaxRecorded);
     }
 
-    [AssertionMethod]
-    private static void FalseAndNotRecorded(OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax)
-    {
-        var recorder = Mapper.Target(Data.TrueRecorder);
-
-        var data = new Data();
-
-        var outcome = recorder(data, syntax);
-
-        Assert.False(outcome);
-
-        Assert.False(data.SyntaxRecorded);
-    }
-
     [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "Used to expose static member of ASyntacticAttributeMapper.")]
     private sealed class Mapper : ASyntacticAttributeMapper<Data>
     {
-        public static Func<Data, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> Target(Func<Data, ExpressionSyntax, bool> recorder) => Adapters.ForNonParams(recorder).Invoke;
+        public static Func<Data, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> Target(Func<Data, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> recorder) => Adapters.ArrayArgument.ForParams(recorder).Invoke;
     }
 
     private sealed class Data
     {
-        public static Func<Data, ExpressionSyntax, bool> TrueRecorder => (dataRecord, syntax) =>
+        public static Func<Data, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> TrueRecorder => (dataRecord, syntax) =>
         {
             Recorder(dataRecord, syntax);
 
             return true;
         };
 
-        public static Func<Data, ExpressionSyntax, bool> FalseRecorder => (dataRecord, syntax) =>
+        public static Func<Data, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> FalseRecorder => (dataRecord, syntax) =>
         {
             Recorder(dataRecord, syntax);
 
             return false;
         };
 
-        public static void Recorder(Data dataRecord, ExpressionSyntax syntax)
+        private static void Recorder(Data dataRecord, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax)
         {
             dataRecord.Syntax = syntax;
             dataRecord.SyntaxRecorded = true;
         }
 
-        public ExpressionSyntax? Syntax { get; set; }
+        public OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> Syntax { get; set; }
         public bool SyntaxRecorded { get; set; }
     }
 }

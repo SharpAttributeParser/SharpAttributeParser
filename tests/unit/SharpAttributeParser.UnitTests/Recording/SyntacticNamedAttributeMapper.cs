@@ -12,8 +12,8 @@ internal sealed class SyntacticNamedAttributeMapper : ASyntacticAttributeMapper<
 {
     protected override IEnumerable<(string, DArgumentSyntaxRecorder)> AddParameterMappings()
     {
-        yield return (nameof(NamedAttribute.SimpleValue), Adapters.ForNonParams(RecordSimpleValueSyntax));
-        yield return (nameof(NamedAttribute.ArrayValue), Adapters.ForNonParams(RecordArrayValueSyntax));
+        yield return (nameof(NamedAttribute.SimpleValue), Adapters.SimpleArgument.For(RecordSimpleValueSyntax));
+        yield return (nameof(NamedAttribute.ArrayValue), Adapters.ArrayArgument.ForNonParams(RecordArrayValueSyntax));
     }
 
     private void RecordSimpleValueSyntax(ISyntacticNamedAttributeRecordBuilder builder, ExpressionSyntax syntax) => builder.WithSimpleValueSyntax(syntax);

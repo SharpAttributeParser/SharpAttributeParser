@@ -1,4 +1,4 @@
-﻿namespace SharpAttributeParser.ASemanticAttributeMapperCases.AdaptersCases.CollectionCases;
+﻿namespace SharpAttributeParser.ASemanticAttributeMapperCases.AdaptersCases.ArrayArgumentCases;
 
 using System;
 using System.Collections.Generic;
@@ -7,10 +7,10 @@ using System.Linq;
 
 using Xunit;
 
-public sealed class ForNullableElements_Action_Class
+public sealed class ForNullable_Action_Class
 {
     [Fact]
-    public void NullDelegate_ArgumentNullExceptionWhenUsed()
+    public void NullDelegate_ArgumentNullException()
     {
         var exception = Record.Exception(() => Mapper<string>.Target(null!));
 
@@ -22,7 +22,7 @@ public sealed class ForNullableElements_Action_Class
     {
         var recorder = Mapper<string>.Target(Data<string>.Recorder);
 
-        var exception = Record.Exception(() => recorder(null!, new[] { "3", "4" }));
+        var exception = Record.Exception(() => recorder(null!, "3"));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -46,7 +46,7 @@ public sealed class ForNullableElements_Action_Class
     [Fact]
     public void String_StringsCastToObjects_TrueAndRecorded()
     {
-        var value = new object?[] { "1", null };
+        var value = new object?[] { "3", null };
 
         TrueAndRecorded(value.Select(static (value) => (string?)value), value);
     }
@@ -54,17 +54,17 @@ public sealed class ForNullableElements_Action_Class
     [Fact]
     public void String_DifferentType_FalseAndNotRecorded()
     {
-        var value = new object[] { StringComparison.OrdinalIgnoreCase, "2" };
+        var value = new object[] { "3", StringComparison.OrdinalIgnoreCase };
 
         FalseAndNotRecorded<string>(value);
     }
 
     [Fact]
-    public void String_NullCollection_FalseAndNotRecorded()
+    public void String_NullCollection_TrueAndRecorded()
     {
         IReadOnlyList<string>? value = null;
 
-        FalseAndNotRecorded<string>(value);
+        TrueAndRecorded(value, value);
     }
 
     [AssertionMethod]
@@ -99,12 +99,12 @@ public sealed class ForNullableElements_Action_Class
     [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "Used to expose static member of ASemanticAttributeMapper.")]
     private sealed class Mapper<T> : ASemanticAttributeMapper<Data<T>> where T : class
     {
-        public static Func<Data<T>, object?, bool> Target(Action<Data<T>, IReadOnlyList<T?>> recorder) => Adapters.ArrayArgument.ForNullableElements(recorder).Invoke;
+        public static Func<Data<T>, object?, bool> Target(Action<Data<T>, IReadOnlyList<T?>?> recorder) => Adapters.ArrayArgument.ForNullable(recorder).Invoke;
     }
 
     private sealed class Data<T>
     {
-        public static Action<Data<T>, IReadOnlyList<T?>> Recorder => (dataRecord, argument) =>
+        public static Action<Data<T>, IReadOnlyList<T?>?> Recorder => (dataRecord, argument) =>
         {
             dataRecord.Value = argument;
             dataRecord.ValueRecorded = true;

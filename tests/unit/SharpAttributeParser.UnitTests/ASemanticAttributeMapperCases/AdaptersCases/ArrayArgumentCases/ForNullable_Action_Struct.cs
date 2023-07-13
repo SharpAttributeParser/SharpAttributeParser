@@ -1,4 +1,4 @@
-﻿namespace SharpAttributeParser.ASemanticAttributeMapperCases.AdaptersCases.CollectionCases;
+﻿namespace SharpAttributeParser.ASemanticAttributeMapperCases.AdaptersCases.ArrayArgumentCases;
 
 using System;
 using System.Collections.Generic;
@@ -7,10 +7,10 @@ using System.Linq;
 
 using Xunit;
 
-public sealed class ForNullableElements_Func_Struct
+public sealed class ForNullable_Action_Struct
 {
     [Fact]
-    public void NullDelegate_ArgumentNullExceptionWhenUsed()
+    public void NullDelegate_ArgumentNullException()
     {
         var exception = Record.Exception(() => Mapper<int>.Target(null!));
 
@@ -20,19 +20,19 @@ public sealed class ForNullableElements_Func_Struct
     [Fact]
     public void ValidRecorder_NullDataRecord_ArgumentNullExceptionWhenUsed()
     {
-        var recorder = Mapper<int>.Target(Data<int?>.TrueRecorder);
+        var recorder = Mapper<int>.Target(Data<int?>.Recorder);
 
-        var exception = Record.Exception(() => recorder(null!, new[] { 3, 4 }));
+        var exception = Record.Exception(() => recorder(null!, 3));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
 
     [Fact]
-    public void String_NotArrayType_FalseAndNotRecorded()
+    public void Enum_NotArrayType_FalseAndNotRecorded()
     {
         var value = "3";
 
-        FalseAndNotRecorded<int>(value);
+        FalseAndNotRecorded<StringComparison>(value);
     }
 
     [Fact]
@@ -52,6 +52,14 @@ public sealed class ForNullableElements_Func_Struct
     }
 
     [Fact]
+    public void Enum_DifferentTypeCastToObjects_FalseAndNotRecorded()
+    {
+        var value = new object?[] { StringSplitOptions.RemoveEmptyEntries, null };
+
+        FalseAndNotRecorded<StringComparison>(value);
+    }
+
+    [Fact]
     public void Enum_DifferentEnumType_FalseAndNotRecorded()
     {
         var value = new StringSplitOptions?[] { StringSplitOptions.RemoveEmptyEntries, null };
@@ -64,11 +72,11 @@ public sealed class ForNullableElements_Func_Struct
     {
         var value = new int?[] { 3, null };
 
-        FalseAndNotRecorded<StringSplitOptions>(value);
+        FalseAndNotRecorded<StringComparison>(value);
     }
 
     [Fact]
-    public void Int_SameType_TrueAndRecorded()
+    public void NullableInt_NullElement_TrueAndRecorded()
     {
         var value = new int?[] { 3, null };
 
@@ -100,11 +108,11 @@ public sealed class ForNullableElements_Func_Struct
     }
 
     [Fact]
-    public void Int_NullCollection_FalseAndNotRecorded()
+    public void Int_NullCollection_TrueAndRecorded()
     {
-        IReadOnlyList<int>? value = null;
+        IReadOnlyList<int?>? value = null;
 
-        FalseAndNotRecorded<int>(value);
+        TrueAndRecorded(value, value);
     }
 
     [Fact]
@@ -115,27 +123,10 @@ public sealed class ForNullableElements_Func_Struct
         FalseAndNotRecorded<double>(value);
     }
 
-    [Fact]
-    public void FalseReturningRecorder_FalseAndRecorded()
-    {
-        var recorder = Mapper<int>.Target(Data<int?>.FalseRecorder);
-
-        var value = new int?[] { 3, 4 };
-
-        var data = new Data<int?>();
-
-        var outcome = recorder(data, value);
-
-        Assert.False(outcome);
-
-        Assert.Equal(value, data.Value);
-        Assert.True(data.ValueRecorded);
-    }
-
     [AssertionMethod]
     private static void TrueAndRecorded<T1>(IEnumerable<T1?>? expected, object? value) where T1 : struct
     {
-        var recorder = Mapper<T1>.Target(Data<T1?>.TrueRecorder);
+        var recorder = Mapper<T1>.Target(Data<T1?>.Recorder);
 
         var data = new Data<T1?>();
 
@@ -150,7 +141,7 @@ public sealed class ForNullableElements_Func_Struct
     [AssertionMethod]
     private static void FalseAndNotRecorded<T1>(object? value) where T1 : struct
     {
-        var recorder = Mapper<T1>.Target(Data<T1?>.TrueRecorder);
+        var recorder = Mapper<T1>.Target(Data<T1?>.Recorder);
 
         var data = new Data<T1?>();
 
@@ -164,30 +155,16 @@ public sealed class ForNullableElements_Func_Struct
     [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "Used to expose static member of ASemanticAttributeMapper.")]
     private sealed class Mapper<T> : ASemanticAttributeMapper<Data<T?>> where T : struct
     {
-        public static Func<Data<T?>, object?, bool> Target(Func<Data<T?>, IReadOnlyList<T?>, bool> recorder) => Adapters.ArrayArgument.ForNullableElements(recorder).Invoke;
+        public static Func<Data<T?>, object?, bool> Target(Action<Data<T?>, IReadOnlyList<T?>?> recorder) => Adapters.ArrayArgument.ForNullable(recorder).Invoke;
     }
 
     private sealed class Data<T>
     {
-        public static Func<Data<T>, IReadOnlyList<T?>, bool> TrueRecorder => (dataRecord, argument) =>
-        {
-            Recorder(dataRecord, argument);
-
-            return true;
-        };
-
-        public static Func<Data<T>, IReadOnlyList<T?>, bool> FalseRecorder => (dataRecord, argument) =>
-        {
-            Recorder(dataRecord, argument);
-
-            return false;
-        };
-
-        private static void Recorder(Data<T> dataRecord, IReadOnlyList<T?>? argument)
+        public static Action<Data<T>, IReadOnlyList<T?>?> Recorder => (dataRecord, argument) =>
         {
             dataRecord.Value = argument;
             dataRecord.ValueRecorded = true;
-        }
+        };
 
         public IReadOnlyList<T?>? Value { get; set; }
         public bool ValueRecorded { get; set; }

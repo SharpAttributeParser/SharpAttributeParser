@@ -20,7 +20,7 @@ internal sealed class Mapper : ASyntacticAttributeMapper<Data>
     public static string NameValueA => "A";
     public static string NameValueB => "B";
 
-    protected override IEnumerable<(OneOf<int, string> Index, DTypeArgumentSyntaxRecorder Mapping)> AddTypeParameterMappings()
+    protected override IEnumerable<(OneOf<int, string> IndexOrName, DTypeArgumentSyntaxRecorder Recorder)> AddTypeParameterMappings()
     {
         yield return (IndexT1, RecordT1Syntax);
         yield return (TypeNameT1, RecordT1Syntax);
@@ -28,7 +28,7 @@ internal sealed class Mapper : ASyntacticAttributeMapper<Data>
         yield return (TypeNameT2, RecordT2Syntax);
     }
 
-    protected override IEnumerable<(string Name, DArgumentSyntaxRecorder Mapping)> AddParameterMappings()
+    protected override IEnumerable<(string Name, DArgumentSyntaxRecorder Recorder)> AddParameterMappings()
     {
         yield return (NameValueA, RecordValueASyntax);
         yield return (NameValueB, RecordValueBSyntax);
