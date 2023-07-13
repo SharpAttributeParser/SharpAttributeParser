@@ -60,7 +60,7 @@ public sealed class For
     [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "Used to expose static member of ASemanticAttributeMapper.")]
     private sealed class Mapper : ASemanticAttributeMapper<Data>
     {
-        public static Func<Data, ITypeSymbol, bool> Target(Action<Data, ITypeSymbol> recorder) => Adapters.Type.For(recorder).Invoke;
+        public static Func<Data, ITypeSymbol, bool> Target(Action<Data, ITypeSymbol> recorder) => Adapters.TypeArgument.For(recorder).Invoke;
     }
 
     private sealed class Data

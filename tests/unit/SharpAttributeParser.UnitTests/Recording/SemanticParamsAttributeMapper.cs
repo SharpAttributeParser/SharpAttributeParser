@@ -10,7 +10,7 @@ internal sealed class SemanticParamsAttributeMapper : ASemanticAttributeMapper<I
 {
     protected override IEnumerable<(string, DArgumentRecorder)> AddParameterMappings()
     {
-        yield return (nameof(ParamsAttribute.Value), Adapters.Collection.ForNullable<object>(RecordValue));
+        yield return (nameof(ParamsAttribute.Value), Adapters.ArrayArgument.ForNullable<object>(RecordValue));
     }
 
     private void RecordValue(ISemanticParamsAttributeRecordBuilder builder, IReadOnlyList<object?>? value) => builder.WithValue(value);

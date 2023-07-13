@@ -14,8 +14,8 @@ internal sealed class SemanticGenericAttributeMapper : ASemanticAttributeMapper<
 {
     protected override IEnumerable<(OneOf<int, string>, DTypeArgumentRecorder)> AddTypeParameterMappings()
     {
-        yield return (0, Adapters.Type.For(RecordT1));
-        yield return (1, Adapters.Type.For(RecordT2));
+        yield return (0, Adapters.TypeArgument.For(RecordT1));
+        yield return (1, Adapters.TypeArgument.For(RecordT2));
     }
 
     private void RecordT1(ISemanticGenericAttributeRecordBuilder builder, ITypeSymbol value) => builder.WithT1(value);

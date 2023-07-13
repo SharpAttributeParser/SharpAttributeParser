@@ -12,14 +12,14 @@ internal sealed class SemanticExampleAttributeMapper : ASemanticAttributeMapper<
 {
     protected override IEnumerable<(OneOf<int, string>, DTypeArgumentRecorder)> AddTypeParameterMappings()
     {
-        yield return (0, Adapters.Type.For(RecordT));
+        yield return (0, Adapters.TypeArgument.For(RecordT));
     }
 
     protected override IEnumerable<(string, DArgumentRecorder)> AddParameterMappings()
     {
-        yield return (nameof(ExampleAttribute<object>.Sequence), Adapters.Collection.For<int>(RecordSequence));
-        yield return (nameof(ExampleAttribute<object>.Name), Adapters.Simple.For<string>(RecordName));
-        yield return (nameof(ExampleAttribute<object>.Answer), Adapters.Simple.For<int>(RecordAnswer));
+        yield return (nameof(ExampleAttribute<object>.Sequence), Adapters.ArrayArgument.For<int>(RecordSequence));
+        yield return (nameof(ExampleAttribute<object>.Name), Adapters.SimpleArgument.For<string>(RecordName));
+        yield return (nameof(ExampleAttribute<object>.Answer), Adapters.SimpleArgument.For<int>(RecordAnswer));
     }
 
     private void RecordT(ISemanticExampleAttributeRecordBuilder builder, ITypeSymbol t) => builder.WithT(t);

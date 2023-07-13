@@ -45,12 +45,38 @@ public sealed class AttributeParser : IAttributeParser
         SemanticAttributeRecorder semanticRecorder = new();
         SyntacticAttributeRecorder syntacticRecorder = new();
 
-        if (SemanticParser.TryParse(semanticRecorder, attributeData) is false || SyntacticParser.TryParse(syntacticRecorder, attributeData, attributeSyntax) is false)
+        if (TryParse(semanticRecorder, syntacticRecorder, attributeData, attributeSyntax) is false)
         {
             return false;
         }
 
         return PropagateRecordedArguments(recorder, semanticRecorder, syntacticRecorder);
+    }
+
+    /// <inheritdoc/>
+    public bool TryParse(ISemanticAttributeRecorder semanticRecorder, ISyntacticAttributeRecorder syntacticRecorder, AttributeData attributeData, AttributeSyntax attributeSyntax)
+    {
+        if (semanticRecorder is null)
+        {
+            throw new ArgumentNullException(nameof(semanticRecorder));
+        }
+
+        if (syntacticRecorder is null)
+        {
+            throw new ArgumentNullException(nameof(syntacticRecorder));
+        }
+
+        if (attributeData is null)
+        {
+            throw new ArgumentNullException(nameof(attributeData));
+        }
+
+        if (attributeSyntax is null)
+        {
+            throw new ArgumentNullException(nameof(attributeSyntax));
+        }
+
+        return SemanticParser.TryParse(semanticRecorder, attributeData) && SyntacticParser.TryParse(syntacticRecorder, attributeData, attributeSyntax);
     }
 
     private bool PropagateRecordedArguments(IAttributeRecorder recorder, SemanticAttributeRecorder semanticRecorder, SyntacticAttributeRecorder syntacticRecorder)

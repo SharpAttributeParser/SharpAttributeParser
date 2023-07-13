@@ -14,18 +14,18 @@ internal sealed class SemanticCombinedAttributeMapper : ASemanticAttributeMapper
 {
     protected override IEnumerable<(OneOf<int, string>, DTypeArgumentRecorder)> AddTypeParameterMappings()
     {
-        yield return (0, Adapters.Type.For(RecordT1));
-        yield return (1, Adapters.Type.For(RecordT2));
+        yield return (0, Adapters.TypeArgument.For(RecordT1));
+        yield return (1, Adapters.TypeArgument.For(RecordT2));
     }
 
     protected override IEnumerable<(string, DArgumentRecorder)> AddParameterMappings()
     {
-        yield return (nameof(CombinedAttribute<object, object>.SimpleValue), Adapters.Simple.ForNullable<object>(RecordSimpleValue));
-        yield return (nameof(CombinedAttribute<object, object>.ArrayValue), Adapters.Collection.ForNullable<object>(RecordArrayValue));
-        yield return (nameof(CombinedAttribute<object, object>.ParamsValue), Adapters.Collection.ForNullable<object>(RecordParamsValue));
+        yield return (nameof(CombinedAttribute<object, object>.SimpleValue), Adapters.SimpleArgument.ForNullable<object>(RecordSimpleValue));
+        yield return (nameof(CombinedAttribute<object, object>.ArrayValue), Adapters.ArrayArgument.ForNullable<object>(RecordArrayValue));
+        yield return (nameof(CombinedAttribute<object, object>.ParamsValue), Adapters.ArrayArgument.ForNullable<object>(RecordParamsValue));
 
-        yield return (nameof(CombinedAttribute<object, object>.SimpleNamedValue), Adapters.Simple.ForNullable<object>(RecordSimpleNamedValue));
-        yield return (nameof(CombinedAttribute<object, object>.ArrayNamedValue), Adapters.Collection.ForNullable<object>(RecordArrayNamedValue));
+        yield return (nameof(CombinedAttribute<object, object>.SimpleNamedValue), Adapters.SimpleArgument.ForNullable<object>(RecordSimpleNamedValue));
+        yield return (nameof(CombinedAttribute<object, object>.ArrayNamedValue), Adapters.ArrayArgument.ForNullable<object>(RecordArrayNamedValue));
     }
 
     private void RecordT1(ISemanticCombinedAttributeRecordBuilder builder, ITypeSymbol t1) => builder.WithT1(t1);

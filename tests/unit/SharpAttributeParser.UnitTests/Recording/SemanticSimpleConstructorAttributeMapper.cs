@@ -10,7 +10,7 @@ internal sealed class SemanticSimpleConstructorAttributeMapper : ASemanticAttrib
 {
     protected override IEnumerable<(string, DArgumentRecorder)> AddParameterMappings()
     {
-        yield return (nameof(SimpleConstructorAttribute.Value), Adapters.Simple.ForNullable<object>(RecordValue));
+        yield return (nameof(SimpleConstructorAttribute.Value), Adapters.SimpleArgument.ForNullable<object>(RecordValue));
     }
 
     private void RecordValue(ISemanticSimpleConstructorAttributeRecordBuilder builder, object? value) => builder.WithValue(value);

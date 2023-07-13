@@ -10,8 +10,8 @@ internal sealed class SemanticNamedAttributeMapper : ASemanticAttributeMapper<IS
 {
     protected override IEnumerable<(string, DArgumentRecorder)> AddParameterMappings()
     {
-        yield return (nameof(NamedAttribute.SimpleValue), Adapters.Simple.ForNullable<object>(RecordSimpleValue));
-        yield return (nameof(NamedAttribute.ArrayValue), Adapters.Collection.ForNullable<object>(RecordArrayValue));
+        yield return (nameof(NamedAttribute.SimpleValue), Adapters.SimpleArgument.ForNullable<object>(RecordSimpleValue));
+        yield return (nameof(NamedAttribute.ArrayValue), Adapters.ArrayArgument.ForNullable<object>(RecordArrayValue));
     }
 
     private void RecordSimpleValue(ISemanticNamedAttributeRecordBuilder builder, object? value) => builder.WithSimpleValue(value);

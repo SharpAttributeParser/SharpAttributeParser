@@ -195,7 +195,7 @@ public sealed class ForNullableCollection_Action
     [SuppressMessage("Performance", "CA1812: Avoid uninstantiated internal classes", Justification = "Used to expose static member of ASemanticAttributeMapper.")]
     private sealed class Mapper<T> : ASemanticAttributeMapper<Data<T>> where T : notnull
     {
-        public static Func<Data<T>, object?, bool> Target(Action<Data<T>, IReadOnlyList<T>?> recorder) => Adapters.Collection.ForNullableCollection(recorder).Invoke;
+        public static Func<Data<T>, object?, bool> Target(Action<Data<T>, IReadOnlyList<T>?> recorder) => Adapters.ArrayArgument.ForNullableCollection(recorder).Invoke;
     }
 
     private sealed class Data<T>
