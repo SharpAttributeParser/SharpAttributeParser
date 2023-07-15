@@ -157,11 +157,11 @@ public sealed class For_Action
     }
 
     [AssertionMethod]
-    private static void TrueAndRecorded<T1>(T1 expected, object? value) where T1 : notnull
+    private static void TrueAndRecorded<T>(T expected, object? value) where T : notnull
     {
-        var recorder = Mapper<T1>.Target(Data<T1>.Recorder);
+        var recorder = Mapper<T>.Target(Data<T>.Recorder);
 
-        var data = new Data<T1>();
+        Data<T> data = new();
 
         var outcome = recorder(data, value);
 
@@ -172,11 +172,11 @@ public sealed class For_Action
     }
 
     [AssertionMethod]
-    private static void FalseAndNotRecorded<T1>(object? value) where T1 : notnull
+    private static void FalseAndNotRecorded<T>(object? value) where T : notnull
     {
-        var recorder = Mapper<T1>.Target(Data<T1>.Recorder);
+        var recorder = Mapper<T>.Target(Data<T>.Recorder);
 
-        var data = new Data<T1>();
+        Data<T> data = new();
 
         var outcome = recorder(data, value);
 

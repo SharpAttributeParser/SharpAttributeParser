@@ -5,7 +5,6 @@ using Microsoft.CodeAnalysis;
 using Moq;
 
 using System;
-using System.Collections.Generic;
 
 using Xunit;
 
@@ -151,14 +150,12 @@ public sealed class TryMapTypeParameter
     [AssertionMethod]
     private static void IdenticalToExpected(Data expected, Data actual)
     {
-        Assert.Equal(expected.T1, actual.T1, ReferenceEqualityComparer.Instance);
-        Assert.Equal(expected.T2, actual.T2, ReferenceEqualityComparer.Instance);
-        Assert.Equal(expected.ValueA, actual.ValueA, ReferenceEqualityComparer.Instance);
-        Assert.Equal(expected.ValueB, actual.ValueB, ReferenceEqualityComparer.Instance);
+        Assert.Equal(expected.T1, actual.T1);
+        Assert.Equal(expected.T2, actual.T2);
 
         Assert.Equal(expected.T1Recorded, actual.T1Recorded);
         Assert.Equal(expected.T2Recorded, actual.T2Recorded);
-        Assert.Equal(expected.ValueARecorded, actual.ValueARecorded);
-        Assert.Equal(expected.ValueBRecorded, actual.ValueBRecorded);
+        Assert.False(actual.ValueARecorded);
+        Assert.False(actual.ValueBRecorded);
     }
 }

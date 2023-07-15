@@ -5,7 +5,6 @@ using Microsoft.CodeAnalysis;
 using Moq;
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 using Xunit;
@@ -45,14 +44,14 @@ public sealed class For_Action
     {
         var recorder = Mapper.Target(Data.Recorder);
 
-        var data = new Data();
+        Data data = new();
         var argument = Mock.Of<ITypeSymbol>();
 
         var outcome = recorder(data, argument);
 
         Assert.True(outcome);
 
-        Assert.Equal(argument, data.Value, ReferenceEqualityComparer.Instance);
+        Assert.Equal(argument, data.Value);
         Assert.True(data.ValueRecorded);
     }
 

@@ -1,6 +1,5 @@
 ﻿namespace SharpAttributeParser.ASyntacticAttributeMapperCases.AdaptersCases.ArrayArgumentCases;
 
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using OneOf;
@@ -25,7 +24,7 @@ public sealed class ForParams_Func
     {
         var recorder = Mapper.Target(Data.TrueRecorder);
 
-        var exception = Record.Exception(() => recorder(null!, SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression)));
+        var exception = Record.Exception(() => recorder(null!, ExpressionSyntaxFactory.Create()));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -41,7 +40,7 @@ public sealed class ForParams_Func
     }
 
     [Fact]
-    public void ValidRecorder_NullElementSyntax_ArgumentExceptionWhenUsed()
+    public void ValidRecorder_NullSyntaxCollection_ArgumentExceptionWhenUsed()
     {
         var recorder = Mapper.Target(Data.TrueRecorder);
 
@@ -53,15 +52,15 @@ public sealed class ForParams_Func
     [Fact]
     public void Syntax_UsesRecorderAndReturnsTrue()
     {
-        var syntax = SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression);
+        var syntax = ExpressionSyntaxFactory.Create();
 
         TrueAndRecorded(syntax);
     }
 
     [Fact]
-    public void ElementSyntax_UsesRecorderAndReturnsTrue()
+    public void SyntaxCollection_UsesRecorderAndReturnsTrue()
     {
-        var syntax = OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>.FromT1(new[] { SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression) });
+        var syntax = OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>.FromT1(ExpressionSyntaxFactory.CreateCollection());
 
         TrueAndRecorded(syntax);
     }
@@ -71,8 +70,8 @@ public sealed class ForParams_Func
     {
         var recorder = Mapper.Target(Data.FalseRecorder);
 
-        var data = new Data();
-        var syntax = OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>.FromT1(new[] { SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression) });
+        Data data = new();
+        var syntax = OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>.FromT1(ExpressionSyntaxFactory.CreateCollection());
 
         var outcome = recorder(data, syntax);
 
@@ -87,7 +86,7 @@ public sealed class ForParams_Func
     {
         var recorder = Mapper.Target(Data.TrueRecorder);
 
-        var data = new Data();
+        Data data = new();
 
         var outcome = recorder(data, syntax);
 

@@ -25,7 +25,7 @@ public sealed class GetComparer
     }
 
     [Fact]
-    public void TryMapTypeArgument_DifferentStringsButMatching_ComparerInvokedAndRecordedProduced()
+    public void TryMapTypeArgument_DifferentStringsButMatching_ComparerInvokedAndRecorderProduced()
     {
         var comparerMock = StringComparerMock.CreateMock(true);
 
@@ -39,7 +39,7 @@ public sealed class GetComparer
     }
 
     [Fact]
-    public void TryMapConstructorArgument_DifferentStringsButMatching_ComparerInvokedAndRecordedProduced()
+    public void TryMapConstructorArgument_DifferentStringsButMatching_ComparerInvokedAndRecorderProduced()
     {
         var comparerMock = StringComparerMock.CreateMock(true);
 
@@ -53,7 +53,7 @@ public sealed class GetComparer
     }
 
     [Fact]
-    public void TryMapNamedArgument_DifferentStringsButMatching_ComparerInvokedAndRecordedProduced()
+    public void TryMapNamedArgument_DifferentStringsButMatching_ComparerInvokedAndRecorderProduced()
     {
         var comparerMock = StringComparerMock.CreateMock(true);
 

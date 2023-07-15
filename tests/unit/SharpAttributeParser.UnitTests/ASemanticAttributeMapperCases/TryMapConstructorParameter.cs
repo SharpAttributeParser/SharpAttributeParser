@@ -5,7 +5,6 @@ using Microsoft.CodeAnalysis;
 using Moq;
 
 using System;
-using System.Collections.Generic;
 
 using Xunit;
 
@@ -51,7 +50,7 @@ public sealed class TryMapConstructorParameter
 
         Assert.False(dataRecord.T1Recorded);
         Assert.False(dataRecord.T2Recorded);
-        Assert.Equal(argument, dataRecord.ValueA, ReferenceEqualityComparer.Instance);
+        Assert.Equal(argument, dataRecord.ValueA);
         Assert.False(dataRecord.ValueBRecorded);
     }
 
@@ -70,6 +69,6 @@ public sealed class TryMapConstructorParameter
         Assert.False(dataRecord.T1Recorded);
         Assert.False(dataRecord.T2Recorded);
         Assert.False(dataRecord.ValueARecorded);
-        Assert.Equal(argument, dataRecord.ValueB, ReferenceEqualityComparer.Instance);
+        Assert.Equal(argument, dataRecord.ValueB);
     }
 }

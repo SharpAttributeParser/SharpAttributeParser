@@ -27,19 +27,7 @@ internal static class CommonArrayConverters
                 return new Error();
             }
 
-            var converted = new T[objectListArgument.Count];
-
-            for (var i = 0; i < objectListArgument.Count; i++)
-            {
-                if (objectListArgument[i] is not T tElement)
-                {
-                    return new Error();
-                }
-
-                converted[i] = tElement;
-            }
-
-            return OneOf<Error, IReadOnlyList<T>>.FromT1(converted);
+            return NonNullable<T>(objectListArgument);
         }
 
         if (argument.GetType().GetElementType() != typeof(T))
@@ -73,26 +61,7 @@ internal static class CommonArrayConverters
                 return new Error();
             }
 
-            var converted = new T?[objectListArgument.Count];
-
-            for (var i = 0; i < objectListArgument.Count; i++)
-            {
-                if (objectListArgument[i] is null)
-                {
-                    converted[i] = default;
-
-                    continue;
-                }
-
-                if (objectListArgument[i] is not T tElement)
-                {
-                    return new Error();
-                }
-
-                converted[i] = tElement;
-            }
-
-            return OneOf<Error, IReadOnlyList<T?>?>.FromT1(converted);
+            return Nullable<T>(objectListArgument);
         }
 
         if (argument.GetType().GetElementType() != typeof(T))
@@ -129,5 +98,46 @@ internal static class CommonArrayConverters
         }
 
         return Nullable<T>(argument).MapT1(static (array) => array!);
+    }
+
+    private static OneOf<Error, IReadOnlyList<T>> NonNullable<T>(IReadOnlyList<object> argument)
+    {
+        var converted = new T[argument.Count];
+
+        for (var i = 0; i < argument.Count; i++)
+        {
+            if (argument[i] is not T tElement)
+            {
+                return new Error();
+            }
+
+            converted[i] = tElement;
+        }
+
+        return OneOf<Error, IReadOnlyList<T>>.FromT1(converted);
+    }
+
+    private static OneOf<Error, IReadOnlyList<T?>?> Nullable<T>(IReadOnlyList<object> argument)
+    {
+        var converted = new T?[argument.Count];
+
+        for (var i = 0; i < argument.Count; i++)
+        {
+            if (argument[i] is null)
+            {
+                converted[i] = default;
+
+                continue;
+            }
+
+            if (argument[i] is not T tElement)
+            {
+                return new Error();
+            }
+
+            converted[i] = tElement;
+        }
+
+        return OneOf<Error, IReadOnlyList<T?>?>.FromT1(converted);
     }
 }

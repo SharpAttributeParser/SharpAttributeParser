@@ -5,7 +5,6 @@ using Microsoft.CodeAnalysis;
 using Moq;
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 using Xunit;
@@ -67,9 +66,9 @@ public sealed class Create_Data_DataBuilder
         mapperMock.Verify((mapper) => mapper.TryMapConstructorParameter(constructorParameter, dataRecordBuilder), Times.AtLeastOnce);
         mapperMock.Verify((mapper) => mapper.TryMapNamedParameter(namedParameter, dataRecordBuilder), Times.AtLeastOnce);
 
-        Assert.Equal(typeArgument, result.TypeArgument, ReferenceEqualityComparer.Instance);
-        Assert.Equal(constructorArgument, result.ConstructorArgument, ReferenceEqualityComparer.Instance);
-        Assert.Equal(namedArgument, result.NamedArgument, ReferenceEqualityComparer.Instance);
+        Assert.Equal(typeArgument, result.TypeArgument);
+        Assert.Equal(constructorArgument, result.ConstructorArgument);
+        Assert.Equal(namedArgument, result.NamedArgument);
 
         ISemanticAttributeArgumentRecorder? tryMapTypeParameter(ITypeParameterSymbol parameter, DataRecordBuilder dataBuilder) => new SemanticAttributeArgumentRecorder((argument) =>
         {
@@ -111,9 +110,9 @@ public sealed class Create_Data_DataBuilder
             BuildTarget = buildTarget;
         }
 
-        public void WithTypeArgument(object? typeArgument) => BuildTarget.TypeArgument = typeArgument;
-        public void WithConstructorArgument(object? typeArgument) => BuildTarget.ConstructorArgument = typeArgument;
-        public void WithNamedArgument(object? typeArgument) => BuildTarget.NamedArgument = typeArgument;
+        public void WithTypeArgument(object? argument) => BuildTarget.TypeArgument = argument;
+        public void WithConstructorArgument(object? argument) => BuildTarget.ConstructorArgument = argument;
+        public void WithNamedArgument(object? argument) => BuildTarget.NamedArgument = argument;
 
         DataRecord IRecordBuilder<DataRecord>.Build() => BuildTarget;
     }

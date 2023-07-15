@@ -1,7 +1,6 @@
 ﻿namespace SharpAttributeParser.SyntacticAttributeRecorderFactoryCases;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using Moq;
@@ -44,10 +43,10 @@ public sealed class Create_Data
         var constructorParameter = Mock.Of<IParameterSymbol>();
         var namedParameter = string.Empty;
 
-        var typeArgument = SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression);
-        var constructorArgument = SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression);
+        var typeArgument = ExpressionSyntaxFactory.Create();
+        var constructorArgument = ExpressionSyntaxFactory.Create();
         var constructorParamsArgument = Array.Empty<ExpressionSyntax>();
-        var namedArgument = SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression);
+        var namedArgument = ExpressionSyntaxFactory.Create();
 
         Mock<ISyntacticAttributeMapper<DataRecord>> mapperMock = new();
 
@@ -70,10 +69,10 @@ public sealed class Create_Data
         mapperMock.Verify((mapper) => mapper.TryMapConstructorParameter(constructorParameter, dataRecord), Times.AtLeast(2));
         mapperMock.Verify((mapper) => mapper.TryMapNamedParameter(namedParameter, dataRecord), Times.AtLeastOnce);
 
-        Assert.Equal(typeArgument, result.TypeArgumentSyntax, ReferenceEqualityComparer.Instance);
-        Assert.Equal(constructorArgument, result.ConstructorArgumentSyntax, ReferenceEqualityComparer.Instance);
-        Assert.Equal<IReadOnlyList<ExpressionSyntax>>(constructorParamsArgument, result.ConstructorParamsArgumentSyntax, ReferenceEqualityComparer.Instance);
-        Assert.Equal(namedArgument, result.NamedArgumentSyntax, ReferenceEqualityComparer.Instance);
+        Assert.Equal(typeArgument, result.TypeArgumentSyntax);
+        Assert.Equal(constructorArgument, result.ConstructorArgumentSyntax);
+        Assert.Equal<IReadOnlyList<ExpressionSyntax>>(constructorParamsArgument, result.ConstructorParamsArgumentSyntax);
+        Assert.Equal(namedArgument, result.NamedArgumentSyntax);
 
         ISyntacticAttributeArgumentRecorder? tryMapTypeParameter(ITypeParameterSymbol parameter, DataRecord dataRecord) => new SyntacticAttributeArgumentRecorder((syntax) =>
         {

@@ -1,7 +1,6 @@
 ﻿namespace SharpAttributeParser.SyntacticAttributeRecorderCases.NonBuilder;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using Moq;
@@ -33,7 +32,7 @@ public sealed class TryRecordConstructorParamsArgumentSyntax
     }
 
     [Fact]
-    public void NullElementSyntax_ArgumentNullException()
+    public void NullSyntaxCollection_ArgumentNullException()
     {
         var recorder = RecorderFactory.Create(Mock.Of<ISyntacticAttributeMapper<string>>(), string.Empty);
 
@@ -63,8 +62,9 @@ public sealed class TryRecordConstructorParamsArgumentSyntax
     {
         Mock<ISyntacticAttributeMapper<string>> mapperMock = new();
 
-        IReadOnlyList<ExpressionSyntax>? recordedSyntax = null;
-        var syntax = new[] { SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression) };
+        Data data = new();
+
+        var syntax = ExpressionSyntaxFactory.CreateCollection();
 
         mapperMock.Setup(static (mapper) => mapper.TryMapConstructorParameter(It.IsAny<IParameterSymbol>(), It.IsAny<string>())).Returns(tryMapConstructorParameter());
 
@@ -74,13 +74,18 @@ public sealed class TryRecordConstructorParamsArgumentSyntax
 
         Assert.Equal(returnValue, outcome);
 
-        Assert.Equal<IReadOnlyList<ExpressionSyntax>>(syntax, recordedSyntax, ReferenceEqualityComparer.Instance);
+        Assert.Equal<IReadOnlyList<ExpressionSyntax>>(syntax, data.Syntax);
 
         ISyntacticAttributeConstructorArgumentRecorder? tryMapConstructorParameter() => new SyntacticAttributeArgumentRecorder((syntax) =>
         {
-            recordedSyntax = syntax.AsT1;
+            data.Syntax = syntax.AsT1;
 
             return returnValue;
         });
+    }
+
+    private sealed class Data
+    {
+        public IReadOnlyList<ExpressionSyntax>? Syntax { get; set; }
     }
 }

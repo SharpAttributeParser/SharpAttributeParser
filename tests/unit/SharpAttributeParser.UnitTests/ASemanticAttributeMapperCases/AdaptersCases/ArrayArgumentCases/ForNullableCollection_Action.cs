@@ -164,26 +164,26 @@ public sealed class ForNullableCollection_Action
     }
 
     [AssertionMethod]
-    private static void TrueAndRecorded<T1>(IEnumerable<T1>? expected, object? value) where T1 : notnull
+    private static void TrueAndRecorded<T>(IEnumerable<T>? expected, object? value) where T : notnull
     {
-        var recorder = Mapper<T1>.Target(Data<T1>.Recorder);
+        var recorder = Mapper<T>.Target(Data<T>.Recorder);
 
-        var data = new Data<T1>();
+        Data<T> data = new();
 
         var outcome = recorder(data, value);
 
         Assert.True(outcome);
 
-        Assert.Equal<IEnumerable<T1>>(expected, data.Value);
+        Assert.Equal<IEnumerable<T>>(expected, data.Value);
         Assert.True(data.ValueRecorded);
     }
 
     [AssertionMethod]
-    private static void FalseAndNotRecorded<T1>(object? value) where T1 : notnull
+    private static void FalseAndNotRecorded<T>(object? value) where T : notnull
     {
-        var recorder = Mapper<T1>.Target(Data<T1>.Recorder);
+        var recorder = Mapper<T>.Target(Data<T>.Recorder);
 
-        var data = new Data<T1>();
+        Data<T> data = new();
 
         var outcome = recorder(data, value);
 

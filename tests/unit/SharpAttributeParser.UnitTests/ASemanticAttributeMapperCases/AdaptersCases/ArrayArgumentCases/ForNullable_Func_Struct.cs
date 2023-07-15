@@ -22,7 +22,7 @@ public sealed class ForNullable_Func_Struct
     {
         var recorder = Mapper<int>.Target(Data<int?>.TrueRecorder);
 
-        var exception = Record.Exception(() => recorder(null!, 3));
+        var exception = Record.Exception(() => recorder(null!, new[] { 3, 4 }));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -68,7 +68,7 @@ public sealed class ForNullable_Func_Struct
     }
 
     [Fact]
-    public void NullableInt_NullElement_TrueAndRecorded()
+    public void Int_SameType_TrueAndRecorded()
     {
         var value = new int?[] { 3, null };
 
@@ -122,7 +122,7 @@ public sealed class ForNullable_Func_Struct
 
         var value = new int?[] { 3, 4 };
 
-        var data = new Data<int?>();
+        Data<int?> data = new();
 
         var outcome = recorder(data, value);
 
@@ -133,26 +133,26 @@ public sealed class ForNullable_Func_Struct
     }
 
     [AssertionMethod]
-    private static void TrueAndRecorded<T1>(IEnumerable<T1?>? expected, object? value) where T1 : struct
+    private static void TrueAndRecorded<T>(IEnumerable<T?>? expected, object? value) where T : struct
     {
-        var recorder = Mapper<T1>.Target(Data<T1?>.TrueRecorder);
+        var recorder = Mapper<T>.Target(Data<T?>.TrueRecorder);
 
-        var data = new Data<T1?>();
+        Data<T?> data = new();
 
         var outcome = recorder(data, value);
 
         Assert.True(outcome);
 
-        Assert.Equal<IEnumerable<T1?>>(expected, data.Value);
+        Assert.Equal<IEnumerable<T?>>(expected, data.Value);
         Assert.True(data.ValueRecorded);
     }
 
     [AssertionMethod]
-    private static void FalseAndNotRecorded<T1>(object? value) where T1 : struct
+    private static void FalseAndNotRecorded<T>(object? value) where T : struct
     {
-        var recorder = Mapper<T1>.Target(Data<T1?>.TrueRecorder);
+        var recorder = Mapper<T>.Target(Data<T?>.TrueRecorder);
 
-        var data = new Data<T1?>();
+        Data<T?> data = new();
 
         var outcome = recorder(data, value);
 

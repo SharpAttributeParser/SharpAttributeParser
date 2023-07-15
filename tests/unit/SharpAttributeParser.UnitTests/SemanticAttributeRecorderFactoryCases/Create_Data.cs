@@ -5,7 +5,6 @@ using Microsoft.CodeAnalysis;
 using Moq;
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 using Xunit;
@@ -66,9 +65,9 @@ public sealed class Create_Data
         mapperMock.Verify((mapper) => mapper.TryMapConstructorParameter(constructorParameter, dataRecord), Times.AtLeastOnce);
         mapperMock.Verify((mapper) => mapper.TryMapNamedParameter(namedParameter, dataRecord), Times.AtLeastOnce);
 
-        Assert.Equal(typeArgument, result.TypeArgument, ReferenceEqualityComparer.Instance);
-        Assert.Equal(constructorArgument, result.ConstructorArgument, ReferenceEqualityComparer.Instance);
-        Assert.Equal(namedArgument, result.NamedArgument, ReferenceEqualityComparer.Instance);
+        Assert.Equal(typeArgument, result.TypeArgument);
+        Assert.Equal(constructorArgument, result.ConstructorArgument);
+        Assert.Equal(namedArgument, result.NamedArgument);
 
         ISemanticAttributeArgumentRecorder? tryMapTypeParameter(ITypeParameterSymbol parameter, DataRecord dataRecord) => new SemanticAttributeArgumentRecorder((argument) =>
         {

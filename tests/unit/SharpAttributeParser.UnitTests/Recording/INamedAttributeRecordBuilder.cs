@@ -1,3 +1,3 @@
 ﻿namespace SharpAttributeParser.Recording;
 
-internal interface INamedAttributeRecordBuilder : ISemanticNamedAttributeRecordBuilder, ISyntacticNamedAttributeRecordBuilder { }
+internal interface INamedAttributeRecordBuilder : IRecordBuilder<INamedAttributeRecord>, ISemanticNamedAttributeRecordBuilder, ISyntacticNamedAttributeRecordBuilder { }

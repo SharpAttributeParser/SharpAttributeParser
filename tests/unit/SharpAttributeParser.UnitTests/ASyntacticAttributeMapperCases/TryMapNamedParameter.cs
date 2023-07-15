@@ -1,9 +1,6 @@
 ﻿namespace SharpAttributeParser.ASyntacticAttributeMapperCases;
 
-using Microsoft.CodeAnalysis.CSharp;
-
 using System;
-using System.Collections.Generic;
 
 using Xunit;
 
@@ -39,7 +36,7 @@ public sealed class TryMapNamedParameter
     public void ValueA_RecorderMapsToValueA()
     {
         Data dataRecord = new();
-        var syntax = SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression);
+        var syntax = ExpressionSyntaxFactory.Create();
 
         var recorder = Target(new Mapper(), dataRecord, Mapper.NameValueA);
 
@@ -49,7 +46,7 @@ public sealed class TryMapNamedParameter
 
         Assert.False(dataRecord.T1SyntaxRecorded);
         Assert.False(dataRecord.T2SyntaxRecorded);
-        Assert.Equal(syntax, dataRecord.ValueASyntax.AsT0, ReferenceEqualityComparer.Instance);
+        Assert.Equal(syntax, dataRecord.ValueASyntax);
         Assert.False(dataRecord.ValueBSyntaxRecorded);
     }
 
@@ -57,7 +54,7 @@ public sealed class TryMapNamedParameter
     public void ValueB_RecorderMapsToValueB()
     {
         Data dataRecord = new();
-        var syntax = SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression);
+        var syntax = ExpressionSyntaxFactory.Create();
 
         var recorder = Target(new Mapper(), dataRecord, Mapper.NameValueB);
 
@@ -68,6 +65,18 @@ public sealed class TryMapNamedParameter
         Assert.False(dataRecord.T1SyntaxRecorded);
         Assert.False(dataRecord.T2SyntaxRecorded);
         Assert.False(dataRecord.ValueASyntaxRecorded);
-        Assert.Equal(syntax, dataRecord.ValueBSyntax.AsT0, ReferenceEqualityComparer.Instance);
+        Assert.Equal(syntax, dataRecord.ValueBSyntax);
+    }
+
+    [Fact]
+    public void NullSyntaxToMappedRecorder_ArgumentNullExceptionWhenUsed()
+    {
+        Data dataRecord = new();
+
+        var recorder = Target(new Mapper(), dataRecord, Mapper.NameValueA);
+
+        var exception = Record.Exception(() => recorder!.RecordArgumentSyntax(null!));
+
+        Assert.IsType<ArgumentNullException>(exception);
     }
 }

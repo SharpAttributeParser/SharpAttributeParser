@@ -257,11 +257,18 @@ public abstract class AAttributeMapper<TRecord> : IAttributeMapper<TRecord>
         /// <summary>Provides adapters related to simple, non-array valued arguments.</summary>
         public abstract ISimpleArgumentAdapter SimpleArgument { get; }
 
+        /// <summary>Provides adapters related to array-valued arguments.</summary>
+        public abstract IArrayArgumentAdapterProvider ArrayArgument { get; }
+    }
+
+    /// <summary>Provides adapters that may be applied to parsed attribute arguments before invoking a recorder.</summary>
+    protected interface IArrayArgumentAdapterProvider
+    {
         /// <summary>Provides adapters related to array-valued arguments, which may not be expressed as <see langword="params"/>-arrays.</summary>
-        public abstract INonParamsArrayArgumentAdapter NonParamsArrayArgument { get; }
+        public abstract INonParamsArrayArgumentAdapter NonParams { get; }
 
         /// <summary>Provides adapters related to array-valued arguments, which may be expressed as <see langword="params"/>-arrays.</summary>
-        public abstract IParamsArrayArgumentAdapter ParamsArrayArgument { get; }
+        public abstract IParamsArrayArgumentAdapter Params { get; }
     }
 
     /// <summary>Provides adapters that may be applied to parsed attribute type-arguments before invoking a recorder.</summary>
@@ -651,8 +658,13 @@ public abstract class AAttributeMapper<TRecord> : IAttributeMapper<TRecord>
     {
         ITypeArgumentAdapter IArgumentAdapterProvider.TypeArgument { get; } = new TypeArgumentAdapter();
         ISimpleArgumentAdapter IArgumentAdapterProvider.SimpleArgument { get; } = new SimpleArgumentAdapter();
-        INonParamsArrayArgumentAdapter IArgumentAdapterProvider.NonParamsArrayArgument { get; } = new NonParamsArrayArgumentAdapter();
-        IParamsArrayArgumentAdapter IArgumentAdapterProvider.ParamsArrayArgument { get; } = new ParamsArrayArgumentAdapter();
+        IArrayArgumentAdapterProvider IArgumentAdapterProvider.ArrayArgument { get; } = new ArrayArgumentAdapterProvider();
+    }
+
+    private sealed class ArrayArgumentAdapterProvider : IArrayArgumentAdapterProvider
+    {
+        INonParamsArrayArgumentAdapter IArrayArgumentAdapterProvider.NonParams { get; } = new NonParamsArrayArgumentAdapter();
+        IParamsArrayArgumentAdapter IArrayArgumentAdapterProvider.Params { get; } = new ParamsArrayArgumentAdapter();
     }
 
     private sealed class TypeArgumentAdapter : ITypeArgumentAdapter

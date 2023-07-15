@@ -72,13 +72,13 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
     }
 
     private static void PopulateTypeMappingsDictionaries(IDictionary<int, DSharedTypeArgumentRecorder> sharedIndexedDictionary, IDictionary<string, DSharedTypeArgumentRecorder> sharedNamedDictionary,
-        IDictionary<int, DSemanticTypeArgumentRecorder> semanticIndexedDictionary, IDictionary<string, DSemanticTypeArgumentRecorder> semanticNamedDictionary, IEnumerable<(OneOf<int, string>, ITypeArgumentRecorders)> mappings)
+        IDictionary<int, DSemanticTypeArgumentRecorder> semanticIndexedDictionary, IDictionary<string, DSemanticTypeArgumentRecorder> semanticNamedDictionary, IEnumerable<(OneOf<int, string>, ITypeArgumentRecorderProvider)> mappings)
     {
         foreach (var (parameter, recorders) in mappings)
         {
             if (recorders is null)
             {
-                throw new InvalidOperationException($"A {nameof(ITypeArgumentRecorders)} in the provided collection of mappings was null.");
+                throw new InvalidOperationException($"A {nameof(ITypeArgumentRecorderProvider)} in the provided collection of mappings was null.");
             }
 
             if (recorders.Shared is null)
@@ -91,7 +91,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                 throw new InvalidOperationException($"A semantic recorder in the provided collection of mappings was null.");
             }
 
-            var dictionaryDelegate = parameter.Match<Action<ITypeArgumentRecorders>>
+            var dictionaryDelegate = parameter.Match<Action<ITypeArgumentRecorderProvider>>
             (
                 (index) =>
                 {
@@ -136,7 +136,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
         }
     }
 
-    private static void PopulateMappingsDictionary(IDictionary<string, DSharedArgumentRecorder> sharedDictionary, IDictionary<string, DSemanticArgumentRecorder> semanticDictionary, IEnumerable<(string, IArgumentRecorders)> mappings)
+    private static void PopulateMappingsDictionary(IDictionary<string, DSharedArgumentRecorder> sharedDictionary, IDictionary<string, DSemanticArgumentRecorder> semanticDictionary, IEnumerable<(string, IArgumentRecorderProvider)> mappings)
     {
         foreach (var (parameterName, recorders) in mappings)
         {
@@ -147,7 +147,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
 
             if (recorders is null)
             {
-                throw new InvalidOperationException($"A {nameof(IArgumentRecorders)} in the provided collection of mappings was null.");
+                throw new InvalidOperationException($"A {nameof(IArgumentRecorderProvider)} in the provided collection of mappings was null.");
             }
 
             if (recorders.Shared is null)
@@ -177,11 +177,13 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
 
     /// <summary>Maps the indices of type-parameters to recorders, responsible for recording the argument of the parameter.</summary>
     /// <returns>The mappings from type-parameter index to recorder.</returns>
-    protected virtual IEnumerable<(OneOf<int, string> IndexOrName, ITypeArgumentRecorders Recorders)> AddTypeParameterMappings() => Enumerable.Empty<(OneOf<int, string>, ITypeArgumentRecorders)>();
+    /// <exception cref="InvalidOperationException"/>
+    protected virtual IEnumerable<(OneOf<int, string> IndexOrName, ITypeArgumentRecorderProvider Recorders)> AddTypeParameterMappings() => Enumerable.Empty<(OneOf<int, string>, ITypeArgumentRecorderProvider)>();
 
     /// <summary>Maps the names of constructor or named parameters to recorders, responsible for recording the argument of the parameter.</summary>
     /// <returns>The mappings from parameter name to recorder.</returns>
-    protected virtual IEnumerable<(string Name, IArgumentRecorders Recorders)> AddParameterMappings() => Enumerable.Empty<(string, IArgumentRecorders)>();
+    /// <exception cref="InvalidOperationException"/>
+    protected virtual IEnumerable<(string Name, IArgumentRecorderProvider Recorders)> AddParameterMappings() => Enumerable.Empty<(string, IArgumentRecorderProvider)>();
 
     /// <inheritdoc/>
     public IAttributeArgumentRecorder? TryMapTypeParameter(ITypeParameterSymbol parameter, TRecord dataRecord)
@@ -404,7 +406,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
     protected delegate bool DSemanticArgumentRecorder(TSemanticRecord dataRecord, object? argument);
 
     /// <summary>Provides the recorders responsible for recording the argument of a type-parameter.</summary>
-    protected interface ITypeArgumentRecorders
+    protected interface ITypeArgumentRecorderProvider
     {
         /// <summary>The <see cref="DSharedTypeArgumentRecorder"/>, used when parsing with syntactic context.</summary>
         public abstract DSharedTypeArgumentRecorder Shared { get; }
@@ -414,7 +416,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
     }
 
     /// <summary>Provides the recorders responsible for recording the argument of a parameter.</summary>
-    protected interface IArgumentRecorders
+    protected interface IArgumentRecorderProvider
     {
         /// <summary>The <see cref="DSharedArgumentRecorder"/>, used when parsing with syntactic context.</summary>
         public abstract DSharedArgumentRecorder Shared { get; }
@@ -432,281 +434,328 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
         /// <summary>Provides adapters related to simple, non-array valued arguments.</summary>
         public abstract ISimpleArgumentAdapter SimpleArgument { get; }
 
+        /// <summary>Provides adapters related to array-valued arguments.</summary>
+        public abstract IArrayArgumentAdapterProvider ArrayArgument { get; }
+    }
+
+    /// <summary>Provides adapters that may be applied to parsed attribute arguments before invoking a recorder.</summary>
+    protected interface IArrayArgumentAdapterProvider
+    {
         /// <summary>Provides adapters related to array-valued arguments, which may not be expressed as <see langword="params"/>-arrays.</summary>
-        public abstract INonParamsArrayArgumentAdapter NonParamsArrayArgument { get; }
+        public abstract INonParamsArrayArgumentAdapter NonParams { get; }
 
         /// <summary>Provides adapters related to array-valued arguments, which may be expressed as <see langword="params"/>-arrays.</summary>
-        public abstract IParamsArrayArgumentAdapter ParamsArrayArgument { get; }
+        public abstract IParamsArrayArgumentAdapter Params { get; }
     }
 
     /// <summary>Provides adapters that may be applied to parsed attribute type-arguments before invoking a recorder.</summary>
     protected interface ITypeArgumentAdapter
     {
-        /// <summary>Produces a <see cref="ITypeArgumentRecorders"/> which invokes the provided recorders.</summary>
+        /// <summary>Produces a <see cref="ITypeArgumentRecorderProvider"/> which invokes the provided recorders.</summary>
         /// <param name="sharedRecorder">Responsible for recording the argument when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="ITypeArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="ITypeArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract ITypeArgumentRecorders For(Func<TRecord, ITypeSymbol, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, ITypeSymbol, bool> semanticRecorder);
+        public abstract ITypeArgumentRecorderProvider For(Func<TRecord, ITypeSymbol, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, ITypeSymbol, bool> semanticRecorder);
 
-        /// <summary>Produces a <see cref="ITypeArgumentRecorders"/> which invokes the provided recorders and returns <see langword="true"/>.</summary>
+        /// <summary>Produces a <see cref="ITypeArgumentRecorderProvider"/> which invokes the provided recorders and returns <see langword="true"/>.</summary>
         /// <param name="sharedRecorder">Responsible for recording the argument when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="ITypeArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="ITypeArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract ITypeArgumentRecorders For(Action<TRecord, ITypeSymbol, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, ITypeSymbol> semanticRecorder);
+        public abstract ITypeArgumentRecorderProvider For(Action<TRecord, ITypeSymbol, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, ITypeSymbol> semanticRecorder);
     }
 
     /// <summary>Provides adapters that may be applied to parsed attribute arguments before invoking a recorder.</summary>
     protected interface ISimpleArgumentAdapter
     {
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is of type <typeparamref name="T"/> before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is of type <typeparamref name="T"/> before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders For<T>(Func<TRecord, T, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, T, bool> semanticRecorder) where T : notnull;
+        public abstract IArgumentRecorderProvider For<T>(Func<TRecord, T, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, T, bool> semanticRecorder) where T : notnull;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is of type <typeparamref name="T"/> before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is of type <typeparamref name="T"/> before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders For<T>(Action<TRecord, T, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, T> semanticRecorder) where T : notnull;
+        public abstract IArgumentRecorderProvider For<T>(Action<TRecord, T, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, T> semanticRecorder) where T : notnull;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is of type <typeparamref name="T"/>, or <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is of type <typeparamref name="T"/>, or <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is of type <typeparamref name="T"/> or <see langword="null"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is of type <typeparamref name="T"/> or <see langword="null"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullable<T>(Func<TRecord, T?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, T?, bool> semanticRecorder) where T : class;
+        public abstract IArgumentRecorderProvider ForNullable<T>(Func<TRecord, T?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, T?, bool> semanticRecorder) where T : class;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is of type <typeparamref name="T"/>, or <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is of type <typeparamref name="T"/>, or <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is of type <typeparamref name="T"/> or <see langword="null"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is of type <typeparamref name="T"/> or <see langword="null"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullable<T>(Action<TRecord, T?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, T?> semanticRecorder) where T : class;
+        public abstract IArgumentRecorderProvider ForNullable<T>(Action<TRecord, T?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, T?> semanticRecorder) where T : class;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is of type <typeparamref name="T"/>, or <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is of type <typeparamref name="T"/>, or <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is of type <typeparamref name="T"/> or <see langword="null"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is of type <typeparamref name="T"/> or <see langword="null"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullable<T>(Func<TRecord, T?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, T?, bool> semanticRecorder) where T : struct;
+        public abstract IArgumentRecorderProvider ForNullable<T>(Func<TRecord, T?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, T?, bool> semanticRecorder) where T : struct;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is of type <typeparamref name="T"/>, or <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is of type <typeparamref name="T"/>, or <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is of type <typeparamref name="T"/> or <see langword="null"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is of type <typeparamref name="T"/> or <see langword="null"/>, when parsing purely.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullable<T>(Action<TRecord, T?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, T?> semanticRecorder) where T : struct;
+        public abstract IArgumentRecorderProvider ForNullable<T>(Action<TRecord, T?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, T?> semanticRecorder) where T : struct;
     }
 
     /// <summary>Provides adapters that may be applied to parsed array-valued attribute arguments, which may not be expressed as <see langword="params"/>-arrays, before invoking a recorder.</summary>
     protected interface INonParamsArrayArgumentAdapter
     {
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is an array with elements of type <typeparamref name="T"/> before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is an array with elements of type <typeparamref name="T"/> before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders For<T>(Func<TRecord, IReadOnlyList<T>, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>, bool> semanticRecorder) where T : notnull;
+        public abstract IArgumentRecorderProvider For<T>(Func<TRecord, IReadOnlyList<T>, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>, bool> semanticRecorder) where T : notnull;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/> before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/> before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders For<T>(Action<TRecord, IReadOnlyList<T>, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T>> semanticRecorder) where T : notnull;
+        public abstract IArgumentRecorderProvider For<T>(Action<TRecord, IReadOnlyList<T>, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T>> semanticRecorder) where T : notnull;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is either <see langword="null"/> or a collection with elements of type <typeparamref name="T"/> before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is either <see langword="null"/> or a collection with elements of type <typeparamref name="T"/> before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullableCollection<T>(Func<TRecord, IReadOnlyList<T>?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>?, bool> semanticRecorder) where T : notnull;
+        public abstract IArgumentRecorderProvider ForNullableCollection<T>(Func<TRecord, IReadOnlyList<T>?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>?, bool> semanticRecorder) where T : notnull;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is either <see langword="null"/> or a collection with elements of type <typeparamref name="T"/> before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is either <see langword="null"/> or a collection with elements of type <typeparamref name="T"/> before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullableCollection<T>(Action<TRecord, IReadOnlyList<T>?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T>?> semanticRecorder) where T : notnull;
+        public abstract IArgumentRecorderProvider ForNullableCollection<T>(Action<TRecord, IReadOnlyList<T>?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T>?> semanticRecorder) where T : notnull;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where both elements and the collection itself may be <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where both elements and the collection itself may be <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : class;
+        public abstract IArgumentRecorderProvider ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : class;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where both elements and the collection itself may be <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where both elements and the collection itself may be <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>?> semanticRecorder) where T : class;
+        public abstract IArgumentRecorderProvider ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>?> semanticRecorder) where T : class;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where both elements and the collection itself may be <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>s
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where both elements and the collection itself may be <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>s
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : struct;
+        public abstract IArgumentRecorderProvider ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : struct;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where both elements and the collection itself may be <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where both elements and the collection itself may be <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>?> semanticRecorder) where T : struct;
+        public abstract IArgumentRecorderProvider ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>?> semanticRecorder) where T : struct;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where the elements may be <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where the elements may be <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : class;
+        public abstract IArgumentRecorderProvider ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : class;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where the elements may be <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where the elements may be <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>> semanticRecorder) where T : class;
+        public abstract IArgumentRecorderProvider ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>> semanticRecorder) where T : class;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where the elements may be <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where the elements may be <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : struct;
+        public abstract IArgumentRecorderProvider ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : struct;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where the elements may be <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where the elements may be <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>> semanticRecorder) where T : struct;
+        public abstract IArgumentRecorderProvider ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>> semanticRecorder) where T : struct;
     }
 
     /// <summary>Provides adapters that may be applied to parsed array-valued attribute arguments, which may be expressed as <see langword="params"/>-arrays, before invoking a recorder.</summary>
     protected interface IParamsArrayArgumentAdapter
     {
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is an array with elements of type <typeparamref name="T"/> before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is an array with elements of type <typeparamref name="T"/> before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders For<T>(Func<TRecord, IReadOnlyList<T>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>, bool> semanticRecorder) where T : notnull;
+        public abstract IArgumentRecorderProvider For<T>(Func<TRecord, IReadOnlyList<T>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>, bool> semanticRecorder) where T : notnull;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/> before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/> before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders For<T>(Action<TRecord, IReadOnlyList<T>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T>> semanticRecorder) where T : notnull;
+        public abstract IArgumentRecorderProvider For<T>(Action<TRecord, IReadOnlyList<T>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T>> semanticRecorder) where T : notnull;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is either <see langword="null"/> or a collection with elements of type <typeparamref name="T"/> before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is either <see langword="null"/> or a collection with elements of type <typeparamref name="T"/> before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullableCollection<T>(Func<TRecord, IReadOnlyList<T>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>?, bool> semanticRecorder) where T : notnull;
+        public abstract IArgumentRecorderProvider ForNullableCollection<T>(Func<TRecord, IReadOnlyList<T>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>?, bool> semanticRecorder) where T : notnull;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is either <see langword="null"/> or a collection with elements of type <typeparamref name="T"/> before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is either <see langword="null"/> or a collection with elements of type <typeparamref name="T"/> before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullableCollection<T>(Action<TRecord, IReadOnlyList<T>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T>?> semanticRecorder) where T : notnull;
+        public abstract IArgumentRecorderProvider ForNullableCollection<T>(Action<TRecord, IReadOnlyList<T>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T>?> semanticRecorder) where T : notnull;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where both elements and the collection itself may be <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where both elements and the collection itself may be <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : class;
+        public abstract IArgumentRecorderProvider ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : class;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where both elements and the collection itself may be <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where both elements and the collection itself may be <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>?> semanticRecorder) where T : class;
+        public abstract IArgumentRecorderProvider ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>?> semanticRecorder) where T : class;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where both elements and the collection itself may be <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>s
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where both elements and the collection itself may be <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>s
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : struct;
+        public abstract IArgumentRecorderProvider ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : struct;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where both elements and the collection itself may be <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where both elements and the collection itself may be <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>?> semanticRecorder) where T : struct;
+        public abstract IArgumentRecorderProvider ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>?> semanticRecorder) where T : struct;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where the elements may be <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where the elements may be <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : class;
+        public abstract IArgumentRecorderProvider ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : class;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where the elements may be <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where the elements may be <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>> semanticRecorder) where T : class;
+        public abstract IArgumentRecorderProvider ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>> semanticRecorder) where T : class;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where the elements may be <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where the elements may be <see langword="null"/>, before invoking the provided recorders, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : struct;
+        public abstract IArgumentRecorderProvider ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : struct;
 
-        /// <summary>Produces a <see cref="IArgumentRecorders"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where the elements may be <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
+        /// <summary>Produces a <see cref="IArgumentRecorderProvider"/> which ensures that the argument is a collection with elements of type <typeparamref name="T"/>, where the elements may be <see langword="null"/>, before invoking the provided recorders and returning <see langword="true"/>, and which otherwise returns <see langword="false"/>.</summary>
         /// <typeparam name="T">The expected type of the elements of the argument.</typeparam>
         /// <param name="sharedRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing with syntactic context.</param>
         /// <param name="semanticRecorder">Responsible for recording the argument, if it is a collection with elements of type <typeparamref name="T"/>, when parsing without syntactic context.</param>
-        /// <returns>The produced <see cref="IArgumentRecorders"/>.</returns>
+        /// <returns>The produced <see cref="IArgumentRecorderProvider"/>.</returns>
         /// <exception cref="ArgumentNullException"/>
-        public abstract IArgumentRecorders ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>> semanticRecorder) where T : struct;
+        public abstract IArgumentRecorderProvider ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>> semanticRecorder) where T : struct;
+    }
+
+    /// <inheritdoc cref="ITypeArgumentRecorderProvider"/>
+    protected sealed class TypeArgumentRecorderProvider : ITypeArgumentRecorderProvider
+    {
+        private DSharedTypeArgumentRecorder Shared { get; }
+        private DSemanticTypeArgumentRecorder Semantic { get; }
+
+        /// <summary>Instantiates a <see cref="TypeArgumentRecorderProvider"/>, providing the recorders responsible for recording the argument of a type-parameter.</summary>
+        /// <param name="shared">The <see cref="DSharedTypeArgumentRecorder"/>, responsible for recording the argument of a type-parameter which was parsed with syntactic context.</param>
+        /// <param name="semantic">The <see cref="DSemanticTypeArgumentRecorder"/>, responsible for recording the argument of a type-parameter which was parsed without syntactic context.</param>
+        /// <exception cref="ArgumentNullException"/>
+        public TypeArgumentRecorderProvider(DSharedTypeArgumentRecorder shared, DSemanticTypeArgumentRecorder semantic)
+        {
+            Shared = shared ?? throw new ArgumentNullException(nameof(shared));
+            Semantic = semantic ?? throw new ArgumentNullException(nameof(semantic));
+        }
+
+        DSharedTypeArgumentRecorder ITypeArgumentRecorderProvider.Shared => Shared;
+        DSemanticTypeArgumentRecorder ITypeArgumentRecorderProvider.Semantic => Semantic;
+    }
+
+    /// <inheritdoc cref="IArgumentRecorderProvider"/>
+    protected sealed class ArgumentRecorderProvider : IArgumentRecorderProvider
+    {
+        private DSharedArgumentRecorder Shared { get; }
+        private DSemanticArgumentRecorder Semantic { get; }
+
+        /// <summary>Instantiates a <see cref="ArgumentRecorderProvider"/>, providing the recorders responsible for recording the argument of a parameter.</summary>
+        /// <param name="shared">The <see cref="DSharedArgumentRecorder"/>, responsible for recording the argument of a parameter which was parsed with syntactic context.</param>
+        /// <param name="semantic">The <see cref="DSemanticArgumentRecorder"/>, responsible for recording the argument of a parameter which was parsed without syntactic context.</param>
+        /// <exception cref="ArgumentNullException"/>
+        public ArgumentRecorderProvider(DSharedArgumentRecorder shared, DSemanticArgumentRecorder semantic)
+        {
+            Shared = shared ?? throw new ArgumentNullException(nameof(shared));
+            Semantic = semantic ?? throw new ArgumentNullException(nameof(semantic));
+        }
+
+        DSharedArgumentRecorder IArgumentRecorderProvider.Shared => Shared;
+        DSemanticArgumentRecorder IArgumentRecorderProvider.Semantic => Semantic;
     }
 
     private static class SharedAdapterUtility
@@ -867,47 +916,22 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
         bool ISemanticAttributeArgumentRecorder.RecordArgument(object? argument) => Recorder(DataRecord, argument);
     }
 
-    private sealed class TypeArgumentRecorders : ITypeArgumentRecorders
-    {
-        private DSharedTypeArgumentRecorder Shared { get; }
-        private DSemanticTypeArgumentRecorder Semantic { get; }
-
-        public TypeArgumentRecorders(DSharedTypeArgumentRecorder shared, DSemanticTypeArgumentRecorder semantic)
-        {
-            Shared = shared;
-            Semantic = semantic;
-        }
-
-        DSharedTypeArgumentRecorder ITypeArgumentRecorders.Shared => Shared;
-        DSemanticTypeArgumentRecorder ITypeArgumentRecorders.Semantic => Semantic;
-    }
-
-    private sealed class ArgumentRecorders : IArgumentRecorders
-    {
-        private DSharedArgumentRecorder Shared { get; }
-        private DSemanticArgumentRecorder Semantic { get; }
-
-        public ArgumentRecorders(DSharedArgumentRecorder shared, DSemanticArgumentRecorder semantic)
-        {
-            Shared = shared;
-            Semantic = semantic;
-        }
-
-        DSharedArgumentRecorder IArgumentRecorders.Shared => Shared;
-        DSemanticArgumentRecorder IArgumentRecorders.Semantic => Semantic;
-    }
-
     private sealed class ArgumentAdapterProvider : IArgumentAdapterProvider
     {
         ITypeArgumentAdapter IArgumentAdapterProvider.TypeArgument { get; } = new TypeArgumentAdapter();
         ISimpleArgumentAdapter IArgumentAdapterProvider.SimpleArgument { get; } = new SimpleArgumentAdapter();
-        INonParamsArrayArgumentAdapter IArgumentAdapterProvider.NonParamsArrayArgument { get; } = new NonParamsArrayArgumentAdapter();
-        IParamsArrayArgumentAdapter IArgumentAdapterProvider.ParamsArrayArgument { get; } = new ParamsArrayArgumentAdapter();
+        IArrayArgumentAdapterProvider IArgumentAdapterProvider.ArrayArgument { get; } = new ArrayArgumentAdapterProvider();
+    }
+
+    private sealed class ArrayArgumentAdapterProvider : IArrayArgumentAdapterProvider
+    {
+        INonParamsArrayArgumentAdapter IArrayArgumentAdapterProvider.NonParams { get; } = new NonParamsArrayArgumentAdapter();
+        IParamsArrayArgumentAdapter IArrayArgumentAdapterProvider.Params { get; } = new ParamsArrayArgumentAdapter();
     }
 
     private sealed class TypeArgumentAdapter : ITypeArgumentAdapter
     {
-        ITypeArgumentRecorders ITypeArgumentAdapter.For(Func<TRecord, ITypeSymbol, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, ITypeSymbol, bool> semanticRecorder)
+        ITypeArgumentRecorderProvider ITypeArgumentAdapter.For(Func<TRecord, ITypeSymbol, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, ITypeSymbol, bool> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -922,7 +946,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             return For(sharedRecorder, semanticRecorder);
         }
 
-        ITypeArgumentRecorders ITypeArgumentAdapter.For(Action<TRecord, ITypeSymbol, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, ITypeSymbol> semanticRecorder)
+        ITypeArgumentRecorderProvider ITypeArgumentAdapter.For(Action<TRecord, ITypeSymbol, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, ITypeSymbol> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -951,9 +975,9 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             }
         }
 
-        private static ITypeArgumentRecorders For(Func<TRecord, ITypeSymbol, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, ITypeSymbol, bool> semanticRecorder)
+        private static ITypeArgumentRecorderProvider For(Func<TRecord, ITypeSymbol, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, ITypeSymbol, bool> semanticRecorder)
         {
-            return new TypeArgumentRecorders(sharedWrapper, semanticWrapper);
+            return new TypeArgumentRecorderProvider(sharedWrapper, semanticWrapper);
 
             bool sharedWrapper(TRecord dataRecord, ITypeSymbol argument, ExpressionSyntax syntax)
             {
@@ -994,7 +1018,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
 
     private sealed class SimpleArgumentAdapter : ISimpleArgumentAdapter
     {
-        IArgumentRecorders ISimpleArgumentAdapter.For<T>(Func<TRecord, T, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, T, bool> semanticRecorder)
+        IArgumentRecorderProvider ISimpleArgumentAdapter.For<T>(Func<TRecord, T, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, T, bool> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -1009,7 +1033,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             return For(sharedRecorder, semanticRecorder);
         }
 
-        IArgumentRecorders ISimpleArgumentAdapter.For<T>(Action<TRecord, T, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, T> semanticRecorder)
+        IArgumentRecorderProvider ISimpleArgumentAdapter.For<T>(Action<TRecord, T, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, T> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -1038,7 +1062,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             }
         }
 
-        IArgumentRecorders ISimpleArgumentAdapter.ForNullable<T>(Func<TRecord, T?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, T?, bool> semanticRecorder) where T : class
+        IArgumentRecorderProvider ISimpleArgumentAdapter.ForNullable<T>(Func<TRecord, T?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, T?, bool> semanticRecorder) where T : class
         {
             if (sharedRecorder is null)
             {
@@ -1053,7 +1077,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             return ForNullable(sharedRecorder, semanticRecorder);
         }
 
-        IArgumentRecorders ISimpleArgumentAdapter.ForNullable<T>(Action<TRecord, T?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, T?> semanticRecorder) where T : class
+        IArgumentRecorderProvider ISimpleArgumentAdapter.ForNullable<T>(Action<TRecord, T?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, T?> semanticRecorder) where T : class
         {
             if (sharedRecorder is null)
             {
@@ -1082,7 +1106,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             }
         }
 
-        IArgumentRecorders ISimpleArgumentAdapter.ForNullable<T>(Func<TRecord, T?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, T?, bool> semanticRecorder) where T : struct
+        IArgumentRecorderProvider ISimpleArgumentAdapter.ForNullable<T>(Func<TRecord, T?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, T?, bool> semanticRecorder) where T : struct
         {
             if (sharedRecorder is null)
             {
@@ -1097,7 +1121,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             return ForNullable(sharedRecorder, semanticRecorder);
         }
 
-        IArgumentRecorders ISimpleArgumentAdapter.ForNullable<T>(Action<TRecord, T?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, T?> semanticRecorder) where T : struct
+        IArgumentRecorderProvider ISimpleArgumentAdapter.ForNullable<T>(Action<TRecord, T?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, T?> semanticRecorder) where T : struct
         {
             if (sharedRecorder is null)
             {
@@ -1126,9 +1150,9 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             }
         }
 
-        private static IArgumentRecorders For<T>(Func<TRecord, T, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, T, bool> semanticRecorder)
+        private static IArgumentRecorderProvider For<T>(Func<TRecord, T, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, T, bool> semanticRecorder)
         {
-            return new ArgumentRecorders(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
+            return new ArgumentRecorderProvider(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
 
             bool sharedWrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax)
             {
@@ -1147,6 +1171,11 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
 
             bool semanticWrapper(TSemanticRecord dataRecord, object? argument)
             {
+                if (dataRecord is null)
+                {
+                    throw new ArgumentNullException(nameof(dataRecord));
+                }
+
                 if (argument is null)
                 {
                     return false;
@@ -1161,9 +1190,9 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             }
         }
 
-        private static IArgumentRecorders ForNullable<T>(Func<TRecord, T?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, T?, bool> semanticRecorder) where T : class
+        private static IArgumentRecorderProvider ForNullable<T>(Func<TRecord, T?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, T?, bool> semanticRecorder) where T : class
         {
-            return new ArgumentRecorders(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
+            return new ArgumentRecorderProvider(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
 
             bool sharedWrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax)
             {
@@ -1182,6 +1211,11 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
 
             bool semanticWrapper(TSemanticRecord dataRecord, object? argument)
             {
+                if (dataRecord is null)
+                {
+                    throw new ArgumentNullException(nameof(dataRecord));
+                }
+
                 if (argument is null)
                 {
                     return semanticRecorder(dataRecord, null);
@@ -1196,9 +1230,9 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             }
         }
 
-        private static IArgumentRecorders ForNullable<T>(Func<TRecord, T?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, T?, bool> semanticRecorder) where T : struct
+        private static IArgumentRecorderProvider ForNullable<T>(Func<TRecord, T?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, T?, bool> semanticRecorder) where T : struct
         {
-            return new ArgumentRecorders(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
+            return new ArgumentRecorderProvider(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
 
             bool sharedWrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax)
             {
@@ -1217,6 +1251,11 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
 
             bool semanticWrapper(TSemanticRecord dataRecord, object? argument)
             {
+                if (dataRecord is null)
+                {
+                    throw new ArgumentNullException(nameof(dataRecord));
+                }
+
                 if (argument is null)
                 {
                     return semanticRecorder(dataRecord, null);
@@ -1234,7 +1273,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
 
     private sealed class NonParamsArrayArgumentAdapter : INonParamsArrayArgumentAdapter
     {
-        IArgumentRecorders INonParamsArrayArgumentAdapter.For<T>(Func<TRecord, IReadOnlyList<T>, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>, bool> semanticRecorder)
+        IArgumentRecorderProvider INonParamsArrayArgumentAdapter.For<T>(Func<TRecord, IReadOnlyList<T>, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>, bool> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -1249,7 +1288,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             return For(sharedRecorder, semanticRecorder);
         }
 
-        IArgumentRecorders INonParamsArrayArgumentAdapter.For<T>(Action<TRecord, IReadOnlyList<T>, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T>> semanticRecorder)
+        IArgumentRecorderProvider INonParamsArrayArgumentAdapter.For<T>(Action<TRecord, IReadOnlyList<T>, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T>> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -1278,7 +1317,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             }
         }
 
-        IArgumentRecorders INonParamsArrayArgumentAdapter.ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : class
+        IArgumentRecorderProvider INonParamsArrayArgumentAdapter.ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : class
         {
             if (sharedRecorder is null)
             {
@@ -1293,7 +1332,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             return ForNullable(sharedRecorder, semanticRecorder);
         }
 
-        IArgumentRecorders INonParamsArrayArgumentAdapter.ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>?> semanticRecorder) where T : class
+        IArgumentRecorderProvider INonParamsArrayArgumentAdapter.ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>?> semanticRecorder) where T : class
         {
             if (sharedRecorder is null)
             {
@@ -1322,7 +1361,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             }
         }
 
-        IArgumentRecorders INonParamsArrayArgumentAdapter.ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder)
+        IArgumentRecorderProvider INonParamsArrayArgumentAdapter.ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -1337,7 +1376,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             return ForNullable(sharedRecorder, semanticRecorder);
         }
 
-        IArgumentRecorders INonParamsArrayArgumentAdapter.ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>?> semanticRecorder)
+        IArgumentRecorderProvider INonParamsArrayArgumentAdapter.ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>?> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -1366,7 +1405,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             }
         }
 
-        IArgumentRecorders INonParamsArrayArgumentAdapter.ForNullableCollection<T>(Func<TRecord, IReadOnlyList<T>?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>?, bool> semanticRecorder)
+        IArgumentRecorderProvider INonParamsArrayArgumentAdapter.ForNullableCollection<T>(Func<TRecord, IReadOnlyList<T>?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>?, bool> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -1381,7 +1420,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             return ForNullableCollection(sharedRecorder, semanticRecorder);
         }
 
-        IArgumentRecorders INonParamsArrayArgumentAdapter.ForNullableCollection<T>(Action<TRecord, IReadOnlyList<T>?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T>?> semanticRecorder)
+        IArgumentRecorderProvider INonParamsArrayArgumentAdapter.ForNullableCollection<T>(Action<TRecord, IReadOnlyList<T>?, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T>?> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -1410,7 +1449,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             }
         }
 
-        IArgumentRecorders INonParamsArrayArgumentAdapter.ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : class
+        IArgumentRecorderProvider INonParamsArrayArgumentAdapter.ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : class
         {
             if (sharedRecorder is null)
             {
@@ -1425,7 +1464,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             return ForNullableElements(sharedRecorder, semanticRecorder);
         }
 
-        IArgumentRecorders INonParamsArrayArgumentAdapter.ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>> semanticRecorder) where T : class
+        IArgumentRecorderProvider INonParamsArrayArgumentAdapter.ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>> semanticRecorder) where T : class
         {
             if (sharedRecorder is null)
             {
@@ -1454,7 +1493,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             }
         }
 
-        IArgumentRecorders INonParamsArrayArgumentAdapter.ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder)
+        IArgumentRecorderProvider INonParamsArrayArgumentAdapter.ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -1469,7 +1508,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             return ForNullableElements(sharedRecorder, semanticRecorder);
         }
 
-        IArgumentRecorders INonParamsArrayArgumentAdapter.ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>> semanticRecorder)
+        IArgumentRecorderProvider INonParamsArrayArgumentAdapter.ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>, ExpressionSyntax> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -1498,9 +1537,9 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             }
         }
 
-        private static IArgumentRecorders For<T>(Func<TRecord, IReadOnlyList<T>, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>, bool> semanticRecorder)
+        private static IArgumentRecorderProvider For<T>(Func<TRecord, IReadOnlyList<T>, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>, bool> semanticRecorder)
         {
-            return new ArgumentRecorders(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
+            return new ArgumentRecorderProvider(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
 
             bool sharedWrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.NonNullable<T>(argument).Match
             (
@@ -1508,16 +1547,24 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
             );
 
-            bool semanticWrapper(TSemanticRecord dataRecord, object? argument) => CommonArrayConverters.NonNullable<T>(argument).Match
-            (
-                static (error) => false,
-                (converted) => semanticRecorder(dataRecord, converted)
-            );
+            bool semanticWrapper(TSemanticRecord dataRecord, object? argument)
+            {
+                if (dataRecord is null)
+                {
+                    throw new ArgumentNullException(nameof(dataRecord));
+                }
+
+                return CommonArrayConverters.NonNullable<T>(argument).Match
+                (
+                    static (error) => false,
+                    (converted) => semanticRecorder(dataRecord, converted)
+                );
+            }
         }
 
-        private static IArgumentRecorders ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : class
+        private static IArgumentRecorderProvider ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : class
         {
-            return new ArgumentRecorders(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
+            return new ArgumentRecorderProvider(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
 
             bool sharedWrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.Nullable<T>(argument).Match
             (
@@ -1525,16 +1572,24 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
             );
 
-            bool semanticWrapper(TSemanticRecord dataRecord, object? argument) => CommonArrayConverters.Nullable<T>(argument).Match
-            (
-                static (error) => false,
-                (converted) => semanticRecorder(dataRecord, converted)
-            );
+            bool semanticWrapper(TSemanticRecord dataRecord, object? argument)
+            {
+                if (dataRecord is null)
+                {
+                    throw new ArgumentNullException(nameof(dataRecord));
+                }
+
+                return CommonArrayConverters.Nullable<T>(argument).Match
+                (
+                    static (error) => false,
+                    (converted) => semanticRecorder(dataRecord, converted)
+                );
+            }
         }
 
-        private static IArgumentRecorders ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : struct
+        private static IArgumentRecorderProvider ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : struct
         {
-            return new ArgumentRecorders(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
+            return new ArgumentRecorderProvider(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
 
             bool sharedWrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.Nullable<T?>(argument).Match
             (
@@ -1542,16 +1597,24 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
             );
 
-            bool semanticWrapper(TSemanticRecord dataRecord, object? argument) => CommonArrayConverters.Nullable<T?>(argument).Match
-            (
-                static (error) => false,
-                (converted) => semanticRecorder(dataRecord, converted)
-            );
+            bool semanticWrapper(TSemanticRecord dataRecord, object? argument)
+            {
+                if (dataRecord is null)
+                {
+                    throw new ArgumentNullException(nameof(dataRecord));
+                }
+
+                return CommonArrayConverters.Nullable<T?>(argument).Match
+                (
+                    static (error) => false,
+                    (converted) => semanticRecorder(dataRecord, converted)
+                );
+            }
         }
 
-        private static IArgumentRecorders ForNullableCollection<T>(Func<TRecord, IReadOnlyList<T>?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>?, bool> semanticRecorder)
+        private static IArgumentRecorderProvider ForNullableCollection<T>(Func<TRecord, IReadOnlyList<T>?, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>?, bool> semanticRecorder)
         {
-            return new ArgumentRecorders(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
+            return new ArgumentRecorderProvider(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
 
             bool sharedWrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.NullableCollection<T>(argument).Match
             (
@@ -1559,16 +1622,24 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
             );
 
-            bool semanticWrapper(TSemanticRecord dataRecord, object? argument) => CommonArrayConverters.NullableCollection<T>(argument).Match
-            (
-                static (error) => false,
-                (converted) => semanticRecorder(dataRecord, converted)
-            );
+            bool semanticWrapper(TSemanticRecord dataRecord, object? argument)
+            {
+                if (dataRecord is null)
+                {
+                    throw new ArgumentNullException(nameof(dataRecord));
+                }
+
+                return CommonArrayConverters.NullableCollection<T>(argument).Match
+                (
+                    static (error) => false,
+                    (converted) => semanticRecorder(dataRecord, converted)
+                );
+            }
         }
 
-        private static IArgumentRecorders ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : class
+        private static IArgumentRecorderProvider ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : class
         {
-            return new ArgumentRecorders(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
+            return new ArgumentRecorderProvider(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
 
             bool sharedWrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.NullableElements<T>(argument).Match
             (
@@ -1576,16 +1647,24 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
             );
 
-            bool semanticWrapper(TSemanticRecord dataRecord, object? argument) => CommonArrayConverters.NullableElements<T?>(argument).Match
-            (
-                static (error) => false,
-                (converted) => semanticRecorder(dataRecord, converted)
-            );
+            bool semanticWrapper(TSemanticRecord dataRecord, object? argument)
+            {
+                if (dataRecord is null)
+                {
+                    throw new ArgumentNullException(nameof(dataRecord));
+                }
+
+                return CommonArrayConverters.NullableElements<T?>(argument).Match
+                (
+                    static (error) => false,
+                    (converted) => semanticRecorder(dataRecord, converted)
+                );
+            }
         }
 
-        private static IArgumentRecorders ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : struct
+        private static IArgumentRecorderProvider ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, ExpressionSyntax, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : struct
         {
-            return new ArgumentRecorders(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
+            return new ArgumentRecorderProvider(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
 
             bool sharedWrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.NullableElements<T?>(argument).Match
             (
@@ -1593,17 +1672,25 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
             );
 
-            bool semanticWrapper(TSemanticRecord dataRecord, object? argument) => CommonArrayConverters.NullableElements<T?>(argument).Match
-            (
-                static (error) => false,
-                (converted) => semanticRecorder(dataRecord, converted)
-            );
+            bool semanticWrapper(TSemanticRecord dataRecord, object? argument)
+            {
+                if (dataRecord is null)
+                {
+                    throw new ArgumentNullException(nameof(dataRecord));
+                }
+
+                return CommonArrayConverters.NullableElements<T?>(argument).Match
+                (
+                    static (error) => false,
+                    (converted) => semanticRecorder(dataRecord, converted)
+                );
+            }
         }
     }
 
     private sealed class ParamsArrayArgumentAdapter : IParamsArrayArgumentAdapter
     {
-        IArgumentRecorders IParamsArrayArgumentAdapter.For<T>(Func<TRecord, IReadOnlyList<T>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>, bool> semanticRecorder)
+        IArgumentRecorderProvider IParamsArrayArgumentAdapter.For<T>(Func<TRecord, IReadOnlyList<T>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>, bool> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -1618,7 +1705,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             return For(sharedRecorder, semanticRecorder);
         }
 
-        IArgumentRecorders IParamsArrayArgumentAdapter.For<T>(Action<TRecord, IReadOnlyList<T>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T>> semanticRecorder)
+        IArgumentRecorderProvider IParamsArrayArgumentAdapter.For<T>(Action<TRecord, IReadOnlyList<T>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T>> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -1647,7 +1734,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             }
         }
 
-        IArgumentRecorders IParamsArrayArgumentAdapter.ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : class
+        IArgumentRecorderProvider IParamsArrayArgumentAdapter.ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : class
         {
             if (sharedRecorder is null)
             {
@@ -1662,7 +1749,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             return ForNullable(sharedRecorder, semanticRecorder);
         }
 
-        IArgumentRecorders IParamsArrayArgumentAdapter.ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>?> semanticRecorder) where T : class
+        IArgumentRecorderProvider IParamsArrayArgumentAdapter.ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>?> semanticRecorder) where T : class
         {
             if (sharedRecorder is null)
             {
@@ -1691,7 +1778,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             }
         }
 
-        IArgumentRecorders IParamsArrayArgumentAdapter.ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder)
+        IArgumentRecorderProvider IParamsArrayArgumentAdapter.ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -1706,7 +1793,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             return ForNullable(sharedRecorder, semanticRecorder);
         }
 
-        IArgumentRecorders IParamsArrayArgumentAdapter.ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>?> semanticRecorder)
+        IArgumentRecorderProvider IParamsArrayArgumentAdapter.ForNullable<T>(Action<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>?> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -1735,7 +1822,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             }
         }
 
-        IArgumentRecorders IParamsArrayArgumentAdapter.ForNullableCollection<T>(Func<TRecord, IReadOnlyList<T>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>?, bool> semanticRecorder)
+        IArgumentRecorderProvider IParamsArrayArgumentAdapter.ForNullableCollection<T>(Func<TRecord, IReadOnlyList<T>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>?, bool> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -1750,7 +1837,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             return ForNullableCollection(sharedRecorder, semanticRecorder);
         }
 
-        IArgumentRecorders IParamsArrayArgumentAdapter.ForNullableCollection<T>(Action<TRecord, IReadOnlyList<T>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T>?> semanticRecorder)
+        IArgumentRecorderProvider IParamsArrayArgumentAdapter.ForNullableCollection<T>(Action<TRecord, IReadOnlyList<T>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T>?> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -1779,7 +1866,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             }
         }
 
-        IArgumentRecorders IParamsArrayArgumentAdapter.ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : class
+        IArgumentRecorderProvider IParamsArrayArgumentAdapter.ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : class
         {
             if (sharedRecorder is null)
             {
@@ -1794,7 +1881,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             return ForNullableElements(sharedRecorder, semanticRecorder);
         }
 
-        IArgumentRecorders IParamsArrayArgumentAdapter.ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>> semanticRecorder) where T : class
+        IArgumentRecorderProvider IParamsArrayArgumentAdapter.ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>> semanticRecorder) where T : class
         {
             if (sharedRecorder is null)
             {
@@ -1823,7 +1910,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             }
         }
 
-        IArgumentRecorders IParamsArrayArgumentAdapter.ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder)
+        IArgumentRecorderProvider IParamsArrayArgumentAdapter.ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -1838,7 +1925,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             return ForNullableElements(sharedRecorder, semanticRecorder);
         }
 
-        IArgumentRecorders IParamsArrayArgumentAdapter.ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>> semanticRecorder)
+        IArgumentRecorderProvider IParamsArrayArgumentAdapter.ForNullableElements<T>(Action<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>> sharedRecorder, Action<TSemanticRecord, IReadOnlyList<T?>> semanticRecorder)
         {
             if (sharedRecorder is null)
             {
@@ -1867,9 +1954,9 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
             }
         }
 
-        private static IArgumentRecorders For<T>(Func<TRecord, IReadOnlyList<T>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>, bool> semanticRecorder)
+        private static IArgumentRecorderProvider For<T>(Func<TRecord, IReadOnlyList<T>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>, bool> semanticRecorder)
         {
-            return new ArgumentRecorders(SharedAdapterUtility.ForParams(sharedWrapper), semanticWrapper);
+            return new ArgumentRecorderProvider(SharedAdapterUtility.ForParams(sharedWrapper), semanticWrapper);
 
             bool sharedWrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.NonNullable<T>(argument).Match
             (
@@ -1877,16 +1964,24 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
             );
 
-            bool semanticWrapper(TSemanticRecord dataRecord, object? argument) => CommonArrayConverters.NonNullable<T>(argument).Match
-            (
-                static (error) => false,
-                (converted) => semanticRecorder(dataRecord, converted)
-            );
+            bool semanticWrapper(TSemanticRecord dataRecord, object? argument)
+            {
+                if (dataRecord is null)
+                {
+                    throw new ArgumentNullException(nameof(dataRecord));
+                }
+
+                return CommonArrayConverters.NonNullable<T>(argument).Match
+                (
+                    static (error) => false,
+                    (converted) => semanticRecorder(dataRecord, converted)
+                );
+            }
         }
 
-        private static IArgumentRecorders ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : class
+        private static IArgumentRecorderProvider ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : class
         {
-            return new ArgumentRecorders(SharedAdapterUtility.ForParams(sharedWrapper), semanticWrapper);
+            return new ArgumentRecorderProvider(SharedAdapterUtility.ForParams(sharedWrapper), semanticWrapper);
 
             bool sharedWrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.Nullable<T>(argument).Match
             (
@@ -1894,16 +1989,24 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
             );
 
-            bool semanticWrapper(TSemanticRecord dataRecord, object? argument) => CommonArrayConverters.Nullable<T>(argument).Match
-            (
-                static (error) => false,
-                (converted) => semanticRecorder(dataRecord, converted)
-            );
+            bool semanticWrapper(TSemanticRecord dataRecord, object? argument)
+            {
+                if (dataRecord is null)
+                {
+                    throw new ArgumentNullException(nameof(dataRecord));
+                }
+
+                return CommonArrayConverters.Nullable<T>(argument).Match
+                (
+                    static (error) => false,
+                    (converted) => semanticRecorder(dataRecord, converted)
+                );
+            }
         }
 
-        private static IArgumentRecorders ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : struct
+        private static IArgumentRecorderProvider ForNullable<T>(Func<TRecord, IReadOnlyList<T?>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>?, bool> semanticRecorder) where T : struct
         {
-            return new ArgumentRecorders(SharedAdapterUtility.ForParams(sharedWrapper), semanticWrapper);
+            return new ArgumentRecorderProvider(SharedAdapterUtility.ForParams(sharedWrapper), semanticWrapper);
 
             bool sharedWrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.Nullable<T?>(argument).Match
             (
@@ -1911,16 +2014,24 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
             );
 
-            bool semanticWrapper(TSemanticRecord dataRecord, object? argument) => CommonArrayConverters.Nullable<T?>(argument).Match
-            (
-                static (error) => false,
-                (converted) => semanticRecorder(dataRecord, converted)
-            );
+            bool semanticWrapper(TSemanticRecord dataRecord, object? argument)
+            {
+                if (dataRecord is null)
+                {
+                    throw new ArgumentNullException(nameof(dataRecord));
+                }
+
+                return CommonArrayConverters.Nullable<T?>(argument).Match
+                (
+                    static (error) => false,
+                    (converted) => semanticRecorder(dataRecord, converted)
+                );
+            }
         }
 
-        private static IArgumentRecorders ForNullableCollection<T>(Func<TRecord, IReadOnlyList<T>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>?, bool> semanticRecorder)
+        private static IArgumentRecorderProvider ForNullableCollection<T>(Func<TRecord, IReadOnlyList<T>?, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T>?, bool> semanticRecorder)
         {
-            return new ArgumentRecorders(SharedAdapterUtility.ForParams(sharedWrapper), semanticWrapper);
+            return new ArgumentRecorderProvider(SharedAdapterUtility.ForParams(sharedWrapper), semanticWrapper);
 
             bool sharedWrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.NullableCollection<T>(argument).Match
             (
@@ -1928,16 +2039,24 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
             );
 
-            bool semanticWrapper(TSemanticRecord dataRecord, object? argument) => CommonArrayConverters.NullableCollection<T>(argument).Match
-            (
-                static (error) => false,
-                (converted) => semanticRecorder(dataRecord, converted)
-            );
+            bool semanticWrapper(TSemanticRecord dataRecord, object? argument)
+            {
+                if (dataRecord is null)
+                {
+                    throw new ArgumentNullException(nameof(dataRecord));
+                }
+
+                return CommonArrayConverters.NullableCollection<T>(argument).Match
+                (
+                    static (error) => false,
+                    (converted) => semanticRecorder(dataRecord, converted)
+                );
+            }
         }
 
-        private static IArgumentRecorders ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : class
+        private static IArgumentRecorderProvider ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : class
         {
-            return new ArgumentRecorders(SharedAdapterUtility.ForParams(sharedWrapper), semanticWrapper);
+            return new ArgumentRecorderProvider(SharedAdapterUtility.ForParams(sharedWrapper), semanticWrapper);
 
             bool sharedWrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.NullableElements<T>(argument).Match
             (
@@ -1945,16 +2064,24 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
             );
 
-            bool semanticWrapper(TSemanticRecord dataRecord, object? argument) => CommonArrayConverters.NullableElements<T?>(argument).Match
-            (
-                static (error) => false,
-                (converted) => semanticRecorder(dataRecord, converted)
-            );
+            bool semanticWrapper(TSemanticRecord dataRecord, object? argument)
+            {
+                if (dataRecord is null)
+                {
+                    throw new ArgumentNullException(nameof(dataRecord));
+                }
+
+                return CommonArrayConverters.NullableElements<T?>(argument).Match
+                (
+                    static (error) => false,
+                    (converted) => semanticRecorder(dataRecord, converted)
+                );
+            }
         }
 
-        private static IArgumentRecorders ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : struct
+        private static IArgumentRecorderProvider ForNullableElements<T>(Func<TRecord, IReadOnlyList<T?>, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>, bool> sharedRecorder, Func<TSemanticRecord, IReadOnlyList<T?>, bool> semanticRecorder) where T : struct
         {
-            return new ArgumentRecorders(SharedAdapterUtility.ForParams(sharedWrapper), semanticWrapper);
+            return new ArgumentRecorderProvider(SharedAdapterUtility.ForParams(sharedWrapper), semanticWrapper);
 
             bool sharedWrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.NullableElements<T?>(argument).Match
             (
@@ -1962,11 +2089,19 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
             );
 
-            bool semanticWrapper(TSemanticRecord dataRecord, object? argument) => CommonArrayConverters.NullableElements<T?>(argument).Match
-            (
-                static (error) => false,
-                (converted) => semanticRecorder(dataRecord, converted)
-            );
+            bool semanticWrapper(TSemanticRecord dataRecord, object? argument)
+            {
+                if (dataRecord is null)
+                {
+                    throw new ArgumentNullException(nameof(dataRecord));
+                }
+
+                return CommonArrayConverters.NullableElements<T?>(argument).Match
+                (
+                    static (error) => false,
+                    (converted) => semanticRecorder(dataRecord, converted)
+                );
+            }
         }
     }
 }

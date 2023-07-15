@@ -147,7 +147,7 @@ public sealed class TryParse_Params_InterpretedAsArray
 
         Assert.True(outcome);
 
-        Assert.Equal(expected, result.ValueSyntax.AsT0);
+        Assert.Equal(expected, result.ValueSyntax);
         Assert.True(result.ValueSyntaxRecorded);
     }
 }

@@ -45,38 +45,12 @@ public sealed class AttributeParser : IAttributeParser
         SemanticAttributeRecorder semanticRecorder = new();
         SyntacticAttributeRecorder syntacticRecorder = new();
 
-        if (TryParse(semanticRecorder, syntacticRecorder, attributeData, attributeSyntax) is false)
+        if (SemanticParser.TryParse(semanticRecorder, attributeData) is false || SyntacticParser.TryParse(syntacticRecorder, attributeData, attributeSyntax) is false)
         {
             return false;
         }
 
         return PropagateRecordedArguments(recorder, semanticRecorder, syntacticRecorder);
-    }
-
-    /// <inheritdoc/>
-    public bool TryParse(ISemanticAttributeRecorder semanticRecorder, ISyntacticAttributeRecorder syntacticRecorder, AttributeData attributeData, AttributeSyntax attributeSyntax)
-    {
-        if (semanticRecorder is null)
-        {
-            throw new ArgumentNullException(nameof(semanticRecorder));
-        }
-
-        if (syntacticRecorder is null)
-        {
-            throw new ArgumentNullException(nameof(syntacticRecorder));
-        }
-
-        if (attributeData is null)
-        {
-            throw new ArgumentNullException(nameof(attributeData));
-        }
-
-        if (attributeSyntax is null)
-        {
-            throw new ArgumentNullException(nameof(attributeSyntax));
-        }
-
-        return SemanticParser.TryParse(semanticRecorder, attributeData) && SyntacticParser.TryParse(syntacticRecorder, attributeData, attributeSyntax);
     }
 
     private bool PropagateRecordedArguments(IAttributeRecorder recorder, SemanticAttributeRecorder semanticRecorder, SyntacticAttributeRecorder syntacticRecorder)
@@ -172,36 +146,21 @@ public sealed class AttributeParser : IAttributeParser
 
         bool ISemanticAttributeRecorder.TryRecordTypeArgument(ITypeParameterSymbol parameter, ITypeSymbol argument)
         {
-            if (TypeArgumentsDictionary.ContainsKey(parameter))
-            {
-                return false;
-            }
-
-            TypeArgumentsDictionary.Add(parameter, argument);
+            TypeArgumentsDictionary[parameter] = argument;
 
             return true;
         }
 
         bool ISemanticAttributeRecorder.TryRecordConstructorArgument(IParameterSymbol parameter, object? argument)
         {
-            if (ConstructorArgumentsDictionary.ContainsKey(parameter))
-            {
-                return false;
-            }
-
-            ConstructorArgumentsDictionary.Add(parameter, argument);
+            ConstructorArgumentsDictionary[parameter] = argument;
 
             return true;
         }
 
         bool ISemanticAttributeRecorder.TryRecordNamedArgument(string parameterName, object? argument)
         {
-            if (NamedArgumentsDictionary.ContainsKey(parameterName))
-            {
-                return false;
-            }
-
-            NamedArgumentsDictionary.Add(parameterName, argument);
+            NamedArgumentsDictionary[parameterName] = argument;
 
             return true;
         }
@@ -219,48 +178,28 @@ public sealed class AttributeParser : IAttributeParser
 
         bool ISyntacticAttributeRecorder.TryRecordTypeArgumentSyntax(ITypeParameterSymbol parameter, ExpressionSyntax syntax)
         {
-            if (TypeArgumentsDictionary.ContainsKey(parameter))
-            {
-                return false;
-            }
-
-            TypeArgumentsDictionary.Add(parameter, syntax);
+            TypeArgumentsDictionary[parameter] = syntax;
 
             return true;
         }
 
         bool ISyntacticAttributeRecorder.TryRecordConstructorArgumentSyntax(IParameterSymbol parameter, ExpressionSyntax syntax)
         {
-            if (ConstructorArgumentsDictionary.ContainsKey(parameter))
-            {
-                return false;
-            }
-
-            ConstructorArgumentsDictionary.Add(parameter, syntax);
+            ConstructorArgumentsDictionary[parameter] = syntax;
 
             return true;
         }
 
         bool ISyntacticAttributeRecorder.TryRecordConstructorParamsArgumentSyntax(IParameterSymbol parameter, IReadOnlyList<ExpressionSyntax> elementSyntax)
         {
-            if (ConstructorArgumentsDictionary.ContainsKey(parameter))
-            {
-                return false;
-            }
-
-            ConstructorArgumentsDictionary.Add(parameter, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>.FromT1(elementSyntax));
+            ConstructorArgumentsDictionary[parameter] = OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>>.FromT1(elementSyntax);
 
             return true;
         }
 
         bool ISyntacticAttributeRecorder.TryRecordNamedArgumentSyntax(string parameterName, ExpressionSyntax syntax)
         {
-            if (NamedArgumentsDictionary.ContainsKey(parameterName))
-            {
-                return false;
-            }
-
-            NamedArgumentsDictionary.Add(parameterName, syntax);
+            NamedArgumentsDictionary[parameterName] = syntax;
 
             return true;
         }

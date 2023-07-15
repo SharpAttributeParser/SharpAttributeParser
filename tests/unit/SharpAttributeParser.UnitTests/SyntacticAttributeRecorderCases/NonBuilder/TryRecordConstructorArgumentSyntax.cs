@@ -1,13 +1,11 @@
 ﻿namespace SharpAttributeParser.SyntacticAttributeRecorderCases.NonBuilder;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using Moq;
 
 using System;
-using System.Collections.Generic;
 
 using Xunit;
 
@@ -27,7 +25,7 @@ public sealed class TryRecordConstructorArgumentSyntax
     {
         var recorder = RecorderFactory.Create(Mock.Of<ISyntacticAttributeMapper<string>>(), string.Empty);
 
-        var exception = Record.Exception(() => Target(recorder, null!, SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression)));
+        var exception = Record.Exception(() => Target(recorder, null!, ExpressionSyntaxFactory.Create()));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -47,7 +45,7 @@ public sealed class TryRecordConstructorArgumentSyntax
     {
         var recorder = RecorderFactory.Create(Mock.Of<ISyntacticAttributeMapper<string>>(), string.Empty);
 
-        var outcome = Target(recorder, Mock.Of<IParameterSymbol>(), SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression));
+        var outcome = Target(recorder, Mock.Of<IParameterSymbol>(), ExpressionSyntaxFactory.Create());
 
         Assert.False(outcome);
     }
@@ -63,8 +61,9 @@ public sealed class TryRecordConstructorArgumentSyntax
     {
         Mock<ISyntacticAttributeMapper<string>> mapperMock = new();
 
-        ExpressionSyntax? recordedSyntax = null;
-        var syntax = SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression);
+        Data data = new();
+
+        var syntax = ExpressionSyntaxFactory.Create();
 
         mapperMock.Setup(static (mapper) => mapper.TryMapConstructorParameter(It.IsAny<IParameterSymbol>(), It.IsAny<string>())).Returns(tryMapConstructorParameter());
 
@@ -74,13 +73,18 @@ public sealed class TryRecordConstructorArgumentSyntax
 
         Assert.Equal(returnValue, outcome);
 
-        Assert.Equal(syntax, recordedSyntax, ReferenceEqualityComparer.Instance);
+        Assert.Equal(syntax, data.Syntax);
 
         ISyntacticAttributeConstructorArgumentRecorder? tryMapConstructorParameter() => new SyntacticAttributeArgumentRecorder((syntax) =>
         {
-            recordedSyntax = syntax.AsT0;
+            data.Syntax = syntax.AsT0;
 
             return returnValue;
         });
+    }
+
+    private sealed class Data
+    {
+        public ExpressionSyntax? Syntax { get; set; }
     }
 }

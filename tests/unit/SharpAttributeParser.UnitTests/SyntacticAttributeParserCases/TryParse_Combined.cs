@@ -254,12 +254,7 @@ public sealed class TryParse_Combined
         Assert.Equal(expected.ArrayValueSyntax, result.ArrayValueSyntax);
         Assert.True(result.ArrayValueSyntaxRecorded);
 
-        expected.ParamsValueSyntax.Switch
-        (
-            (syntax) => Assert.Equal(syntax, result.ParamsValueSyntax.AsT0),
-            (elementSyntax) => Assert.Equal(elementSyntax, result.ParamsValueSyntax.AsT1)
-        );
-
+        OneOfAssertions.Equal(expected.ParamsValueSyntax, result.ParamsValueSyntax);
         Assert.True(result.ParamsValueSyntaxRecorded);
 
         Assert.Equal(expected.SimpleNamedValueSyntax, result.SimpleNamedValueSyntax);

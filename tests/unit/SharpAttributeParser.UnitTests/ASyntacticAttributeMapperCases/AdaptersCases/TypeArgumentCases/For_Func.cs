@@ -1,6 +1,5 @@
 ﻿namespace SharpAttributeParser.ASyntacticAttributeMapperCases.AdaptersCases.TypeArgumentCases;
 
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using System;
@@ -17,12 +16,13 @@ public sealed class For_Func
 
         Assert.IsType<ArgumentNullException>(exception);
     }
+
     [Fact]
     public void ValidRecorder_NullDataRecord_ArgumentNullExceptionWhenUsed()
     {
         var recorder = Mapper.Target(Data.TrueRecorder);
 
-        var exception = Record.Exception(() => recorder(null!, SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression)));
+        var exception = Record.Exception(() => recorder(null!, ExpressionSyntaxFactory.Create()));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -40,7 +40,7 @@ public sealed class For_Func
     [Fact]
     public void ValidRecorder_UsesRecorderAndReturnsTrue()
     {
-        var syntax = SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression);
+        var syntax = ExpressionSyntaxFactory.Create();
 
         TrueAndRecorded(syntax);
     }
@@ -50,8 +50,8 @@ public sealed class For_Func
     {
         var recorder = Mapper.Target(Data.FalseRecorder);
 
-        var data = new Data();
-        var syntax = SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression);
+        Data data = new();
+        var syntax = ExpressionSyntaxFactory.Create();
 
         var outcome = recorder(data, syntax);
 
@@ -66,7 +66,7 @@ public sealed class For_Func
     {
         var recorder = Mapper.Target(Data.TrueRecorder);
 
-        var data = new Data();
+        Data data = new();
 
         var outcome = recorder(data, syntax);
 
