@@ -22,8 +22,4 @@
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
     </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\SharpAttributeParser.Core\SharpAttributeParser.Core.csproj" />
-    </ItemGroup>
-
 </Project>

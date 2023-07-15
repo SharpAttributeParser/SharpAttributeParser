@@ -1,171 +1,169 @@
 ﻿namespace SharpAttributeParser.SyntacticAttributeParserCases;
 
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-using System;
+using SharpAttributeParser.Recording;
+
 using System.Collections.Generic;
+using System;
 using System.Threading.Tasks;
 
 using Xunit;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Linq;
 
 public sealed class TryParse_Params_InterpretedAsParams
 {
-    private static bool Target(ISyntacticAttributeParser parser, ISyntacticArgumentRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax) => parser.TryParse(recorder, attributeData, attributeSyntax);
+    private ISyntacticParamsAttributeRecorderFactory RecorderFactory { get; }
+
+    public TryParse_Params_InterpretedAsParams(ISyntacticParamsAttributeRecorderFactory recorderFactory)
+    {
+        RecorderFactory = recorderFactory;
+    }
+
+    private static bool Target(ISyntacticAttributeParser parser, ISyntacticAttributeRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax) => parser.TryParse(recorder, attributeData, attributeSyntax);
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task NullLiteral_CastedToDifferentType_True_Recorded(ISyntacticAttributeParser parser)
+    public async Task NullLiteral_CastedToDifferentType_TrueAndRecorded(ISyntacticAttributeParser parser)
     {
         var source = """
             [Params((object?)null)]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expected);
+        await TrueAndRecordedAsExpected(parser, source, expected);
 
-        static ExpectedResult expected(Compilation compilation, AttributeSyntax syntax) => new()
-        {
-            Value = new object?[] { null },
-            ValueLocation = ExpectedLocation.ParamsArgument(syntax, 0, 1)
-        };
+        static IReadOnlyList<ExpressionSyntax> expected(AttributeSyntax attributeSyntax) => new[] { attributeSyntax.ArgumentList!.Arguments[0].Expression };
     }
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task DefaultLiteral_CastedToDifferentType_True_Recorded(ISyntacticAttributeParser parser)
+    public async Task DefaultLiteral_CastedToDifferentType_TrueAndRecorded(ISyntacticAttributeParser parser)
     {
         var source = """
             [Params((object?)default)]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expected);
+        await TrueAndRecordedAsExpected(parser, source, expected);
 
-        static ExpectedResult expected(Compilation compilation, AttributeSyntax syntax) => new()
-        {
-            Value = new object?[] { null },
-            ValueLocation = ExpectedLocation.ParamsArgument(syntax, 0, 1)
-        };
+        static IReadOnlyList<ExpressionSyntax> expected(AttributeSyntax attributeSyntax) => new[] { attributeSyntax.ArgumentList!.Arguments[0].Expression };
     }
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task DefaultExpression_DifferentType_True_Recorded(ISyntacticAttributeParser parser)
+    public async Task DefaultExpression_DifferentType_TrueAndRecorded(ISyntacticAttributeParser parser)
     {
         var source = """
             [Params(default(object))]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expected);
+        await TrueAndRecordedAsExpected(parser, source, expected);
 
-        static ExpectedResult expected(Compilation compilation, AttributeSyntax syntax) => new()
-        {
-            Value = new object?[] { null },
-            ValueLocation = ExpectedLocation.ParamsArgument(syntax, 0, 1)
-        };
+        static IReadOnlyList<ExpressionSyntax> expected(AttributeSyntax attributeSyntax) => new[] { attributeSyntax.ArgumentList!.Arguments[0].Expression };
     }
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task Empty_True_Recorded(ISyntacticAttributeParser parser)
+    public async Task Empty_TrueAndRecorded(ISyntacticAttributeParser parser)
     {
         var source = """
             [Params]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expected);
+        await TrueAndRecordedAsExpected(parser, source, expected);
 
-        static ExpectedResult expected(Compilation compilation, AttributeSyntax syntax) => new()
-        {
-            Value = Array.Empty<object?>(),
-            ValueLocation = CollectionLocation.None
-        };
+        static IReadOnlyList<ExpressionSyntax> expected(AttributeSyntax attributeSyntax) => Array.Empty<ExpressionSyntax>();
     }
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task OneParamsValue_True_Recorded(ISyntacticAttributeParser parser)
+    public async Task OneParamsValue_TrueAndRecorded(ISyntacticAttributeParser parser)
     {
         var source = """
             [Params("42")]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expected);
+        await TrueAndRecordedAsExpected(parser, source, expected);
 
-        static ExpectedResult expected(Compilation compilation, AttributeSyntax syntax) => new()
-        {
-            Value = new object?[] { "42" },
-            ValueLocation = ExpectedLocation.ParamsArgument(syntax, 0, 1)
-        };
+        static IReadOnlyList<ExpressionSyntax> expected(AttributeSyntax attributeSyntax) => new[] { attributeSyntax.ArgumentList!.Arguments[0].Expression };
     }
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task MultipleParamsValues_True_Recorded(ISyntacticAttributeParser parser)
-    {
-        var source = """
-            [Params("42", null, typeof(int), nameof(Foo), ((42)), (double)(float)42, new object[] { "42", 42 })]
-            public sealed class Foo { }
-            """;
-
-        await TrueAndIdenticalToExpected(parser, source, expected);
-
-        static ExpectedResult expected(Compilation compilation, AttributeSyntax syntax)
-        {
-            var intType = compilation.GetSpecialType(SpecialType.System_Int32);
-
-            return new()
-            {
-                Value = new object?[] { "42", null, intType, "Foo", 42, (double)42, new object[] { "42", 42 } },
-                ValueLocation = ExpectedLocation.ParamsArgument(syntax, 0, 7)
-            };
-        }
-    }
-
-    [Theory]
-    [ClassData(typeof(ParserSources))]
-    public async Task OneArrayValuedParamsValue_True_Recorded(ISyntacticAttributeParser parser)
+    public async Task OneArrayValuedParamsValue_ExplicitArray_TrueAndRecorded(ISyntacticAttributeParser parser)
     {
         var source = """
             [Params(new int[] { 4 })]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expected);
+        await TrueAndRecordedAsExpected(parser, source, expected);
 
-        static ExpectedResult expected(Compilation compilation, AttributeSyntax syntax) => new()
-        {
-            Value = new object?[] { new[] { 4 } },
-            ValueLocation = ExpectedLocation.ParamsArgument(syntax, 0, 1)
-        };
+        static IReadOnlyList<ExpressionSyntax> expected(AttributeSyntax attributeSyntax) => new[] { attributeSyntax.ArgumentList!.Arguments[0].Expression };
+    }
+
+    [Theory]
+    [ClassData(typeof(ParserSources))]
+    public async Task OneArrayValuedParamsValue_ImplicitArray_TrueAndRecorded(ISyntacticAttributeParser parser)
+    {
+        var source = """
+            [Params(new[] { 4 })]
+            public class Foo { }
+            """;
+
+        await TrueAndRecordedAsExpected(parser, source, expected);
+
+        static IReadOnlyList<ExpressionSyntax> expected(AttributeSyntax attributeSyntax) => new[] { attributeSyntax.ArgumentList!.Arguments[0].Expression };
+    }
+
+    [Theory]
+    [ClassData(typeof(ParserSources))]
+    public async Task OneArrayValuedParamsValue_ExplicitlyEmptyArray_TrueAndRecorded(ISyntacticAttributeParser parser)
+    {
+        var source = """
+            [Params(new int[0])]
+            public class Foo { }
+            """;
+
+        await TrueAndRecordedAsExpected(parser, source, expected);
+
+        static IReadOnlyList<ExpressionSyntax> expected(AttributeSyntax attributeSyntax) => new[] { attributeSyntax.ArgumentList!.Arguments[0].Expression };
+    }
+
+    [Theory]
+    [ClassData(typeof(ParserSources))]
+    public async Task MultipleParamsValues_TrueAndRecorded(ISyntacticAttributeParser parser)
+    {
+        var source = """
+            [Params("42", null, typeof(int), nameof(Foo), ((42)), (double)(float)42, new object[] { "42", 42 })]
+            public class Foo { }
+            """;
+
+        await TrueAndRecordedAsExpected(parser, source, expected);
+
+        static IReadOnlyList<ExpressionSyntax> expected(AttributeSyntax attributeSyntax) => Enumerable.Range(0, 7).Select((index) => attributeSyntax.ArgumentList!.Arguments[index].Expression).ToList();
     }
 
     [AssertionMethod]
-    private static async Task TrueAndIdenticalToExpected(ISyntacticAttributeParser parser, string source, Func<Compilation, AttributeSyntax, ExpectedResult> expectedDelegate)
+    private async Task TrueAndRecordedAsExpected(ISyntacticAttributeParser parser, string source, Func<AttributeSyntax, IReadOnlyList<ExpressionSyntax>> expectedDelegate)
     {
-        SyntacticParamsAttributeRecorder recorder = new();
+        var recorder = RecorderFactory.Create();
 
-        var (compilation, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
+        var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var expected = expectedDelegate(compilation, attributeSyntax);
+        var expected = expectedDelegate(attributeSyntax);
 
-        var result = Target(parser, recorder, attributeData, attributeSyntax);
+        var outcome = Target(parser, recorder, attributeData, attributeSyntax);
+        var result = recorder.GetRecord();
 
-        Assert.True(result);
+        Assert.True(outcome);
 
-        Assert.Equal(expected.Value, recorder.Value);
-        Assert.True(recorder.ValueRecorded);
-        Assert.Equal(expected.ValueLocation!.Collection, recorder.ValueLocation!.Collection);
-        Assert.Equal(expected.ValueLocation.Elements, recorder.ValueLocation.Elements);
-    }
-
-    private sealed class ExpectedResult
-    {
-        public IReadOnlyList<object?>? Value { get; init; }
-        public CollectionLocation? ValueLocation { get; init; }
+        Assert.Equal(expected, result.ValueSyntax.AsT1);
+        Assert.True(result.ValueSyntaxRecorded);
     }
 }

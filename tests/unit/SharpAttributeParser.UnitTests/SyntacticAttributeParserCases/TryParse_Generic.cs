@@ -5,6 +5,8 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using Moq;
 
+using SharpAttributeParser.Recording;
+
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
@@ -13,18 +15,25 @@ using Xunit;
 
 public sealed class TryParse_Generic
 {
-    private static bool Target(ISyntacticAttributeParser parser, ISyntacticArgumentRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax) => parser.TryParse(recorder, attributeData, attributeSyntax);
+    private ISyntacticGenericAttributeRecorderFactory RecorderFactory { get; }
+
+    public TryParse_Generic(ISyntacticGenericAttributeRecorderFactory recorderFactory)
+    {
+        RecorderFactory = recorderFactory;
+    }
+
+    private static bool Target(ISyntacticAttributeParser parser, ISyntacticAttributeRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax) => parser.TryParse(recorder, attributeData, attributeSyntax);
 
     [Theory]
     [ClassData(typeof(ParserSources))]
     [SuppressMessage("Minor Code Smell", "S1125: Boolean literals should not be redundant", Justification = "Prefer equality check over negation.")]
     public async Task FalseReturningRecorder_False(ISyntacticAttributeParser parser)
     {
-        var recorder = Mock.Of<ISyntacticArgumentRecorder>(static (recorder) => recorder.TryRecordGenericArgument(It.IsAny<ITypeParameterSymbol>(), It.IsAny<ITypeSymbol>(), It.IsAny<Location>()) == false);
+        var recorder = Mock.Of<ISyntacticAttributeRecorder>(static (recorder) => recorder.TryRecordTypeArgumentSyntax(It.IsAny<ITypeParameterSymbol>(), It.IsAny<ExpressionSyntax>()) == false);
 
         var source = """
             [Generic<string, int>]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
@@ -36,11 +45,11 @@ public sealed class TryParse_Generic
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task NonExsitingAttribute_False_NotRecorded(ISyntacticAttributeParser parser)
+    public async Task NonExsitingAttribute_FalseAndNotRecorded(ISyntacticAttributeParser parser)
     {
         var source = """
             [NonExisting]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
         await FalseAndNotRecorded(parser, source);
@@ -48,11 +57,11 @@ public sealed class TryParse_Generic
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task NonExsitingConstructor_False_NotRecorded(ISyntacticAttributeParser parser)
+    public async Task NonExsitingConstructor_FalseAndNotRecorded(ISyntacticAttributeParser parser)
     {
         var source = """
             [Generic<string, int>(4)]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
         await FalseAndNotRecorded(parser, source);
@@ -60,11 +69,11 @@ public sealed class TryParse_Generic
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task ErrorArgument_False_NotRecorded(ISyntacticAttributeParser parser)
+    public async Task ErrorArgument_FalseAndNotRecorded(ISyntacticAttributeParser parser)
     {
         var source = """
             [Generic<NonExisting, int>]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
         await FalseAndNotRecorded(parser, source);
@@ -72,153 +81,126 @@ public sealed class TryParse_Generic
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task WithoutBody_True_Recorded(ISyntacticAttributeParser parser)
+    public async Task WithoutBody_TrueAndRecorded(ISyntacticAttributeParser parser)
     {
         var source = """
             [Generic<string, int>]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expected);
+        await TrueAndRecordedAsExpected(parser, source, expected);
 
-        static ExpectedResult expected(Compilation compilation, AttributeSyntax syntax)
+        static ExpectedResult expected(AttributeSyntax attributeSyntax)
         {
-            var stringType = compilation.GetSpecialType(SpecialType.System_String);
-            var intType = compilation.GetSpecialType(SpecialType.System_Int32);
+            var typeArguments = ((GenericNameSyntax)attributeSyntax.Name).TypeArgumentList.Arguments;
 
-            var t1Location = ExpectedLocation.TypeArgument(syntax, 0);
-            var t2Location = ExpectedLocation.TypeArgument(syntax, 1);
-
-            return new(stringType, intType, t1Location, t2Location);
+            return new(typeArguments[0], typeArguments[1]);
         }
     }
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task WithBody_True_Recorded(ISyntacticAttributeParser parser)
+    public async Task WithBody_TrueAndRecorded(ISyntacticAttributeParser parser)
     {
         var source = """
             [Generic<string, int>()]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expected);
+        await TrueAndRecordedAsExpected(parser, source, expected);
 
-        static ExpectedResult expected(Compilation compilation, AttributeSyntax syntax)
+        static ExpectedResult expected(AttributeSyntax attributeSyntax)
         {
-            var stringType = compilation.GetSpecialType(SpecialType.System_String);
-            var intType = compilation.GetSpecialType(SpecialType.System_Int32);
+            var typeArguments = ((GenericNameSyntax)attributeSyntax.Name).TypeArgumentList.Arguments;
 
-            var t1Location = ExpectedLocation.TypeArgument(syntax, 0);
-            var t2Location = ExpectedLocation.TypeArgument(syntax, 1);
-
-            return new(stringType, intType, t1Location, t2Location);
+            return new(typeArguments[0], typeArguments[1]);
         }
     }
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task Tuple_True_Recorded(ISyntacticAttributeParser parser)
+    public async Task Tuple_TrueAndRecorded(ISyntacticAttributeParser parser)
     {
         var source = """
             [Generic<(string, int), (int, string)>]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expected);
+        await TrueAndRecordedAsExpected(parser, source, expected);
 
-        static ExpectedResult expected(Compilation compilation, AttributeSyntax syntax)
+        static ExpectedResult expected(AttributeSyntax attributeSyntax)
         {
-            var stringType = compilation.GetSpecialType(SpecialType.System_String);
-            var intType = compilation.GetSpecialType(SpecialType.System_Int32);
+            var typeArguments = ((GenericNameSyntax)attributeSyntax.Name).TypeArgumentList.Arguments;
 
-            var valueTupleType = compilation.GetTypeByMetadataName("System.ValueTuple`2")!;
-
-            var t1 = valueTupleType.Construct(stringType, intType);
-            var t2 = valueTupleType.Construct(intType, stringType);
-
-            var t1Location = ExpectedLocation.TypeArgument(syntax, 0);
-            var t2Location = ExpectedLocation.TypeArgument(syntax, 1);
-
-            return new(t1, t2, t1Location, t2Location);
+            return new(typeArguments[0], typeArguments[1]);
         }
     }
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task QualifiedTrue_Recorded(ISyntacticAttributeParser parser)
+    public async Task Qualified_TrueAndRecorded(ISyntacticAttributeParser parser)
     {
         var source = """
             [SharpAttributeParser.QualifiedGeneric<string, int>]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
-        await TrueAndIdenticalToExpected(parser, source, expected);
+        await TrueAndRecordedAsExpected(parser, source, expected);
 
-        static ExpectedResult expected(Compilation compilation, AttributeSyntax syntax)
+        static ExpectedResult expected(AttributeSyntax attributeSyntax)
         {
-            var stringType = compilation.GetSpecialType(SpecialType.System_String);
-            var intType = compilation.GetSpecialType(SpecialType.System_Int32);
+            var typeArguments = ((GenericNameSyntax)((QualifiedNameSyntax)attributeSyntax.Name).Right).TypeArgumentList.Arguments;
 
-            var t1Location = ExpectedLocation.TypeArgument(syntax, 0);
-            var t2Location = ExpectedLocation.TypeArgument(syntax, 1);
-
-            return new(stringType, intType, t1Location, t2Location);
+            return new(typeArguments[0], typeArguments[1]);
         }
     }
 
     [AssertionMethod]
-    private static async Task TrueAndIdenticalToExpected(ISyntacticAttributeParser parser, string source, Func<Compilation, AttributeSyntax, ExpectedResult> expectedDelegate)
+    private async Task TrueAndRecordedAsExpected(ISyntacticAttributeParser parser, string source, Func<AttributeSyntax, ExpectedResult> expectedDelegate)
     {
-        SyntacticGenericAttributeRecorder recorder = new();
-
-        var (compilation, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
-
-        var expected = expectedDelegate(compilation, attributeSyntax);
-
-        var result = Target(parser, recorder, attributeData, attributeSyntax);
-
-        Assert.True(result);
-
-        Assert.Equal(expected.T1, recorder.T1);
-        Assert.True(recorder.T1Recorded);
-        Assert.Equal(expected.T1Location, recorder.T1Location);
-
-        Assert.Equal(expected.T2, recorder.T2);
-        Assert.True(recorder.T2Recorded);
-        Assert.Equal(expected.T2Location, recorder.T2Location);
-    }
-
-    [AssertionMethod]
-    private static async Task FalseAndNotRecorded(ISyntacticAttributeParser parser, string source)
-    {
-        SyntacticGenericAttributeRecorder recorder = new();
+        var recorder = RecorderFactory.Create();
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var result = Target(parser, recorder, attributeData, attributeSyntax);
+        var expected = expectedDelegate(attributeSyntax);
 
-        Assert.False(result);
+        var outcome = Target(parser, recorder, attributeData, attributeSyntax);
+        var result = recorder.GetRecord();
 
-        Assert.False(recorder.T1Recorded);
-        Assert.False(recorder.T2Recorded);
+        Assert.True(outcome);
+
+        Assert.Equal(expected.T1Syntax, result.T1Syntax);
+        Assert.True(result.T1SyntaxRecorded);
+
+        Assert.Equal(expected.T2Syntax, result.T2Syntax);
+        Assert.True(result.T2SyntaxRecorded);
+    }
+
+    [AssertionMethod]
+    private async Task FalseAndNotRecorded(ISyntacticAttributeParser parser, string source)
+    {
+        var recorder = RecorderFactory.Create();
+
+        var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
+
+        var outcome = Target(parser, recorder, attributeData, attributeSyntax);
+        var result = recorder.GetRecord();
+
+        Assert.False(outcome);
+
+        Assert.False(result.T1SyntaxRecorded);
+        Assert.False(result.T2SyntaxRecorded);
     }
 
     private sealed class ExpectedResult
     {
-        public ITypeSymbol T1 { get; }
-        public ITypeSymbol T2 { get; }
+        public ExpressionSyntax T1Syntax { get; }
+        public ExpressionSyntax T2Syntax { get; }
 
-        public Location T1Location { get; }
-        public Location T2Location { get; }
-
-        public ExpectedResult(ITypeSymbol t1, ITypeSymbol t2, Location t1Location, Location t2Location)
+        public ExpectedResult(ExpressionSyntax t1syntax, ExpressionSyntax t2syntax)
         {
-            T1 = t1;
-            T2 = t2;
-
-            T1Location = t1Location;
-            T2Location = t2Location;
+            T1Syntax = t1syntax;
+            T2Syntax = t2syntax;
         }
     }
 }

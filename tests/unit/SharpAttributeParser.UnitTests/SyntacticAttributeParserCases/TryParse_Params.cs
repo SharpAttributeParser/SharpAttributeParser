@@ -3,21 +3,52 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
+using SharpAttributeParser.Recording;
+
 using System.Threading.Tasks;
 
 using Xunit;
 
 public sealed class TryParse_Params
 {
-    private static bool Target(ISyntacticAttributeParser parser, ISyntacticArgumentRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax) => parser.TryParse(recorder, attributeData, attributeSyntax);
+    private ISyntacticParamsAttributeRecorderFactory RecorderFactory { get; }
+
+    public TryParse_Params(ISyntacticParamsAttributeRecorderFactory recorderFactory)
+    {
+        RecorderFactory = recorderFactory;
+    }
+
+    private static bool Target(ISyntacticAttributeParser parser, ISyntacticAttributeRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax) => parser.TryParse(recorder, attributeData, attributeSyntax);
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task NonExsitingAttribute_False_NotRecorded(ISyntacticAttributeParser parser)
+    public async Task FalseReturningRecorder_FalseAndRecorded(ISyntacticAttributeParser parser)
+    {
+        var source = """
+            [Params(4)]
+            public class Foo { }
+            """;
+
+        var recorder = RecorderFactory.Create();
+
+        var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
+
+        var outcome = Target(parser, recorder, attributeData, attributeSyntax);
+        var result = recorder.GetRecord();
+
+        Assert.True(outcome);
+
+        Assert.Equal(new[] { attributeSyntax.ArgumentList!.Arguments[0].Expression }, result.ValueSyntax.AsT1);
+        Assert.True(result.ValueSyntaxRecorded);
+    }
+
+    [Theory]
+    [ClassData(typeof(ParserSources))]
+    public async Task NonExsitingAttribute_FalseAndNotRecorded(ISyntacticAttributeParser parser)
     {
         var source = """
             [NonExisting]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
         await FalseAndNotRecorded(parser, source);
@@ -25,11 +56,11 @@ public sealed class TryParse_Params
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task NonExsitingConstructor_False_NotRecorded(ISyntacticAttributeParser parser)
+    public async Task NonExsitingConstructor_FalseAndNotRecorded(ISyntacticAttributeParser parser)
     {
         var source = """
             [Params(nonExisting: 4)]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
         await FalseAndNotRecorded(parser, source);
@@ -37,11 +68,11 @@ public sealed class TryParse_Params
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task ErrorParamsArgument_False_NotRecorded(ISyntacticAttributeParser parser)
+    public async Task ErrorParamsArgument_FalseAndNotRecorded(ISyntacticAttributeParser parser)
     {
         var source = """
             [Params((string)4)]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
         await FalseAndNotRecorded(parser, source);
@@ -49,27 +80,28 @@ public sealed class TryParse_Params
 
     [Theory]
     [ClassData(typeof(ParserSources))]
-    public async Task ErrorArrayArgument_False_NotRecorded(ISyntacticAttributeParser parser)
+    public async Task ErrorArrayArgument_FalseAndNotRecorded(ISyntacticAttributeParser parser)
     {
         var source = """
             [Params((object[])4)]
-            public sealed class Foo { }
+            public class Foo { }
             """;
 
         await FalseAndNotRecorded(parser, source);
     }
 
     [AssertionMethod]
-    private static async Task FalseAndNotRecorded(ISyntacticAttributeParser parser, string source)
+    private async Task FalseAndNotRecorded(ISyntacticAttributeParser parser, string source)
     {
-        SyntacticParamsAttributeRecorder recorder = new();
+        var recorder = RecorderFactory.Create();
 
         var (_, attributeData, attributeSyntax) = await CompilationStore.GetComponents(source, "Foo");
 
-        var result = Target(parser, recorder, attributeData, attributeSyntax);
+        var outcome = Target(parser, recorder, attributeData, attributeSyntax);
+        var result = recorder.GetRecord();
 
-        Assert.False(result);
+        Assert.False(outcome);
 
-        Assert.False(recorder.ValueRecorded);
+        Assert.False(result.ValueSyntaxRecorded);
     }
 }
