@@ -1566,7 +1566,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
         {
             return new ArgumentRecorderProvider(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
 
-            bool sharedWrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.Nullable<T>(argument).Match
+            bool sharedWrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.NullableClass<T>(argument).Match
             (
                 static (error) => false,
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
@@ -1579,7 +1579,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.Nullable<T>(argument).Match
+                return CommonArrayConverters.NullableClass<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => semanticRecorder(dataRecord, converted)
@@ -1591,7 +1591,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
         {
             return new ArgumentRecorderProvider(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
 
-            bool sharedWrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.Nullable<T?>(argument).Match
+            bool sharedWrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.NullableStruct<T>(argument).Match
             (
                 static (error) => false,
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
@@ -1604,7 +1604,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.Nullable<T?>(argument).Match
+                return CommonArrayConverters.NullableStruct<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => semanticRecorder(dataRecord, converted)
@@ -1641,7 +1641,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
         {
             return new ArgumentRecorderProvider(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
 
-            bool sharedWrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.NullableElements<T>(argument).Match
+            bool sharedWrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.NullableClassElements<T>(argument).Match
             (
                 static (error) => false,
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
@@ -1654,7 +1654,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.NullableElements<T?>(argument).Match
+                return CommonArrayConverters.NullableClassElements<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => semanticRecorder(dataRecord, converted)
@@ -1666,7 +1666,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
         {
             return new ArgumentRecorderProvider(SharedAdapterUtility.ForNonParams(sharedWrapper), semanticWrapper);
 
-            bool sharedWrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.NullableElements<T?>(argument).Match
+            bool sharedWrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.NullableStructElements<T>(argument).Match
             (
                 static (error) => false,
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
@@ -1679,7 +1679,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.NullableElements<T?>(argument).Match
+                return CommonArrayConverters.NullableStructElements<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => semanticRecorder(dataRecord, converted)
@@ -1983,7 +1983,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
         {
             return new ArgumentRecorderProvider(SharedAdapterUtility.ForParams(sharedWrapper), semanticWrapper);
 
-            bool sharedWrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.Nullable<T>(argument).Match
+            bool sharedWrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.NullableClass<T>(argument).Match
             (
                 static (error) => false,
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
@@ -1996,7 +1996,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.Nullable<T>(argument).Match
+                return CommonArrayConverters.NullableClass<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => semanticRecorder(dataRecord, converted)
@@ -2008,7 +2008,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
         {
             return new ArgumentRecorderProvider(SharedAdapterUtility.ForParams(sharedWrapper), semanticWrapper);
 
-            bool sharedWrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.Nullable<T?>(argument).Match
+            bool sharedWrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.NullableStruct<T>(argument).Match
             (
                 static (error) => false,
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
@@ -2021,7 +2021,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.Nullable<T?>(argument).Match
+                return CommonArrayConverters.NullableStruct<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => semanticRecorder(dataRecord, converted)
@@ -2058,7 +2058,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
         {
             return new ArgumentRecorderProvider(SharedAdapterUtility.ForParams(sharedWrapper), semanticWrapper);
 
-            bool sharedWrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.NullableElements<T>(argument).Match
+            bool sharedWrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.NullableClassElements<T>(argument).Match
             (
                 static (error) => false,
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
@@ -2071,7 +2071,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.NullableElements<T?>(argument).Match
+                return CommonArrayConverters.NullableClassElements<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => semanticRecorder(dataRecord, converted)
@@ -2083,7 +2083,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
         {
             return new ArgumentRecorderProvider(SharedAdapterUtility.ForParams(sharedWrapper), semanticWrapper);
 
-            bool sharedWrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.NullableElements<T?>(argument).Match
+            bool sharedWrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.NullableStructElements<T>(argument).Match
             (
                 static (error) => false,
                 (converted) => sharedRecorder(dataRecord, converted, syntax)
@@ -2096,7 +2096,7 @@ public abstract class AAdaptiveAttributeMapper<TRecord, TSemanticRecord> : IAttr
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.NullableElements<T?>(argument).Match
+                return CommonArrayConverters.NullableStructElements<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => semanticRecorder(dataRecord, converted)

@@ -847,7 +847,7 @@ public abstract class ASemanticAttributeMapper<TRecord> : ISemanticAttributeMapp
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.Nullable<T>(argument).Match
+                return CommonArrayConverters.NullableClass<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => recorder(dataRecord, converted)
@@ -866,7 +866,7 @@ public abstract class ASemanticAttributeMapper<TRecord> : ISemanticAttributeMapp
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.Nullable<T?>(argument).Match
+                return CommonArrayConverters.NullableStruct<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => recorder(dataRecord, converted)
@@ -904,7 +904,7 @@ public abstract class ASemanticAttributeMapper<TRecord> : ISemanticAttributeMapp
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.NullableElements<T>(argument).Match
+                return CommonArrayConverters.NullableClassElements<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => recorder(dataRecord, converted)
@@ -923,7 +923,7 @@ public abstract class ASemanticAttributeMapper<TRecord> : ISemanticAttributeMapp
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.NullableElements<T?>(argument).Match
+                return CommonArrayConverters.NullableStructElements<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => recorder(dataRecord, converted)

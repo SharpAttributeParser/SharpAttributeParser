@@ -1045,7 +1045,7 @@ public abstract class AAttributeMapper<TRecord> : IAttributeMapper<TRecord>
         {
             return AdapterUtility.ForNonParams(wrapper);
 
-            bool wrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.Nullable<T>(argument).Match
+            bool wrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.NullableClass<T>(argument).Match
             (
                 static (error) => false,
                 (converted) => recorder(dataRecord, converted, syntax)
@@ -1056,7 +1056,7 @@ public abstract class AAttributeMapper<TRecord> : IAttributeMapper<TRecord>
         {
             return AdapterUtility.ForNonParams(wrapper);
 
-            bool wrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.Nullable<T?>(argument).Match
+            bool wrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.NullableStruct<T>(argument).Match
             (
                 static (error) => false,
                 (converted) => recorder(dataRecord, converted, syntax)
@@ -1078,7 +1078,7 @@ public abstract class AAttributeMapper<TRecord> : IAttributeMapper<TRecord>
         {
             return AdapterUtility.ForNonParams(wrapper);
 
-            bool wrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.NullableElements<T>(argument).Match
+            bool wrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.NullableClassElements<T>(argument).Match
             (
                 static (error) => false,
                 (converted) => recorder(dataRecord, converted, syntax)
@@ -1089,7 +1089,7 @@ public abstract class AAttributeMapper<TRecord> : IAttributeMapper<TRecord>
         {
             return AdapterUtility.ForNonParams(wrapper);
 
-            bool wrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.NullableElements<T?>(argument).Match
+            bool wrapper(TRecord dataRecord, object? argument, ExpressionSyntax syntax) => CommonArrayConverters.NullableStructElements<T>(argument).Match
             (
                 static (error) => false,
                 (converted) => recorder(dataRecord, converted, syntax)
@@ -1276,7 +1276,7 @@ public abstract class AAttributeMapper<TRecord> : IAttributeMapper<TRecord>
         {
             return AdapterUtility.ForParams(wrapper);
 
-            bool wrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.Nullable<T>(argument).Match
+            bool wrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.NullableClass<T>(argument).Match
             (
                 static (error) => false,
                 (converted) => recorder(dataRecord, converted, syntax)
@@ -1287,7 +1287,7 @@ public abstract class AAttributeMapper<TRecord> : IAttributeMapper<TRecord>
         {
             return AdapterUtility.ForParams(wrapper);
 
-            bool wrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.Nullable<T?>(argument).Match
+            bool wrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.NullableStruct<T>(argument).Match
             (
                 static (error) => false,
                 (converted) => recorder(dataRecord, converted, syntax)
@@ -1309,7 +1309,7 @@ public abstract class AAttributeMapper<TRecord> : IAttributeMapper<TRecord>
         {
             return AdapterUtility.ForParams(wrapper);
 
-            bool wrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.NullableElements<T>(argument).Match
+            bool wrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.NullableClassElements<T>(argument).Match
             (
                 static (error) => false,
                 (converted) => recorder(dataRecord, converted, syntax)
@@ -1320,7 +1320,7 @@ public abstract class AAttributeMapper<TRecord> : IAttributeMapper<TRecord>
         {
             return AdapterUtility.ForParams(wrapper);
 
-            bool wrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.NullableElements<T?>(argument).Match
+            bool wrapper(TRecord dataRecord, object? argument, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> syntax) => CommonArrayConverters.NullableStructElements<T>(argument).Match
             (
                 static (error) => false,
                 (converted) => recorder(dataRecord, converted, syntax)

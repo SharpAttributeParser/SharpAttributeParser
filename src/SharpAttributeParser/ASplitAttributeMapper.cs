@@ -1522,7 +1522,7 @@ public abstract class ASplitAttributeMapper<TSemanticRecord, TSyntacticRecord> :
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.Nullable<T>(argument).Match
+                return CommonArrayConverters.NullableClass<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => semanticRecorder(dataRecord, converted)
@@ -1541,7 +1541,7 @@ public abstract class ASplitAttributeMapper<TSemanticRecord, TSyntacticRecord> :
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.Nullable<T?>(argument).Match
+                return CommonArrayConverters.NullableStruct<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => semanticRecorder(dataRecord, converted)
@@ -1579,7 +1579,7 @@ public abstract class ASplitAttributeMapper<TSemanticRecord, TSyntacticRecord> :
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.NullableElements<T?>(argument).Match
+                return CommonArrayConverters.NullableClassElements<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => semanticRecorder(dataRecord, converted)
@@ -1598,7 +1598,7 @@ public abstract class ASplitAttributeMapper<TSemanticRecord, TSyntacticRecord> :
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.NullableElements<T?>(argument).Match
+                return CommonArrayConverters.NullableStructElements<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => semanticRecorder(dataRecord, converted)
@@ -1903,7 +1903,7 @@ public abstract class ASplitAttributeMapper<TSemanticRecord, TSyntacticRecord> :
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.Nullable<T>(argument).Match
+                return CommonArrayConverters.NullableClass<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => semanticRecorder(dataRecord, converted)
@@ -1922,7 +1922,7 @@ public abstract class ASplitAttributeMapper<TSemanticRecord, TSyntacticRecord> :
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.Nullable<T?>(argument).Match
+                return CommonArrayConverters.NullableStruct<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => semanticRecorder(dataRecord, converted)
@@ -1960,7 +1960,7 @@ public abstract class ASplitAttributeMapper<TSemanticRecord, TSyntacticRecord> :
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.NullableElements<T?>(argument).Match
+                return CommonArrayConverters.NullableClassElements<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => semanticRecorder(dataRecord, converted)
@@ -1979,7 +1979,7 @@ public abstract class ASplitAttributeMapper<TSemanticRecord, TSyntacticRecord> :
                     throw new ArgumentNullException(nameof(dataRecord));
                 }
 
-                return CommonArrayConverters.NullableElements<T?>(argument).Match
+                return CommonArrayConverters.NullableStructElements<T>(argument).Match
                 (
                     static (error) => false,
                     (converted) => semanticRecorder(dataRecord, converted)

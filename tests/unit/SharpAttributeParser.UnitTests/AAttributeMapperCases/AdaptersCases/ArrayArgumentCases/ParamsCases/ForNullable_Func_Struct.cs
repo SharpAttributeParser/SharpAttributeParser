@@ -110,6 +110,14 @@ public sealed class ForNullable_Func_Struct
     }
 
     [Fact]
+    public void Int_NonNullable_TrueAndRecorded()
+    {
+        var value = new[] { 3, 4 };
+
+        TrueAndRecorded(value.Select(static (value) => (int?)value), value, ExpressionSyntaxFactory.Create());
+    }
+
+    [Fact]
     public void Int_Enum_FalseAndNotRecorded()
     {
         var value = new StringComparison?[] { StringComparison.CurrentCulture, null };

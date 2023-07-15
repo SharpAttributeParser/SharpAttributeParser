@@ -87,7 +87,7 @@ public sealed class ForNullableElements_Action_Struct
     }
 
     [Fact]
-    public void Enum_DifferentTypeCastToObjects_FalseAndNotRecorded()
+    public void Enum_DifferentEnumTypeCastToObject_FalseAndNotRecorded()
     {
         var value = new object?[] { StringSplitOptions.RemoveEmptyEntries, null };
 
@@ -116,6 +116,14 @@ public sealed class ForNullableElements_Action_Struct
         var value = new int?[] { 3, null };
 
         TrueAndRecorded(value, value, ExpressionSyntaxFactory.Create());
+    }
+
+    [Fact]
+    public void Int_NonNullable_TrueAndRecorded()
+    {
+        var value = new[] { 3, 4 };
+
+        TrueAndRecorded(value.Select(static (value) => (int?)value), value, ExpressionSyntaxFactory.Create());
     }
 
     [Fact]

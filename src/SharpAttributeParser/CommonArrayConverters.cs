@@ -20,56 +20,85 @@ internal static class CommonArrayConverters
             return new Error();
         }
 
-        if (argument is not IReadOnlyList<T> tListArgument)
+        if (argument is IReadOnlyList<T> tListArgument)
         {
-            if (argument is not IReadOnlyList<object> objectListArgument)
+            if (argument.GetType().GetElementType() != typeof(T))
             {
                 return new Error();
             }
 
+            if (tListArgument.Any(static (argumentElement) => argumentElement is null))
+            {
+                return new Error();
+            }
+
+            return OneOf<Error, IReadOnlyList<T>>.FromT1(tListArgument);
+        }
+
+        if (argument is IReadOnlyList<object> objectListArgument)
+        {
             return NonNullable<T>(objectListArgument);
         }
 
-        if (argument.GetType().GetElementType() != typeof(T))
-        {
-            return new Error();
-        }
-
-        if (tListArgument.Any(static (argumentElement) => argumentElement is null))
-        {
-            return new Error();
-        }
-
-        return OneOf<Error, IReadOnlyList<T>>.FromT1(tListArgument);
+        return new Error();
     }
 
     /// <summary>Attempts to convert the provided <see cref="object"/> to a array of <typeparamref name="T"/>, where both the collection itself and the elements are nullable.</summary>
     /// <typeparam name="T">The type of the elements of the converted array.</typeparam>
     /// <param name="argument">The <see cref="object"/> that is converted to an array of <typeparamref name="T"/>.</param>
     /// <returns>The converted array, or <see cref="Error"/> if the attempt was unsuccessful.</returns>
-    public static OneOf<Error, IReadOnlyList<T?>?> Nullable<T>(object? argument)
+    public static OneOf<Error, IReadOnlyList<T?>?> NullableClass<T>(object? argument) where T : class
     {
         if (argument is null)
         {
             return OneOf<Error, IReadOnlyList<T?>?>.FromT1(null);
         }
 
-        if (argument is not IReadOnlyList<T> tListArgument)
+        if (argument is IReadOnlyList<T> tListArgument)
         {
-            if (argument is not IReadOnlyList<object> objectListArgument)
+            return OneOf<Error, IReadOnlyList<T?>?>.FromT1(tListArgument);
+        }
+
+        if (argument is IReadOnlyList<object> objectListArgument)
+        {
+            return Nullable<T>(objectListArgument);
+        }
+
+        return new Error();
+    }
+
+    /// <summary>Attempts to convert the provided <see cref="object"/> to a array of <typeparamref name="T"/>, where both the collection itself and the elements are nullable.</summary>
+    /// <typeparam name="T">The type of the elements of the converted array.</typeparam>
+    /// <param name="argument">The <see cref="object"/> that is converted to an array of <typeparamref name="T"/>.</param>
+    /// <returns>The converted array, or <see cref="Error"/> if the attempt was unsuccessful.</returns>
+    public static OneOf<Error, IReadOnlyList<T?>?> NullableStruct<T>(object? argument) where T : struct
+    {
+        if (argument is null)
+        {
+            return OneOf<Error, IReadOnlyList<T?>?>.FromT1(null);
+        }
+
+        if (argument is IReadOnlyList<T?> tListArgument)
+        {
+            return OneOf<Error, IReadOnlyList<T?>?>.FromT1(tListArgument);
+        }
+
+        if (argument is IReadOnlyList<T> nonNullTListArgument)
+        {
+            if (argument.GetType().GetElementType() != typeof(T))
             {
                 return new Error();
             }
 
-            return Nullable<T>(objectListArgument);
+            return OneOf<Error, IReadOnlyList<T?>?>.FromT1(Nullable(nonNullTListArgument));
         }
 
-        if (argument.GetType().GetElementType() != typeof(T))
+        if (argument is IReadOnlyList<object> objectListArgument)
         {
-            return new Error();
+            return Nullable<T?>(objectListArgument);
         }
 
-        return OneOf<Error, IReadOnlyList<T?>?>.FromT1(tListArgument);
+        return new Error();
     }
 
     /// <summary>Attempts to convert the provided <see cref="object"/> to a array of <typeparamref name="T"/>, where the collection itself is nullable.</summary>
@@ -90,14 +119,28 @@ internal static class CommonArrayConverters
     /// <typeparam name="T">The type of the elements of the converted array.</typeparam>
     /// <param name="argument">The <see cref="object"/> that is converted to an array of <typeparamref name="T"/>.</param>
     /// <returns>The converted array, or <see cref="Error"/> if the attempt was unsuccessful.</returns>
-    public static OneOf<Error, IReadOnlyList<T?>> NullableElements<T>(object? argument)
+    public static OneOf<Error, IReadOnlyList<T?>> NullableClassElements<T>(object? argument) where T : class
     {
         if (argument is null)
         {
             return new Error();
         }
 
-        return Nullable<T>(argument).MapT1(static (array) => array!);
+        return NullableClass<T>(argument).MapT1(static (array) => array!);
+    }
+
+    /// <summary>Attempts to convert the provided <see cref="object"/> to a array of <typeparamref name="T"/>, where the elements are nullable.</summary>
+    /// <typeparam name="T">The type of the elements of the converted array.</typeparam>
+    /// <param name="argument">The <see cref="object"/> that is converted to an array of <typeparamref name="T"/>.</param>
+    /// <returns>The converted array, or <see cref="Error"/> if the attempt was unsuccessful.</returns>
+    public static OneOf<Error, IReadOnlyList<T?>> NullableStructElements<T>(object? argument) where T : struct
+    {
+        if (argument is null)
+        {
+            return new Error();
+        }
+
+        return NullableStruct<T>(argument).MapT1(static (array) => array!);
     }
 
     private static OneOf<Error, IReadOnlyList<T>> NonNullable<T>(IReadOnlyList<object> argument)
@@ -139,5 +182,17 @@ internal static class CommonArrayConverters
         }
 
         return OneOf<Error, IReadOnlyList<T?>?>.FromT1(converted);
+    }
+
+    private static IReadOnlyList<T?> Nullable<T>(IReadOnlyList<T> argument) where T : struct
+    {
+        var nullableArgument = new T?[argument.Count];
+
+        for (var i = 0; i < argument.Count; i++)
+        {
+            nullableArgument[i] = argument[i];
+        }
+
+        return nullableArgument;
     }
 }

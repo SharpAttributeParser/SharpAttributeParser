@@ -103,6 +103,14 @@ public sealed class ForNullableElements_Func_Struct
     }
 
     [Fact]
+    public void Enum_NonNullSameType_TrueAndRecorded()
+    {
+        var value = new[] { StringComparison.CurrentCulture, StringComparison.InvariantCultureIgnoreCase };
+
+        TrueAndRecorded(value.Select(static (value) => (StringComparison?)value), value, ExpressionSyntaxFactory.Create());
+    }
+
+    [Fact]
     public void Enum_EnumsCastToObjects_TrueAndRecorded()
     {
         var value = new object?[] { StringComparison.CurrentCulture, null };
@@ -114,6 +122,14 @@ public sealed class ForNullableElements_Func_Struct
     public void Enum_DifferentEnumType_FalseAndNotRecorded()
     {
         var value = new StringSplitOptions?[] { StringSplitOptions.RemoveEmptyEntries, null };
+
+        FalseAndNotRecorded<StringComparison>(value, ExpressionSyntaxFactory.Create());
+    }
+
+    [Fact]
+    public void Enum_NonNullDifferentEnumType_FalseAndNotRecorded()
+    {
+        var value = new[] { StringSplitOptions.RemoveEmptyEntries, StringSplitOptions.TrimEntries };
 
         FalseAndNotRecorded<StringComparison>(value, ExpressionSyntaxFactory.Create());
     }
@@ -132,6 +148,14 @@ public sealed class ForNullableElements_Func_Struct
         var value = new int?[] { 3, null };
 
         TrueAndRecorded(value, value, ExpressionSyntaxFactory.Create());
+    }
+
+    [Fact]
+    public void Int_NonNullable_TrueAndRecorded()
+    {
+        var value = new[] { 3, 4 };
+
+        TrueAndRecorded(value.Select(static (value) => (int?)value), value, ExpressionSyntaxFactory.Create());
     }
 
     [Fact]
