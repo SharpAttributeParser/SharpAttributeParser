@@ -1,4 +1,4 @@
-﻿namespace SharpAttributeParser.Tests.ASyntacticArgumentRecorderCases;
+﻿namespace SharpAttributeParser.ASyntacticArgumentRecorderCases;
 
 using Microsoft.CodeAnalysis;
 
@@ -7,20 +7,14 @@ using System.Collections.Generic;
 
 using Xunit;
 
-public class AddSingleRecorders
+public sealed class AddSingleRecorders
 {
-    private static void TryRecordNamedArgument(ASyntacticArgumentRecorder recorder, string parameterName, object? value, Location location) => recorder.TryRecordNamedArgument(parameterName, value, location);
-
     [Fact]
     public void Null_InvalidOperationExceptionWhenUsed()
     {
         NullGenericRecorder recorder = new();
 
-        var parameterName = Datasets.GetValidParameterName();
-        var value = Datasets.GetValidTypeSymbol();
-        var location = Datasets.GetValidLocation();
-
-        var exception = Record.Exception(() => TryRecordNamedArgument(recorder, parameterName, value, location));
+        var exception = Record.Exception(() => RecordArgument(recorder));
 
         Assert.IsType<InvalidOperationException>(exception);
     }
@@ -30,11 +24,7 @@ public class AddSingleRecorders
     {
         NullNameRecorder recorder = new();
 
-        var parameterName = Datasets.GetValidParameterName();
-        var value = Datasets.GetValidTypeSymbol();
-        var location = Datasets.GetValidLocation();
-
-        var exception = Record.Exception(() => TryRecordNamedArgument(recorder, parameterName, value, location));
+        var exception = Record.Exception(() => RecordArgument(recorder));
 
         Assert.IsType<InvalidOperationException>(exception);
     }
@@ -44,28 +34,22 @@ public class AddSingleRecorders
     {
         NullDelegateRecorder recorder = new();
 
-        var parameterName = Datasets.GetValidParameterName();
-        var value = Datasets.GetValidTypeSymbol();
-        var location = Datasets.GetValidLocation();
-
-        var exception = Record.Exception(() => TryRecordNamedArgument(recorder, parameterName, value, location));
+        var exception = Record.Exception(() => RecordArgument(recorder));
 
         Assert.IsType<InvalidOperationException>(exception);
     }
 
     [Fact]
-    public void Duplicate_InvalidOperationExceptionWhenUsed()
+    public void DuplicateName_InvalidOperationExceptionWhenUsed()
     {
-        DuplicateGenericRecorder recorder = new();
+        DuplicateNameGenericRecorder recorder = new();
 
-        var parameterName = Datasets.GetValidParameterName();
-        var value = Datasets.GetValidTypeSymbol();
-        var location = Datasets.GetValidLocation();
-
-        var exception = Record.Exception(() => TryRecordNamedArgument(recorder, parameterName, value, location));
+        var exception = Record.Exception(() => RecordArgument(recorder));
 
         Assert.IsType<InvalidOperationException>(exception);
     }
+
+    private static void RecordArgument(ASyntacticArgumentRecorder recorder) => recorder.TryRecordNamedArgument(string.Empty, null, Location.None);
 
     private sealed class NullGenericRecorder : ASyntacticArgumentRecorder
     {
@@ -90,7 +74,7 @@ public class AddSingleRecorders
         }
     }
 
-    private sealed class DuplicateGenericRecorder : ASyntacticArgumentRecorder
+    private sealed class DuplicateNameGenericRecorder : ASyntacticArgumentRecorder
     {
         protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
         {

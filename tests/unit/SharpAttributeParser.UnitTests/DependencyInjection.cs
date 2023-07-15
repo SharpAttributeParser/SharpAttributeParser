@@ -1,4 +1,4 @@
-﻿namespace SharpAttributeParser.Tests;
+﻿namespace SharpAttributeParser;
 
 using Microsoft.Extensions.DependencyInjection;
 

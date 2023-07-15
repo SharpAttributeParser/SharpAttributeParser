@@ -1,125 +1,69 @@
-﻿namespace SharpAttributeParser.Tests.ASyntacticArgumentRecorderCases;
+﻿namespace SharpAttributeParser.ASyntacticArgumentRecorderCases;
 
 using Microsoft.CodeAnalysis;
+
+using Moq;
 
 using System;
 using System.Collections.Generic;
 
 using Xunit;
 
-public class TryRecordConstructorArgument_Array
+public sealed class TryRecordConstructorArgument_Array
 {
-    private static bool Target(ASyntacticArgumentRecorder recorder, IParameterSymbol parameter, IReadOnlyList<object?>? value, Location collectionLocation, IReadOnlyList<Location> elementLocations) => recorder.TryRecordConstructorArgument(parameter, value, collectionLocation, elementLocations);
+    private static bool Target(ISyntacticArgumentRecorder recorder, IParameterSymbol parameter, IReadOnlyList<object?>? value, CollectionLocation location) => recorder.TryRecordConstructorArgument(parameter, value, location);
 
     [Fact]
-    public void NullParameterName_ArgumentNullException()
+    public void NullParameter_ArgumentNullException()
     {
         SyntacticArgumentRecorder recorder = new(StringComparer.OrdinalIgnoreCase);
 
-        var parameter = Datasets.GetNullParameter();
-        var value = Datasets.GetValidArrayArgument();
-        var collectionLocation = Datasets.GetValidLocation();
-        var elementLocations = Datasets.GetValidElementLocations();
-
-        var exception = Record.Exception(() => Target(recorder, parameter, value, collectionLocation, elementLocations));
+        var exception = Record.Exception(() => Target(recorder, null!, null, CollectionLocation.None));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
 
     [Fact]
-    public void NullCollectionLocation_ArgumentNullException()
+    public void NullLocation_ArgumentNullException()
     {
-        var comparerMock = ComparerMock.GetComparer(true);
+        SyntacticArgumentRecorder recorder = new(StringComparer.OrdinalIgnoreCase);
 
-        SyntacticArgumentRecorder recorder = new(comparerMock.Object);
-
-        var parameter = Datasets.GetMockedParameter();
-        var value = Datasets.GetValidArrayArgument();
-        var collectionLocation = Datasets.GetNullLocation();
-        var elementLocations = Datasets.GetValidElementLocations();
-
-        var exception = Record.Exception(() => Target(recorder, parameter, value, collectionLocation, elementLocations));
+        var exception = Record.Exception(() => Target(recorder, Mock.Of<IParameterSymbol>(), null, null!));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
 
     [Fact]
-    public void NullElementLocations_ArgumentNullException()
-    {
-        var comparerMock = ComparerMock.GetComparer(true);
-
-        SyntacticArgumentRecorder recorder = new(comparerMock.Object);
-
-        var parameter = Datasets.GetMockedParameter();
-        var value = Datasets.GetValidArrayArgument();
-        var collectionLocation = Datasets.GetValidLocation();
-        var elementLocations = Datasets.GetNullElementLocations();
-
-        var exception = Record.Exception(() => Target(recorder, parameter, value, collectionLocation, elementLocations));
-
-        Assert.IsType<ArgumentNullException>(exception);
-    }
+    public void NullValue_True_Recorded() => TrueAndRecorded(null);
 
     [Fact]
-    public void NullValue_True_ArgumentRecorded()
-    {
-        var comparerMock = ComparerMock.GetComparer(true);
-
-        SyntacticArgumentRecorder recorder = new(comparerMock.Object);
-
-        var parameter = Datasets.GetMockedParameter();
-        var value = Datasets.GetNullArrayArgument();
-        var collectionLocation = Datasets.GetValidLocation();
-        var elementLocations = Datasets.GetValidElementLocations();
-
-        var actual = Target(recorder, parameter, value, collectionLocation, elementLocations);
-
-        Assert.True(actual);
-
-        Assert.Null(recorder.Values);
-        Assert.Equal(collectionLocation, recorder.ValuesCollectionLocation);
-        Assert.Equal(elementLocations, recorder.ValuesElementLocations);
-    }
+    public void NonNullValue_True_Recorded() => TrueAndRecorded(Array.Empty<object?>());
 
     [Fact]
-    public void Matching_True_ArgumentRecorded()
+    public void NotMatching_False_NotRecorded()
     {
-        var comparerMock = ComparerMock.GetComparer(true);
+        SyntacticArgumentRecorder recorder = new(StringComparerMock.CreateComparer(false));
 
-        SyntacticArgumentRecorder recorder = new(comparerMock.Object);
-
-        var parameter = Datasets.GetMockedParameter();
-        var value = Datasets.GetValidArrayArgument();
-        var collectionLocation = Datasets.GetValidLocation();
-        var elementLocations = Datasets.GetValidElementLocations();
-
-        var actual = Target(recorder, parameter, value, collectionLocation, elementLocations);
-
-        Assert.True(actual);
-
-        Assert.Equal(value, recorder.Values);
-        Assert.Equal(collectionLocation, recorder.ValuesCollectionLocation);
-        Assert.Equal(elementLocations, recorder.ValuesElementLocations);
-    }
-
-    [Fact]
-    public void NotMatching_False_ArgumentNotRecorded()
-    {
-        var comparerMock = ComparerMock.GetComparer(false);
-
-        SyntacticArgumentRecorder recorder = new(comparerMock.Object);
-
-        var parameter = Datasets.GetMockedParameter();
-        var value = Datasets.GetValidArrayArgument();
-        var collectionLocation = Datasets.GetValidLocation();
-        var elementLocations = Datasets.GetValidElementLocations();
-
-        var actual = Target(recorder, parameter, value, collectionLocation, elementLocations);
+        var actual = Target(recorder, Mock.Of<IParameterSymbol>(static (symbol) => symbol.Name == string.Empty), null, CollectionLocation.None);
 
         Assert.False(actual);
 
-        Assert.Null(recorder.Values);
-        Assert.Null(recorder.ValuesCollectionLocation);
-        Assert.Null(recorder.ValuesElementLocations);
+        Assert.False(recorder.ArrayValueRecorded);
+    }
+
+    [AssertionMethod]
+    private static void TrueAndRecorded(IReadOnlyList<object?>? value)
+    {
+        SyntacticArgumentRecorder recorder = new(StringComparerMock.CreateComparer(true));
+
+        var location = CustomLocation.CreateCollection();
+
+        var actual = Target(recorder, Mock.Of<IParameterSymbol>(static (symbol) => symbol.Name == string.Empty), value, location);
+
+        Assert.True(actual);
+
+        Assert.Equal(value, recorder.ArrayValue);
+        Assert.True(recorder.ArrayValueRecorded);
+        Assert.Equal(location, recorder.ArrayValueLocation, ReferenceEqualityComparer.Instance);
     }
 }

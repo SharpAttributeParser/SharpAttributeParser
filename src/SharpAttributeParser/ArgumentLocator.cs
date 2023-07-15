@@ -49,7 +49,7 @@ public sealed class ArgumentLocator : IArgumentLocator
     }
 
     /// <inheritdoc/>
-    public (Location, IReadOnlyList<Location>) ArrayArgument(ExpressionSyntax expression)
+    public CollectionLocation ArrayArgument(ExpressionSyntax expression)
     {
         if (expression is null)
         {
@@ -63,17 +63,7 @@ public sealed class ArgumentLocator : IArgumentLocator
                 return FromArray(arrayCreationExpression.Initializer);
             }
 
-            return (arrayCreationExpression.GetLocation(), Array.Empty<Location>());
-        }
-
-        if (expression is InitializerExpressionSyntax initializerExpression)
-        {
-            if (initializerExpression.IsKind(SyntaxKind.ArrayInitializerExpression) is false)
-            {
-                return (initializerExpression.GetLocation(), Array.Empty<Location>());
-            }
-
-            return FromArray(initializerExpression);
+            return CollectionLocation.Empty(arrayCreationExpression.GetLocation());
         }
 
         if (expression is ImplicitArrayCreationExpressionSyntax implicitArrayCreationExpression)
@@ -88,7 +78,7 @@ public sealed class ArgumentLocator : IArgumentLocator
 
         if (expression is LiteralExpressionSyntax && (expression.IsKind(SyntaxKind.NullLiteralExpression) || expression.IsKind(SyntaxKind.DefaultLiteralExpression)))
         {
-            return (expression.GetLocation(), Array.Empty<Location>());
+            return CollectionLocation.Empty(expression.GetLocation());
         }
 
         if (expression is ParenthesizedExpressionSyntax parenthesizedExpression)
@@ -98,14 +88,14 @@ public sealed class ArgumentLocator : IArgumentLocator
 
         if (expression is DefaultExpressionSyntax)
         {
-            return (expression.GetLocation(), Array.Empty<Location>());
+            return CollectionLocation.Empty(expression.GetLocation());
         }
 
         throw new ArgumentException($"The provided {nameof(ExpressionSyntax)} could not be interpreted as constructing an array.", nameof(expression));
     }
 
     /// <inheritdoc/>
-    public (Location, IReadOnlyList<Location>) ParamsArguments(IReadOnlyList<ExpressionSyntax> expressions)
+    public CollectionLocation ParamsArguments(IReadOnlyList<ExpressionSyntax> expressions)
     {
         if (expressions is null)
         {
@@ -114,7 +104,7 @@ public sealed class ArgumentLocator : IArgumentLocator
 
         if (expressions.Count is 0)
         {
-            return (Location.None, Array.Empty<Location>());
+            return CollectionLocation.None;
         }
 
         var elementLocations = new Location[expressions.Count];
@@ -134,13 +124,13 @@ public sealed class ArgumentLocator : IArgumentLocator
 
         var collectionLocation = CreateCollectionLocation(firstLocation, lastLocation);
 
-        return (collectionLocation, elementLocations);
+        return CollectionLocation.Create(collectionLocation, elementLocations);
     }
 
     /// <inheritdoc/>
-    public (Location, IReadOnlyList<Location>) ParamsArguments(params ExpressionSyntax[] expressions) => ParamsArguments(expressions as IReadOnlyList<ExpressionSyntax>);
+    public CollectionLocation ParamsArguments(params ExpressionSyntax[] expressions) => ParamsArguments(expressions as IReadOnlyList<ExpressionSyntax>);
 
-    private (Location, IReadOnlyList<Location>) FromArray(InitializerExpressionSyntax initializerExpression)
+    private CollectionLocation FromArray(InitializerExpressionSyntax initializerExpression)
     {
         var elementLocations = new Location[initializerExpression.Expressions.Count];
 
@@ -149,7 +139,7 @@ public sealed class ArgumentLocator : IArgumentLocator
             elementLocations[i] = SingleArgument(initializerExpression.Expressions[i]);
         }
 
-        return new(initializerExpression.GetLocation(), elementLocations);
+        return CollectionLocation.Create(initializerExpression.GetLocation(), elementLocations);
     }
 
     private static Location CreateCollectionLocation(Location firstLocation, Location lastLocation)

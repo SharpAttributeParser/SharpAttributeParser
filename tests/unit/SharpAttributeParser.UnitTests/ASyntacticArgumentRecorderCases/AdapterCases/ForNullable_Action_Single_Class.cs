@@ -1,4 +1,4 @@
-﻿namespace SharpAttributeParser.Tests.ASyntacticArgumentRecorderCases.AdapterCases;
+﻿namespace SharpAttributeParser.ASyntacticArgumentRecorderCases.AdapterCases;
 
 using Microsoft.CodeAnalysis;
 
@@ -7,132 +7,118 @@ using System.Collections.Generic;
 
 using Xunit;
 
-public class ForNullable_Action_Single_Class
+public sealed class ForNullable_Action_Single_Class
 {
-    private static bool TryRecordConstructorArgument(ASyntacticArgumentRecorder recorder, string parameterName, object? value) => recorder.TryRecordNamedArgument(parameterName, value, Location.None);
+    private static DSyntacticSingleRecorder Target<T>(ISyntacticAdapterProvider adapters, Action<T?, Location> recorder) where T : class => adapters.ForNullable(recorder);
 
     [Fact]
-    public void IntArray_IntArray_True_RecorderPopulated()
+    public void NullDelegate_ArgumentNullExceptionWhenUsed()
     {
-        ArrayRecorder recorder = new();
+        NullDelegateRecorder recorder = new();
 
-        var parameterName = "Value";
-        var value = new[] { 1, 2, 3 };
+        var exception = Record.Exception(() => RecordArgument(recorder, null, Location.None));
 
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.True(actual);
-
-        Assert.Equal(value, recorder.Value);
+        Assert.IsType<ArgumentNullException>(exception);
     }
 
     [Fact]
-    public void IntArray_NullableIntArray_False_RecorderNotPopulated()
+    public void IntArray_NullElement_True_Recorded()
     {
-        ArrayRecorder recorder = new();
+        var value = new int?[] { null, 2, 3 };
 
-        var parameterName = "Value";
-        var value = new int?[] { 1, 2, 3 };
-
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.False(actual);
-
-        Assert.False(recorder.ValueRecorded);
+        TrueAndRecorded(value, value);
     }
 
     [Fact]
-    public void IntArray_Null_True_RecorderPopulated()
+    public void IntArray_NullCollection_True_Recorded()
     {
-        ArrayRecorder recorder = new();
+        IReadOnlyList<int?>? value = null;
 
-        var parameterName = "Value";
-        object? value = null;
-
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.True(actual);
-
-        Assert.Null(recorder.Value);
-        Assert.True(recorder.ValueRecorded);
+        TrueAndRecorded(value, value);
     }
 
     [Fact]
-    public void String_String_True_RecorderPopulated()
+    public void String_SameType_True_Recorded()
     {
-        StringRecorder recorder = new();
-
-        var parameterName = "Value";
         var value = "1";
 
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.True(actual);
-
-        Assert.Equal(value, recorder.Value);
+        TrueAndRecorded(value, value);
     }
 
     [Fact]
-    public void String_Enum_False_RecorderNotPopulated()
+    public void String_Enum_False_NotRecorded()
     {
-        StringRecorder recorder = new();
-
-        var parameterName = "Value";
         var value = StringComparison.OrdinalIgnoreCase;
 
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
+        FalseAndNotRecorded<string, StringComparison>(value);
+    }
+
+    [Fact]
+    public void String_Null_True_Recorded()
+    {
+        string? value = null;
+
+        TrueAndRecorded(value, value);
+    }
+
+    [AssertionMethod]
+    private static void TrueAndRecorded<T1, T2>(T1? expected, T2? value) where T1 : class
+    {
+        Recorder<T1> recorder = new();
+
+        var location = CustomLocation.Create();
+
+        var actual = RecordArgument(recorder, value, location);
+
+        Assert.True(actual);
+
+        Assert.Equal(expected, recorder.Value);
+        Assert.True(recorder.ValueRecorded);
+        Assert.Equal(location, recorder.ValueLocation, ReferenceEqualityComparer.Instance);
+    }
+
+    [AssertionMethod]
+    private static void FalseAndNotRecorded<T1, T2>(T2? value) where T1 : class
+    {
+        Recorder<T1> recorder = new();
+
+        var actual = RecordArgument(recorder, value, Location.None);
 
         Assert.False(actual);
 
         Assert.False(recorder.ValueRecorded);
     }
 
-    [Fact]
-    public void String_Null_True_RecorderPopulated()
+    private static bool RecordArgument(ASyntacticArgumentRecorder recorder, object? value, Location location) => recorder.TryRecordNamedArgument(string.Empty, value, location);
+
+    private sealed class NullDelegateRecorder : ASyntacticArgumentRecorder
     {
-        StringRecorder recorder = new();
-
-        var parameterName = "Value";
-        object? value = null;
-
-        var actual = TryRecordConstructorArgument(recorder, parameterName, value);
-
-        Assert.True(actual);
-
-        Assert.Null(recorder.Value);
-        Assert.True(recorder.ValueRecorded);
-    }
-    private sealed class ArrayRecorder : ASyntacticArgumentRecorder
-    {
-        public IReadOnlyList<int>? Value { get; private set; }
-        public bool ValueRecorded { get; private set; }
+        protected override IEqualityComparer<string> Comparer { get; } = StringComparerMock.CreateComparer(true);
 
         protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.ForNullable<IReadOnlyList<int>>(RecordIntArray));
-        }
-
-        private void RecordIntArray(IReadOnlyList<int>? value, Location location)
-        {
-            Value = value;
-            ValueRecorded = true;
+            yield return (string.Empty, Target<string>(Adapters, null!));
         }
     }
 
-    private sealed class StringRecorder : ASyntacticArgumentRecorder
+    private sealed class Recorder<T> : ASyntacticArgumentRecorder where T : class
     {
-        public string? Value { get; private set; }
+        public T? Value { get; private set; }
         public bool ValueRecorded { get; private set; }
+        public Location? ValueLocation { get; private set; }
+
+        protected override IEqualityComparer<string> Comparer { get; } = StringComparerMock.CreateComparer(true);
 
         protected override IEnumerable<(string, DSyntacticSingleRecorder)> AddSingleRecorders()
         {
-            yield return ("Value", Adapters.ForNullable<string>(RecordString));
+            yield return (string.Empty, Target<T>(Adapters, RecordValue));
         }
 
-        private void RecordString(string? value, Location location)
+        private void RecordValue(T? value, Location location)
         {
             Value = value;
             ValueRecorded = true;
+            ValueLocation = location;
         }
     }
 }

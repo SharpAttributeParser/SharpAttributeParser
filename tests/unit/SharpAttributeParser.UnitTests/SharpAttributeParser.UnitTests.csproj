@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
-        <RootNamespace>SharpAttributeParser.Tests</RootNamespace>
+        <RootNamespace>SharpAttributeParser</RootNamespace>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -27,6 +27,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\src\SharpAttributeParser.Abstractions\SharpAttributeParser.Abstractions.csproj" />
+      <ProjectReference Include="..\..\..\src\SharpAttributeParser.Core\SharpAttributeParser.Core.csproj" />
       <ProjectReference Include="..\..\..\src\SharpAttributeParser\SharpAttributeParser.csproj" />
     </ItemGroup>
 

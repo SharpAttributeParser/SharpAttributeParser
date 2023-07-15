@@ -1,23 +1,18 @@
-﻿namespace SharpAttributeParser.Tests.ASemanticArgumentRecorderCases;
+﻿namespace SharpAttributeParser.ASemanticArgumentRecorderCases;
 
 using System;
 using System.Collections.Generic;
 
 using Xunit;
 
-public class AddSingleRecorders
+public sealed class AddSingleRecorders
 {
-    private static void TryRecordNamedArgument(ASemanticArgumentRecorder recorder, string parameterName, object? value) => recorder.TryRecordNamedArgument(parameterName, value);
-
     [Fact]
     public void Null_InvalidOperationExceptionWhenUsed()
     {
         NullGenericRecorder recorder = new();
 
-        var parameterName = Datasets.GetValidParameterName();
-        var value = Datasets.GetValidTypeSymbol();
-
-        var exception = Record.Exception(() => TryRecordNamedArgument(recorder, parameterName, value));
+        var exception = Record.Exception(() => RecordArgument(recorder));
 
         Assert.IsType<InvalidOperationException>(exception);
     }
@@ -27,10 +22,7 @@ public class AddSingleRecorders
     {
         NullNameRecorder recorder = new();
 
-        var parameterName = Datasets.GetValidParameterName();
-        var value = Datasets.GetValidTypeSymbol();
-
-        var exception = Record.Exception(() => TryRecordNamedArgument(recorder, parameterName, value));
+        var exception = Record.Exception(() => RecordArgument(recorder));
 
         Assert.IsType<InvalidOperationException>(exception);
     }
@@ -40,26 +32,22 @@ public class AddSingleRecorders
     {
         NullDelegateRecorder recorder = new();
 
-        var parameterName = Datasets.GetValidParameterName();
-        var value = Datasets.GetValidTypeSymbol();
-
-        var exception = Record.Exception(() => TryRecordNamedArgument(recorder, parameterName, value));
+        var exception = Record.Exception(() => RecordArgument(recorder));
 
         Assert.IsType<InvalidOperationException>(exception);
     }
 
     [Fact]
-    public void Duplicate_InvalidOperationExceptionWhenUsed()
+    public void DuplicateName_InvalidOperationExceptionWhenUsed()
     {
-        DuplicateGenericRecorder recorder = new();
+        DuplicateNameGenericRecorder recorder = new();
 
-        var parameterName = Datasets.GetValidParameterName();
-        var value = Datasets.GetValidTypeSymbol();
-
-        var exception = Record.Exception(() => TryRecordNamedArgument(recorder, parameterName, value));
+        var exception = Record.Exception(() => RecordArgument(recorder));
 
         Assert.IsType<InvalidOperationException>(exception);
     }
+
+    private static void RecordArgument(ASemanticArgumentRecorder recorder) => recorder.TryRecordNamedArgument(string.Empty, null);
 
     private sealed class NullGenericRecorder : ASemanticArgumentRecorder
     {
@@ -84,7 +72,7 @@ public class AddSingleRecorders
         }
     }
 
-    private sealed class DuplicateGenericRecorder : ASemanticArgumentRecorder
+    private sealed class DuplicateNameGenericRecorder : ASemanticArgumentRecorder
     {
         protected override IEnumerable<(string, DSemanticSingleRecorder)> AddSingleRecorders()
         {

@@ -6,6 +6,6 @@ using System.Diagnostics.CodeAnalysis;
 [AttributeUsage(AttributeTargets.Class)]
 public sealed class NamedAttribute : Attribute
 {
-    public object? Value { get; set; }
-    public object?[]? Values { get; set; }
+    public object? SingleValue { get; set; }
+    public object?[]? ArrayValue { get; set; }
 }

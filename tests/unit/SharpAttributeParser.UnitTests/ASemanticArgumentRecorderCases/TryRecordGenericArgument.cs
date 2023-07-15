@@ -1,24 +1,24 @@
-﻿namespace SharpAttributeParser.Tests.ASemanticArgumentRecorderCases;
+﻿namespace SharpAttributeParser.ASemanticArgumentRecorderCases;
 
 using Microsoft.CodeAnalysis;
 
+using Moq;
+
 using System;
+using System.Collections.Generic;
 
 using Xunit;
 
-public class TryRecordGenericArgument
+public sealed class TryRecordGenericArgument
 {
-    private static bool Target(ASemanticArgumentRecorder recorder, ITypeParameterSymbol parameter, ITypeSymbol value) => recorder.TryRecordGenericArgument(parameter, value);
+    private static bool Target(ISemanticArgumentRecorder recorder, ITypeParameterSymbol parameter, ITypeSymbol value) => recorder.TryRecordGenericArgument(parameter, value);
 
     [Fact]
     public void NullParameter_ArgumentNullException()
     {
         SemanticArgumentRecorder recorder = new(StringComparer.OrdinalIgnoreCase);
 
-        var parameter = Datasets.GetNullTypeParameter();
-        var value = Datasets.GetValidTypeSymbol();
-
-        var exception = Record.Exception(() => Target(recorder, parameter, value));
+        var exception = Record.Exception(() => Target(recorder, null!, Mock.Of<ITypeSymbol>()));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
@@ -28,45 +28,77 @@ public class TryRecordGenericArgument
     {
         SemanticArgumentRecorder recorder = new(StringComparer.OrdinalIgnoreCase);
 
-        var parameter = Datasets.GetMockedTypeParameter();
-        var value = Datasets.GetNullTypeSymbol();
-
-        var exception = Record.Exception(() => Target(recorder, parameter, value));
+        var exception = Record.Exception(() => Target(recorder, Mock.Of<ITypeParameterSymbol>(), null!));
 
         Assert.IsType<ArgumentNullException>(exception);
     }
 
     [Fact]
-    public void Matching_True_ArgumentRecorded()
+    public void MatchingName_True_Recorded()
     {
-        var comparerMock = ComparerMock.GetComparer(true);
+        var parameter = Mock.Of<ITypeParameterSymbol>(static (symbol) => symbol.Name == string.Empty && symbol.Ordinal == -1);
 
-        SemanticArgumentRecorder recorder = new(comparerMock.Object);
-
-        var parameter = Datasets.GetMockedTypeParameter();
-        var value = Datasets.GetValidTypeSymbol();
-
-        var actual = Target(recorder, parameter, value);
-
-        Assert.True(actual);
-
-        Assert.Equal(value, recorder.TGeneric);
+        TrueAndRecorded(StringComparerMock.CreateComparer(true), parameter);
     }
 
     [Fact]
-    public void NotMatching_False_ArgumentNotRecorded()
+    public void MatchingIndex_True_Recorded()
     {
-        var comparerMock = ComparerMock.GetComparer(false);
+        var parameter = Mock.Of<ITypeParameterSymbol>(static (symbol) => symbol.Name == string.Empty && symbol.Ordinal == 0);
 
-        SemanticArgumentRecorder recorder = new(comparerMock.Object);
+        TrueAndRecorded(StringComparerMock.CreateComparer(false), parameter);
+    }
 
-        var parameter = Datasets.GetMockedTypeParameter();
-        var value = Datasets.GetValidTypeSymbol();
+    [Fact]
+    public void MatchingNameAndIndexSameRecorder_True_Recorded()
+    {
+        var parameter = Mock.Of<ITypeParameterSymbol>(static (symbol) => symbol.Name == string.Empty && symbol.Ordinal == 0);
+
+        TrueAndRecorded(StringComparerMock.CreateComparer(true), parameter);
+    }
+
+    [Fact]
+    public void MatchingNameAndIndexDifferentRecorder_False_NotRecorded()
+    {
+        MultipleMatchingGenericRecorder recorder = new();
+
+        var parameter = Mock.Of<ITypeParameterSymbol>(static (symbol) => symbol.Name == string.Empty && symbol.Ordinal == 0);
+
+        var value = Mock.Of<ITypeSymbol>();
 
         var actual = Target(recorder, parameter, value);
 
         Assert.False(actual);
 
-        Assert.Null(recorder.TGeneric);
+        Assert.False(recorder.TRecorded);
+    }
+
+    [Fact]
+    public void NotMatching_False_NotRecorded()
+    {
+        SemanticArgumentRecorder recorder = new(StringComparerMock.CreateComparer(false));
+
+        var parameter = Mock.Of<ITypeParameterSymbol>(static (symbol) => symbol.Name == string.Empty && symbol.Ordinal == -1);
+
+        var actual = Target(recorder, parameter, Mock.Of<ITypeSymbol>());
+
+        Assert.False(actual);
+
+        Assert.False(recorder.TRecorded);
+    }
+
+    [AssertionMethod]
+    private static void TrueAndRecorded(IEqualityComparer<string> comparer, ITypeParameterSymbol parameter)
+    {
+        SemanticArgumentRecorder recorder = new(comparer);
+
+        var value = Mock.Of<ITypeSymbol>();
+
+        var actual = Target(recorder, parameter, value);
+
+        Assert.True(actual);
+
+        Assert.Equal(value, recorder.T, ReferenceEqualityComparer.Instance);
+        Assert.True(recorder.TRecorded);
     }
 }
