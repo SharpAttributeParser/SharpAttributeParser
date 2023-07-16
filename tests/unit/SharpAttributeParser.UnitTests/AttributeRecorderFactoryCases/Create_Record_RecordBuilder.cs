@@ -11,9 +11,9 @@ using System.Diagnostics.CodeAnalysis;
 
 using Xunit;
 
-public sealed class Create_Data_DataBuilder
+public sealed class Create_Record_RecordBuilder
 {
-    private static IAttributeRecorder<TData> Target<TData, TDataBuilder>(IAttributeRecorderFactory factory, IAttributeMapper<TDataBuilder> mapper, TDataBuilder dataBuilder) where TDataBuilder : IRecordBuilder<TData> => factory.Create<TData, TDataBuilder>(mapper, dataBuilder);
+    private static IAttributeRecorder<TRecord> Target<TRecord, TRecordBuilder>(IAttributeRecorderFactory factory, IAttributeMapper<TRecordBuilder> mapper, TRecordBuilder recordBuilder) where TRecordBuilder : IRecordBuilder<TRecord> => factory.Create<TRecord, TRecordBuilder>(mapper, recordBuilder);
 
     [Theory]
     [ClassData(typeof(FactorySources))]
@@ -85,27 +85,27 @@ public sealed class Create_Data_DataBuilder
         Assert.Equal<IReadOnlyList<ExpressionSyntax>>(constructorParamsArgumentSyntax, result.ConstructorParamsArgumentSyntax);
         Assert.Equal(namedArgumentSyntax, result.NamedArgumentSyntax);
 
-        IAttributeArgumentRecorder? tryMapTypeParameter(ITypeParameterSymbol parameter, DataRecordBuilder dataBuilder) => new AttributeArgumentRecorder((argument, syntax) =>
+        IAttributeArgumentRecorder? tryMapTypeParameter(ITypeParameterSymbol parameter, DataRecordBuilder recordBuilder) => new AttributeArgumentRecorder((argument, syntax) =>
         {
-            dataBuilder.WithTypeArgument(argument, syntax.AsT0);
+            recordBuilder.WithTypeArgument(argument, syntax.AsT0);
 
             return true;
         });
 
-        IAttributeConstructorArgumentRecorder? tryMapConstructorParameter(IParameterSymbol parameter, DataRecordBuilder dataBuilder) => new AttributeArgumentRecorder((argument, syntax) =>
+        IAttributeConstructorArgumentRecorder? tryMapConstructorParameter(IParameterSymbol parameter, DataRecordBuilder recordBuilder) => new AttributeArgumentRecorder((argument, syntax) =>
         {
             syntax.Switch
             (
-                (syntax) => dataBuilder.WithConstructorArgument(argument, syntax),
-                (elementSyntax) => dataBuilder.WithConstructorParamsArgument(argument, elementSyntax)
+                (syntax) => recordBuilder.WithConstructorArgument(argument, syntax),
+                (elementSyntax) => recordBuilder.WithConstructorParamsArgument(argument, elementSyntax)
             );
 
             return true;
         });
 
-        IAttributeArgumentRecorder? tryMapNamedParameter(string parameterName, DataRecordBuilder dataBuilder) => new AttributeArgumentRecorder((argument, syntax) =>
+        IAttributeArgumentRecorder? tryMapNamedParameter(string parameterName, DataRecordBuilder recordBuilder) => new AttributeArgumentRecorder((argument, syntax) =>
         {
-            dataBuilder.WithNamedArgument(argument, syntax.AsT0);
+            recordBuilder.WithNamedArgument(argument, syntax.AsT0);
 
             return true;
         });

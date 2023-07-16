@@ -19,11 +19,11 @@ internal sealed class NamedAttributeRecorderFactory : INamedAttributeRecorderFac
         ArgumentMapper = argumentMapper;
     }
 
-    IAttributeRecorder<INamedAttributeRecord> INamedAttributeRecorderFactory.Create() => Factory.Create<INamedAttributeRecord, INamedAttributeRecordBuilder>(ArgumentMapper, new NamedAttributeDataBuilder());
+    IAttributeRecorder<INamedAttributeRecord> INamedAttributeRecorderFactory.Create() => Factory.Create<INamedAttributeRecord, INamedAttributeRecordBuilder>(ArgumentMapper, new NamedAttributeRecordBuilder());
 
-    private sealed class NamedAttributeDataBuilder : INamedAttributeRecordBuilder
+    private sealed class NamedAttributeRecordBuilder : INamedAttributeRecordBuilder
     {
-        private NamedAttributeData Target { get; } = new();
+        private NamedAttributeRecord Target { get; } = new();
 
         INamedAttributeRecord IRecordBuilder<INamedAttributeRecord>.Build() => Target;
         ISemanticNamedAttributeRecord IRecordBuilder<ISemanticNamedAttributeRecord>.Build() => Target;
@@ -53,7 +53,7 @@ internal sealed class NamedAttributeRecorderFactory : INamedAttributeRecorderFac
             Target.ArrayValueSyntaxRecorded = true;
         }
 
-        private sealed class NamedAttributeData : INamedAttributeRecord
+        private sealed class NamedAttributeRecord : INamedAttributeRecord
         {
             public object? SimpleValue { get; set; }
             public bool SimpleValueRecorded { get; set; }

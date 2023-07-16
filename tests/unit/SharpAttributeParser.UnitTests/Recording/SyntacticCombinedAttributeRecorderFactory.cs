@@ -21,11 +21,11 @@ internal sealed class SyntacticCombinedAttributeRecorderFactory : ISyntacticComb
         ArgumentMapper = argumentMapper;
     }
 
-    ISyntacticAttributeRecorder<ISyntacticCombinedAttributeRecord> ISyntacticCombinedAttributeRecorderFactory.Create() => Factory.Create<ISyntacticCombinedAttributeRecord, ISyntacticCombinedAttributeRecordBuilder>(ArgumentMapper, new CombinedAttributeDataBuilder());
+    ISyntacticAttributeRecorder<ISyntacticCombinedAttributeRecord> ISyntacticCombinedAttributeRecorderFactory.Create() => Factory.Create<ISyntacticCombinedAttributeRecord, ISyntacticCombinedAttributeRecordBuilder>(ArgumentMapper, new CombinedAttributeRecordBuilder());
 
-    private sealed class CombinedAttributeDataBuilder : ISyntacticCombinedAttributeRecordBuilder
+    private sealed class CombinedAttributeRecordBuilder : ISyntacticCombinedAttributeRecordBuilder
     {
-        private CombinedAttributeData Target { get; } = new();
+        private CombinedAttributeRecord Target { get; } = new();
 
         ISyntacticCombinedAttributeRecord IRecordBuilder<ISyntacticCombinedAttributeRecord>.Build() => Target;
 
@@ -71,7 +71,7 @@ internal sealed class SyntacticCombinedAttributeRecorderFactory : ISyntacticComb
             Target.ArrayNamedValueSyntaxRecorded = true;
         }
 
-        private sealed class CombinedAttributeData : ISyntacticCombinedAttributeRecord
+        private sealed class CombinedAttributeRecord : ISyntacticCombinedAttributeRecord
         {
             public ExpressionSyntax? T1Syntax { get; set; }
             public bool T1SyntaxRecorded { get; set; }

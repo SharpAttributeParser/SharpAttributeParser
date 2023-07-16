@@ -11,9 +11,9 @@ using System.Diagnostics.CodeAnalysis;
 
 using Xunit;
 
-public sealed class Create_Data_DataBuilder
+public sealed class Create_Record_RecordBuilder
 {
-    private static ISyntacticAttributeRecorder<TData> Target<TData, TDataBuilder>(ISyntacticAttributeRecorderFactory factory, ISyntacticAttributeMapper<TDataBuilder> mapper, TDataBuilder dataBuilder) where TDataBuilder : IRecordBuilder<TData> => factory.Create<TData, TDataBuilder>(mapper, dataBuilder);
+    private static ISyntacticAttributeRecorder<TRecord> Target<TRecord, TRecordBuilder>(ISyntacticAttributeRecorderFactory factory, ISyntacticAttributeMapper<TRecordBuilder> mapper, TRecordBuilder recordBuilder) where TRecordBuilder : IRecordBuilder<TRecord> => factory.Create<TRecord, TRecordBuilder>(mapper, recordBuilder);
 
     [Theory]
     [ClassData(typeof(FactorySources))]
@@ -75,14 +75,14 @@ public sealed class Create_Data_DataBuilder
         Assert.Equal<IReadOnlyList<ExpressionSyntax>>(constructorParamsArgument, result.ConstructorParamsArgumentSyntax);
         Assert.Equal(namedArgument, result.NamedArgumentSyntax);
 
-        ISyntacticAttributeArgumentRecorder? tryMapTypeParameter(ITypeParameterSymbol parameter, DataRecordBuilder dataBuilder) => new SyntacticAttributeArgumentRecorder((syntax) =>
+        ISyntacticAttributeArgumentRecorder? tryMapTypeParameter(ITypeParameterSymbol parameter, DataRecordBuilder recordBuilder) => new SyntacticAttributeArgumentRecorder((syntax) =>
         {
             dataRecord.TypeArgumentSyntax = syntax.AsT0;
 
             return true;
         });
 
-        ISyntacticAttributeConstructorArgumentRecorder? tryMapConstructorParameter(IParameterSymbol parameter, DataRecordBuilder dataBuilder) => new SyntacticAttributeArgumentRecorder((syntax) =>
+        ISyntacticAttributeConstructorArgumentRecorder? tryMapConstructorParameter(IParameterSymbol parameter, DataRecordBuilder recordBuilder) => new SyntacticAttributeArgumentRecorder((syntax) =>
         {
             syntax.Switch
             (
@@ -93,7 +93,7 @@ public sealed class Create_Data_DataBuilder
             return true;
         });
 
-        ISyntacticAttributeArgumentRecorder? tryMapNamedParameter(string parameterName, DataRecordBuilder dataBuilder) => new SyntacticAttributeArgumentRecorder((syntax) =>
+        ISyntacticAttributeArgumentRecorder? tryMapNamedParameter(string parameterName, DataRecordBuilder recordBuilder) => new SyntacticAttributeArgumentRecorder((syntax) =>
         {
             dataRecord.NamedArgumentSyntax = syntax.AsT0;
 

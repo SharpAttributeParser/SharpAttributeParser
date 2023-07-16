@@ -21,11 +21,11 @@ internal sealed class SyntacticParamsAttributeRecorderFactory : ISyntacticParams
         ArgumentMapper = argumentMapper;
     }
 
-    ISyntacticAttributeRecorder<ISyntacticParamsAttributeRecord> ISyntacticParamsAttributeRecorderFactory.Create() => Factory.Create<ISyntacticParamsAttributeRecord, ISyntacticParamsAttributeRecordBuilder>(ArgumentMapper, new ParamsAttributeDataBuilder());
+    ISyntacticAttributeRecorder<ISyntacticParamsAttributeRecord> ISyntacticParamsAttributeRecorderFactory.Create() => Factory.Create<ISyntacticParamsAttributeRecord, ISyntacticParamsAttributeRecordBuilder>(ArgumentMapper, new ParamsAttributeRecordBuilder());
 
-    private sealed class ParamsAttributeDataBuilder : ISyntacticParamsAttributeRecordBuilder
+    private sealed class ParamsAttributeRecordBuilder : ISyntacticParamsAttributeRecordBuilder
     {
-        private ParamsAttributeData Target { get; } = new();
+        private ParamsAttributeRecord Target { get; } = new();
 
         ISyntacticParamsAttributeRecord IRecordBuilder<ISyntacticParamsAttributeRecord>.Build() => Target;
 
@@ -35,7 +35,7 @@ internal sealed class SyntacticParamsAttributeRecorderFactory : ISyntacticParams
             Target.ValueSyntaxRecorded = true;
         }
 
-        private sealed class ParamsAttributeData : ISyntacticParamsAttributeRecord
+        private sealed class ParamsAttributeRecord : ISyntacticParamsAttributeRecord
         {
             public OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> ValueSyntax { get; set; }
             public bool ValueSyntaxRecorded { get; set; }

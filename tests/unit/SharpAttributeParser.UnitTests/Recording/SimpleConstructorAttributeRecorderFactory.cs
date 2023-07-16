@@ -18,11 +18,11 @@ internal sealed class SimpleConstructorAttributeRecorderFactory : ISimpleConstru
         ArgumentMapper = argumentMapper;
     }
 
-    IAttributeRecorder<ISimpleConstructorAttributeRecord> ISimpleConstructorAttributeRecorderFactory.Create() => Factory.Create<ISimpleConstructorAttributeRecord, ISimpleConstructorAttributeRecordBuilder>(ArgumentMapper, new SimpleConstructorAttributeDataBuilder());
+    IAttributeRecorder<ISimpleConstructorAttributeRecord> ISimpleConstructorAttributeRecorderFactory.Create() => Factory.Create<ISimpleConstructorAttributeRecord, ISimpleConstructorAttributeRecordBuilder>(ArgumentMapper, new SimpleConstructorAttributeRecordBuilder());
 
-    private sealed class SimpleConstructorAttributeDataBuilder : ISimpleConstructorAttributeRecordBuilder
+    private sealed class SimpleConstructorAttributeRecordBuilder : ISimpleConstructorAttributeRecordBuilder
     {
-        private SimpleConstructorAttributeData Target { get; } = new();
+        private SimpleConstructorAttributeRecord Target { get; } = new();
 
         ISimpleConstructorAttributeRecord IRecordBuilder<ISimpleConstructorAttributeRecord>.Build() => Target;
         ISemanticSimpleConstructorAttributeRecord IRecordBuilder<ISemanticSimpleConstructorAttributeRecord>.Build() => Target;
@@ -40,7 +40,7 @@ internal sealed class SimpleConstructorAttributeRecorderFactory : ISimpleConstru
             Target.ValueSyntaxRecorded = true;
         }
 
-        private sealed class SimpleConstructorAttributeData : ISimpleConstructorAttributeRecord
+        private sealed class SimpleConstructorAttributeRecord : ISimpleConstructorAttributeRecord
         {
             public object? Value { get; set; }
             public bool ValueRecorded { get; set; }

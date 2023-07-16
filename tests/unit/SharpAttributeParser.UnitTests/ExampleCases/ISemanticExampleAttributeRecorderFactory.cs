@@ -1,5 +1,4 @@
-﻿namespace SharpAttributeParser.Recording;
-
+﻿namespace SharpAttributeParser.ExampleCases;
 public interface ISemanticExampleAttributeRecorderFactory
 {
     public abstract ISemanticAttributeRecorder<ISemanticExampleAttributeRecord> Create();

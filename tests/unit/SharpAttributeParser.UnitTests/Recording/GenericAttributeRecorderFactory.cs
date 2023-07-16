@@ -19,11 +19,11 @@ internal sealed class GenericAttributeRecorderFactory : IGenericAttributeRecorde
         ArgumentMapper = argumentMapper;
     }
 
-    IAttributeRecorder<IGenericAttributeRecord> IGenericAttributeRecorderFactory.Create() => Factory.Create<IGenericAttributeRecord, IGenericAttributeRecordBuilder>(ArgumentMapper, new GenericAttributeDataBuilder());
+    IAttributeRecorder<IGenericAttributeRecord> IGenericAttributeRecorderFactory.Create() => Factory.Create<IGenericAttributeRecord, IGenericAttributeRecordBuilder>(ArgumentMapper, new GenericAttributeRecordBuilder());
 
-    private sealed class GenericAttributeDataBuilder : IGenericAttributeRecordBuilder
+    private sealed class GenericAttributeRecordBuilder : IGenericAttributeRecordBuilder
     {
-        private GenericAttributeData Target { get; } = new();
+        private GenericAttributeRecord Target { get; } = new();
 
         IGenericAttributeRecord IRecordBuilder<IGenericAttributeRecord>.Build() => Target;
         ISemanticGenericAttributeRecord IRecordBuilder<ISemanticGenericAttributeRecord>.Build() => Target;
@@ -53,7 +53,7 @@ internal sealed class GenericAttributeRecorderFactory : IGenericAttributeRecorde
             Target.T2SyntaxRecorded = true;
         }
 
-        private sealed class GenericAttributeData : IGenericAttributeRecord
+        private sealed class GenericAttributeRecord : IGenericAttributeRecord
         {
             public ITypeSymbol? T1 { get; set; }
             public bool T1Recorded { get; set; }

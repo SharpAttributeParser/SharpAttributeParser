@@ -18,11 +18,11 @@ internal sealed class SyntacticNamedAttributeRecorderFactory : ISyntacticNamedAt
         ArgumentMapper = argumentMapper;
     }
 
-    ISyntacticAttributeRecorder<ISyntacticNamedAttributeRecord> ISyntacticNamedAttributeRecorderFactory.Create() => Factory.Create<ISyntacticNamedAttributeRecord, ISyntacticNamedAttributeRecordBuilder>(ArgumentMapper, new NamedAttributeDataBuilder());
+    ISyntacticAttributeRecorder<ISyntacticNamedAttributeRecord> ISyntacticNamedAttributeRecorderFactory.Create() => Factory.Create<ISyntacticNamedAttributeRecord, ISyntacticNamedAttributeRecordBuilder>(ArgumentMapper, new NamedAttributeRecordBuilder());
 
-    private sealed class NamedAttributeDataBuilder : ISyntacticNamedAttributeRecordBuilder
+    private sealed class NamedAttributeRecordBuilder : ISyntacticNamedAttributeRecordBuilder
     {
-        private NamedAttributeData Target { get; } = new();
+        private NamedAttributeRecord Target { get; } = new();
 
         ISyntacticNamedAttributeRecord IRecordBuilder<ISyntacticNamedAttributeRecord>.Build() => Target;
 
@@ -38,7 +38,7 @@ internal sealed class SyntacticNamedAttributeRecorderFactory : ISyntacticNamedAt
             Target.ArrayValueSyntaxRecorded = true;
         }
 
-        private sealed class NamedAttributeData : ISyntacticNamedAttributeRecord
+        private sealed class NamedAttributeRecord : ISyntacticNamedAttributeRecord
         {
             public ExpressionSyntax? SimpleValueSyntax { get; set; }
             public bool SimpleValueSyntaxRecorded { get; set; }

@@ -9,9 +9,9 @@ using System.Diagnostics.CodeAnalysis;
 
 using Xunit;
 
-public sealed class Create_Data_DataBuilder
+public sealed class Create_Record_RecordBuilder
 {
-    private static ISemanticAttributeRecorder<TData> Target<TData, TDataBuilder>(ISemanticAttributeRecorderFactory factory, ISemanticAttributeMapper<TDataBuilder> mapper, TDataBuilder dataBuilder) where TDataBuilder : IRecordBuilder<TData> => factory.Create<TData, TDataBuilder>(mapper, dataBuilder);
+    private static ISemanticAttributeRecorder<TRecord> Target<TRecord, TRecordBuilder>(ISemanticAttributeRecorderFactory factory, ISemanticAttributeMapper<TRecordBuilder> mapper, TRecordBuilder recordBuilder) where TRecordBuilder : IRecordBuilder<TRecord> => factory.Create<TRecord, TRecordBuilder>(mapper, recordBuilder);
 
     [Theory]
     [ClassData(typeof(FactorySources))]
@@ -70,23 +70,23 @@ public sealed class Create_Data_DataBuilder
         Assert.Equal(constructorArgument, result.ConstructorArgument);
         Assert.Equal(namedArgument, result.NamedArgument);
 
-        ISemanticAttributeArgumentRecorder? tryMapTypeParameter(ITypeParameterSymbol parameter, DataRecordBuilder dataBuilder) => new SemanticAttributeArgumentRecorder((argument) =>
+        ISemanticAttributeArgumentRecorder? tryMapTypeParameter(ITypeParameterSymbol parameter, DataRecordBuilder recordBuilder) => new SemanticAttributeArgumentRecorder((argument) =>
         {
-            dataBuilder.WithTypeArgument(argument);
+            recordBuilder.WithTypeArgument(argument);
 
             return true;
         });
 
-        ISemanticAttributeArgumentRecorder? tryMapConstructorParameter(IParameterSymbol parameter, DataRecordBuilder dataBuilder) => new SemanticAttributeArgumentRecorder((argument) =>
+        ISemanticAttributeArgumentRecorder? tryMapConstructorParameter(IParameterSymbol parameter, DataRecordBuilder recordBuilder) => new SemanticAttributeArgumentRecorder((argument) =>
         {
-            dataBuilder.WithConstructorArgument(argument);
+            recordBuilder.WithConstructorArgument(argument);
 
             return true;
         });
 
-        ISemanticAttributeArgumentRecorder? tryMapNamedParameter(string parameterName, DataRecordBuilder dataBuilder) => new SemanticAttributeArgumentRecorder((argument) =>
+        ISemanticAttributeArgumentRecorder? tryMapNamedParameter(string parameterName, DataRecordBuilder recordBuilder) => new SemanticAttributeArgumentRecorder((argument) =>
         {
-            dataBuilder.WithNamedArgument(argument);
+            recordBuilder.WithNamedArgument(argument);
 
             return true;
         });

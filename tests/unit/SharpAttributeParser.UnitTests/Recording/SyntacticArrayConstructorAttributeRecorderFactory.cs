@@ -18,11 +18,11 @@ internal sealed class SyntacticArrayConstructorAttributeRecorderFactory : ISynta
         ArgumentMapper = argumentMapper;
     }
 
-    ISyntacticAttributeRecorder<ISyntacticArrayConstructorAttributeRecord> ISyntacticArrayConstructorAttributeRecorderFactory.Create() => Factory.Create<ISyntacticArrayConstructorAttributeRecord, ISyntacticArrayConstructorAttributeRecordBuilder>(ArgumentMapper, new ArrayConstructorAttributeDataBuilder());
+    ISyntacticAttributeRecorder<ISyntacticArrayConstructorAttributeRecord> ISyntacticArrayConstructorAttributeRecorderFactory.Create() => Factory.Create<ISyntacticArrayConstructorAttributeRecord, ISyntacticArrayConstructorAttributeRecordBuilder>(ArgumentMapper, new ArrayConstructorAttributeRecordBuilder());
 
-    private sealed class ArrayConstructorAttributeDataBuilder : ISyntacticArrayConstructorAttributeRecordBuilder
+    private sealed class ArrayConstructorAttributeRecordBuilder : ISyntacticArrayConstructorAttributeRecordBuilder
     {
-        private ArrayConstructorAttributeData Target { get; } = new();
+        private ArrayConstructorAttributeRecord Target { get; } = new();
 
         ISyntacticArrayConstructorAttributeRecord IRecordBuilder<ISyntacticArrayConstructorAttributeRecord>.Build() => Target;
 
@@ -32,7 +32,7 @@ internal sealed class SyntacticArrayConstructorAttributeRecorderFactory : ISynta
             Target.ValueSyntaxRecorded = true;
         }
 
-        private sealed class ArrayConstructorAttributeData : ISyntacticArrayConstructorAttributeRecord
+        private sealed class ArrayConstructorAttributeRecord : ISyntacticArrayConstructorAttributeRecord
         {
             public ExpressionSyntax? ValueSyntax { get; set; }
             public bool ValueSyntaxRecorded { get; set; }

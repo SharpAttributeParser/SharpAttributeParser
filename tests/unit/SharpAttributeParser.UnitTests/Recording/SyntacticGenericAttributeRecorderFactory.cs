@@ -18,11 +18,11 @@ internal sealed class SyntacticGenericAttributeRecorderFactory : ISyntacticGener
         ArgumentMapper = argumentMapper;
     }
 
-    ISyntacticAttributeRecorder<ISyntacticGenericAttributeRecord> ISyntacticGenericAttributeRecorderFactory.Create() => Factory.Create<ISyntacticGenericAttributeRecord, ISyntacticGenericAttributeRecordBuilder>(ArgumentMapper, new GenericAttributeDataBuilder());
+    ISyntacticAttributeRecorder<ISyntacticGenericAttributeRecord> ISyntacticGenericAttributeRecorderFactory.Create() => Factory.Create<ISyntacticGenericAttributeRecord, ISyntacticGenericAttributeRecordBuilder>(ArgumentMapper, new GenericAttributeRecordBuilder());
 
-    private sealed class GenericAttributeDataBuilder : ISyntacticGenericAttributeRecordBuilder
+    private sealed class GenericAttributeRecordBuilder : ISyntacticGenericAttributeRecordBuilder
     {
-        private GenericAttributeData Target { get; } = new();
+        private GenericAttributeRecord Target { get; } = new();
 
         ISyntacticGenericAttributeRecord IRecordBuilder<ISyntacticGenericAttributeRecord>.Build() => Target;
 
@@ -38,7 +38,7 @@ internal sealed class SyntacticGenericAttributeRecorderFactory : ISyntacticGener
             Target.T2SyntaxRecorded = true;
         }
 
-        private sealed class GenericAttributeData : ISyntacticGenericAttributeRecord
+        private sealed class GenericAttributeRecord : ISyntacticGenericAttributeRecord
         {
             public ExpressionSyntax? T1Syntax { get; set; }
             public bool T1SyntaxRecorded { get; set; }

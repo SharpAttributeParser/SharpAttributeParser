@@ -19,11 +19,11 @@ internal sealed class ArrayConstructorAttributeRecorderFactory : IArrayConstruct
         ArgumentMapper = argumentMapper;
     }
 
-    IAttributeRecorder<IArrayConstructorAttributeRecord> IArrayConstructorAttributeRecorderFactory.Create() => Factory.Create<IArrayConstructorAttributeRecord, IArrayConstructorAttributeRecordBuilder>(ArgumentMapper, new ArrayConstructorAttributeDataBuilder());
+    IAttributeRecorder<IArrayConstructorAttributeRecord> IArrayConstructorAttributeRecorderFactory.Create() => Factory.Create<IArrayConstructorAttributeRecord, IArrayConstructorAttributeRecordBuilder>(ArgumentMapper, new ArrayConstructorAttributeRecordBuilder());
 
-    private sealed class ArrayConstructorAttributeDataBuilder : IArrayConstructorAttributeRecordBuilder
+    private sealed class ArrayConstructorAttributeRecordBuilder : IArrayConstructorAttributeRecordBuilder
     {
-        private ArrayConstructorAttributeData Target { get; } = new();
+        private ArrayConstructorAttributeRecord Target { get; } = new();
 
         IArrayConstructorAttributeRecord IRecordBuilder<IArrayConstructorAttributeRecord>.Build() => Target;
         ISemanticArrayConstructorAttributeRecord IRecordBuilder<ISemanticArrayConstructorAttributeRecord>.Build() => Target;
@@ -41,7 +41,7 @@ internal sealed class ArrayConstructorAttributeRecorderFactory : IArrayConstruct
             Target.ValueSyntaxRecorded = true;
         }
 
-        private sealed class ArrayConstructorAttributeData : IArrayConstructorAttributeRecord
+        private sealed class ArrayConstructorAttributeRecord : IArrayConstructorAttributeRecord
         {
             public IReadOnlyList<object?>? Value { get; set; }
             public bool ValueRecorded { get; set; }

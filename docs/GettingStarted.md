@@ -1,19 +1,19 @@
-# SharpAttributeParser [![NuGet version](https://img.shields.io/nuget/v/SharpAttributeParser.svg?style=plastic)](https://www.nuget.org/packages/SharpAttributeParser/) ![License](https://img.shields.io/github/license/ErikWe/sharp-attribute-parser?style=plastic) ![.NET Target](https://img.shields.io/badge/.NET%20Standard-2.0-blue?style=plastic)
+# Getting Started
 
-Parses C\# attributes using the Roslyn API, primarily intended for Analyzers and Source Generators.
+This article will explain in detail how to use `SharpAttributeParser` to parse an attribute. The pattern used will be as simple as possible, and therefore have many shortcomings. See [recommended pattern](RecommendedPattern/RecommendedPattern.md) for a more involved alternative.
 
-## Usage
+#### 1. Attribute Definition
 
-> This example shows the simplest possible usage. See [recommended pattern](docs/RecommendedPattern/RecommendedPattern.md) for an alternative.
-
-Given the following attribute:
+First, the attribute that will be used as an example throughout this article:
 
 ```csharp
-[Example<string>(new[] { 0, 1, 1, 2 }, name: "Fib", Answer = 41 + 1)]
-public class Foo { }
+[Example<Type>(new[] { 0, 1, 1, 2 }, name: "Fib", Answer = 41 + 1)]
+class Foo { }
 ```
 
-And the following representation of the attribute:
+#### 2. Representation Structure
+
+The desired result of parsing the attribute is the following structure:
 
 ```csharp
 class ExampleRecord
@@ -25,7 +25,9 @@ class ExampleRecord
 }
 ```
 
-A `Mapper` needs to be implemented, responsible for mapping parameters of the target attribute to `Recorders`:
+#### 3. Mapper Implementation
+
+We implement a `Mapper`, extending the abstract class `ASemanticAttributeMapper`.
 
 ```csharp
 class ExampleMapper : ASemanticAttributeMapper<ExampleRecord>
@@ -49,30 +51,26 @@ class ExampleMapper : ASemanticAttributeMapper<ExampleRecord>
 }
 ```
 
-Finally, we can use `SharpAttributeParser` to parse the attribute:
+#### 4. Usage
+
+We are now able to parse the attribute:
 
 ```csharp
 // The AttributeData representing the attribute.
 AttributeData attributeData;
 
-// Services are injected through DI.
-ISemanticAttributeParser parser;
-ISemanticAttributeRecorderFactory factory;
-ISemanticAttributeMapper<ExampleRecord> mapper;
+SemanticAttributeParser parser = new SemanticAttributeParser();
 
-ISemanticAttributeRecorder<ExampleRecord> recorder = factory.Create(mapper, new ExampleRecord());
+ExampleMapper mapper = new ExampleMapper();
+
+SemanticAttributeRecorderFactory factory = new SemanticAttributeRecorderFactory();
+
+ISemanticAttributeRecorder<IExampleRecord> recorder = factory.Create(mapper, new ExampleRecord());
 
 bool outcome = parser.TryParse(recorder, attributeData);
 
 if (outcome is true)
 {
     ExampleRecord result = recorder.GetRecord();
-
-    // 2, string, 42
-    Console.WriteLine($"{result.Sequence[3]}, {result.T.Name}, {result.Answer}");
 }
 ```
-
-## Getting Started
-
-See [Getting Started](docs/GettingStarted.md) and the [docs](docs/README.md) for more information.

@@ -2,6 +2,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
+using SharpAttributeParser.ExampleCases;
 using SharpAttributeParser.Extensions;
 using SharpAttributeParser.Recording;
 

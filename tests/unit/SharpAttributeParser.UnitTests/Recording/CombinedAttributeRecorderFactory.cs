@@ -22,11 +22,11 @@ internal sealed class CombinedAttributeRecorderFactory : ICombinedAttributeRecor
         ArgumentMapper = argumentMapper;
     }
 
-    IAttributeRecorder<ICombinedAttributeRecord> ICombinedAttributeRecorderFactory.Create() => Factory.Create<ICombinedAttributeRecord, ICombinedAttributeRecordBuilder>(ArgumentMapper, new CombinedAttributeDataBuilder());
+    IAttributeRecorder<ICombinedAttributeRecord> ICombinedAttributeRecorderFactory.Create() => Factory.Create<ICombinedAttributeRecord, ICombinedAttributeRecordBuilder>(ArgumentMapper, new CombinedAttributeRecordBuilder());
 
-    private sealed class CombinedAttributeDataBuilder : ICombinedAttributeRecordBuilder
+    private sealed class CombinedAttributeRecordBuilder : ICombinedAttributeRecordBuilder
     {
-        private CombinedAttributeData Target { get; } = new();
+        private CombinedAttributeRecord Target { get; } = new();
 
         ICombinedAttributeRecord IRecordBuilder<ICombinedAttributeRecord>.Build() => Target;
         ISemanticCombinedAttributeRecord IRecordBuilder<ISemanticCombinedAttributeRecord>.Build() => Target;
@@ -116,7 +116,7 @@ internal sealed class CombinedAttributeRecorderFactory : ICombinedAttributeRecor
             Target.ArrayNamedValueSyntaxRecorded = true;
         }
 
-        private sealed class CombinedAttributeData : ICombinedAttributeRecord
+        private sealed class CombinedAttributeRecord : ICombinedAttributeRecord
         {
             public ITypeSymbol? T1 { get; set; }
             public bool T1Recorded { get; set; }

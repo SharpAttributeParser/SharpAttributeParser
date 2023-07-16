@@ -18,11 +18,11 @@ internal sealed class SyntacticSimpleConstructorAttributeRecorderFactory : ISynt
         ArgumentMapper = argumentMapper;
     }
 
-    ISyntacticAttributeRecorder<ISyntacticSimpleConstructorAttributeRecord> ISyntacticSimpleConstructorAttributeRecorderFactory.Create() => Factory.Create<ISyntacticSimpleConstructorAttributeRecord, ISyntacticSimpleConstructorAttributeRecordBuilder>(ArgumentMapper, new SimpleConstructorAttributeDataBuilder());
+    ISyntacticAttributeRecorder<ISyntacticSimpleConstructorAttributeRecord> ISyntacticSimpleConstructorAttributeRecorderFactory.Create() => Factory.Create<ISyntacticSimpleConstructorAttributeRecord, ISyntacticSimpleConstructorAttributeRecordBuilder>(ArgumentMapper, new SimpleConstructorAttributeRecordBuilder());
 
-    private sealed class SimpleConstructorAttributeDataBuilder : ISyntacticSimpleConstructorAttributeRecordBuilder
+    private sealed class SimpleConstructorAttributeRecordBuilder : ISyntacticSimpleConstructorAttributeRecordBuilder
     {
-        private SimpleConstructorAttributeData Target { get; } = new();
+        private SimpleConstructorAttributeRecord Target { get; } = new();
 
         ISyntacticSimpleConstructorAttributeRecord IRecordBuilder<ISyntacticSimpleConstructorAttributeRecord>.Build() => Target;
 
@@ -32,7 +32,7 @@ internal sealed class SyntacticSimpleConstructorAttributeRecorderFactory : ISynt
             Target.ValueSyntaxRecorded = true;
         }
 
-        private sealed class SimpleConstructorAttributeData : ISyntacticSimpleConstructorAttributeRecord
+        private sealed class SimpleConstructorAttributeRecord : ISyntacticSimpleConstructorAttributeRecord
         {
             public ExpressionSyntax? ValueSyntax { get; set; }
             public bool ValueSyntaxRecorded { get; set; }

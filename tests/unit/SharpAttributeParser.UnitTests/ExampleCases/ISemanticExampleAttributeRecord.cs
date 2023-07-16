@@ -1,4 +1,4 @@
-﻿namespace SharpAttributeParser.Recording;
+﻿namespace SharpAttributeParser.ExampleCases;
 
 using Microsoft.CodeAnalysis;
 

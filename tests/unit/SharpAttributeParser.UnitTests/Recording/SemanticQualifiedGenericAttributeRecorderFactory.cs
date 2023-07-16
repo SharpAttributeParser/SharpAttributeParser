@@ -18,11 +18,11 @@ internal sealed class SemanticQualifiedGenericAttributeRecorderFactory : ISemant
         ArgumentMapper = argumentMapper;
     }
 
-    ISemanticAttributeRecorder<ISemanticQualifiedGenericAttributeRecord> ISemanticQualifiedGenericAttributeRecorderFactory.Create() => Factory.Create<ISemanticQualifiedGenericAttributeRecord, ISemanticQualifiedGenericAttributeRecordBuilder>(ArgumentMapper, new QualifiedGenericAttributeDataBuilder());
+    ISemanticAttributeRecorder<ISemanticQualifiedGenericAttributeRecord> ISemanticQualifiedGenericAttributeRecorderFactory.Create() => Factory.Create<ISemanticQualifiedGenericAttributeRecord, ISemanticQualifiedGenericAttributeRecordBuilder>(ArgumentMapper, new QualifiedGenericAttributeRecordBuilder());
 
-    private sealed class QualifiedGenericAttributeDataBuilder : ISemanticQualifiedGenericAttributeRecordBuilder
+    private sealed class QualifiedGenericAttributeRecordBuilder : ISemanticQualifiedGenericAttributeRecordBuilder
     {
-        private QualifiedGenericAttributeData Target { get; } = new();
+        private QualifiedGenericAttributeRecord Target { get; } = new();
 
         ISemanticQualifiedGenericAttributeRecord IRecordBuilder<ISemanticQualifiedGenericAttributeRecord>.Build() => Target;
 
@@ -38,7 +38,7 @@ internal sealed class SemanticQualifiedGenericAttributeRecorderFactory : ISemant
             Target.T2Recorded = true;
         }
 
-        private sealed class QualifiedGenericAttributeData : ISemanticQualifiedGenericAttributeRecord
+        private sealed class QualifiedGenericAttributeRecord : ISemanticQualifiedGenericAttributeRecord
         {
             public ITypeSymbol T1 { get; set; } = null!;
             public bool T1Recorded { get; set; }

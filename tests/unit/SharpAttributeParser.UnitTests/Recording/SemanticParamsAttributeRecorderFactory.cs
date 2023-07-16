@@ -17,11 +17,11 @@ internal sealed class SemanticParamsAttributeRecorderFactory : ISemanticParamsAt
         ArgumentMapper = argumentMapper;
     }
 
-    ISemanticAttributeRecorder<ISemanticParamsAttributeRecord> ISemanticParamsAttributeRecorderFactory.Create() => Factory.Create<ISemanticParamsAttributeRecord, ISemanticParamsAttributeRecordBuilder>(ArgumentMapper, new ParamsAttributeDataBuilder());
+    ISemanticAttributeRecorder<ISemanticParamsAttributeRecord> ISemanticParamsAttributeRecorderFactory.Create() => Factory.Create<ISemanticParamsAttributeRecord, ISemanticParamsAttributeRecordBuilder>(ArgumentMapper, new ParamsAttributeRecordBuilder());
 
-    private sealed class ParamsAttributeDataBuilder : ISemanticParamsAttributeRecordBuilder
+    private sealed class ParamsAttributeRecordBuilder : ISemanticParamsAttributeRecordBuilder
     {
-        private ParamsAttributeData Target { get; } = new();
+        private ParamsAttributeRecord Target { get; } = new();
 
         ISemanticParamsAttributeRecord IRecordBuilder<ISemanticParamsAttributeRecord>.Build() => Target;
 
@@ -31,7 +31,7 @@ internal sealed class SemanticParamsAttributeRecorderFactory : ISemanticParamsAt
             Target.ValueRecorded = true;
         }
 
-        private sealed class ParamsAttributeData : ISemanticParamsAttributeRecord
+        private sealed class ParamsAttributeRecord : ISemanticParamsAttributeRecord
         {
             public IReadOnlyList<object?>? Value { get; set; }
             public bool ValueRecorded { get; set; }

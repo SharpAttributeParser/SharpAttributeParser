@@ -1,8 +1,6 @@
-﻿namespace SharpAttributeParser.SemanticAttributeParserCases;
+﻿namespace SharpAttributeParser.ExampleCases;
 
 using Microsoft.CodeAnalysis;
-
-using SharpAttributeParser.Recording;
 
 using System.Threading.Tasks;
 
