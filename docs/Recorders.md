@@ -2,7 +2,7 @@
 
 When parsing attributes, a user-provided `Recorder`-object is required. The responsibility of the `Recorder` is to record the data parsed by the `Parser`.
 
-> In the [recommended pattern](RecommendedPattern/RecommendedPattern.md), the user is not expected to implement a `Recorder` - but is instead tasked with implementing a `Mapper`, which you can read more about [here](Mappers.md).
+> In the [recommended pattern](RecommendedPattern.md), the user is not expected to implement a `Recorder` - but is instead tasked with implementing a `Mapper`, which you can read more about [here](Mappers.md).
 
 `SharpAttributeParser` defines three `Recorder` APIs, one for each [parsing mode](ParsingModes.md):
 * `ISemanticRecorder`
@@ -31,11 +31,11 @@ bool ICombinedRecorder.TryRecordDefaultConstructorArgument(IParameterSymbol, obj
 bool ICombinedRecorder.TryRecordNamedArgument(string, object?, ExpressionSyntax);
 ```
 
-The first argument of each method identifies a parameter, with the remaining arguments describing an argument of that parameter. Note that type-safety is lost when attributes are parsed semantically - the [recommended pattern](RecommendedPattern/RecommendedPattern.md) resolves this issue.
+The first argument of each method identifies a parameter, with the remaining arguments describing an argument of that parameter. Note that type-safety is lost when attributes are parsed semantically - the [recommended pattern](RecommendedPattern.md) resolves this issue.
 
 ### Implementation
 
-Again, the [recommended pattern](RecommendedPattern/RecommendedPattern.md) does not involve actually implementing a `Recorder`. If you have another pattern in mind, you will currently need to implement the relevant `Recorder`-API from scratch.
+Again, the [recommended pattern](RecommendedPattern.md) does not involve actually implementing a `Recorder`. If you have another pattern in mind, you will currently need to implement the relevant `Recorder`-API from scratch.
 
 ### Recorder Factories
 
