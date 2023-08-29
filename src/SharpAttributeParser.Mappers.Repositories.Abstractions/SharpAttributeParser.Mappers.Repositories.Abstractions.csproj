@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>SharpAttributeParser.Mappers.Repositories</RootNamespace>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Title>SharpAttributeParser.Mappers.Repositories.Abstractions</Title>
+        <Description>
+            Provides abstractions of SharpAttributeParser.Mappers.Repositories.
+        </Description>
+        <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="README.nupkg.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="OneOf" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SharpAttributeParser.Mappers.Abstractions\SharpAttributeParser.Mappers.Abstractions.csproj" />
+        <ProjectReference Include="..\SharpAttributeParser.Patterns.Abstractions\SharpAttributeParser.Patterns.Abstractions.csproj" />
+    </ItemGroup>
+
+</Project>

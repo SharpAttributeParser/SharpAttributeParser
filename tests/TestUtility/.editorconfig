@@ -1,0 +1,7 @@
+[*.cs]
+
+# Validate arguments of public methods
+dotnet_diagnostic.CA1062.severity = none
+
+# Consider calling ConfigureAwait on the awaited task
+dotnet_diagnostic.CA2007.severity = none

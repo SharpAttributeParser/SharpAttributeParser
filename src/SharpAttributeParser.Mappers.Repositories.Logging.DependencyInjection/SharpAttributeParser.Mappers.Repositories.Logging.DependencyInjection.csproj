@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>SharpAttributeParser.Mappers.Repositories.Logging</RootNamespace>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Title>SharpAttributeParser.Mappers.Repositories.Logging.DependencyInjection</Title>
+        <Description>
+            Allows the services provided by SharpAttributeParser.Mappers.Repositories.Logging to be registered with DI-containers.
+        </Description>
+        <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="README.nupkg.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SharpAttributeParser.Logging.DependencyInjection\SharpAttributeParser.Logging.DependencyInjection.csproj" />
+        <ProjectReference Include="..\SharpAttributeParser.Mappers.Repositories.Logging\SharpAttributeParser.Mappers.Repositories.Logging.csproj" />
+    </ItemGroup>
+
+</Project>

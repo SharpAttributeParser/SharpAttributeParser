@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>SharpAttributeParser.Mappers.Repositories</RootNamespace>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Title>SharpAttributeParser.Mappers.Repositories</Title>
+        <Description>
+            Adds repositories to SharpAttributeParser.Mappers, handling collections of mapped argument recorders.
+        </Description>
+        <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="README.nupkg.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SharpAttributeParser.Mappers.Repositories.Abstractions\SharpAttributeParser.Mappers.Repositories.Abstractions.csproj" />
+        <ProjectReference Include="..\SharpAttributeParser.Mappers.Repositories.Logging\SharpAttributeParser.Mappers.Repositories.Logging.csproj" />
+    </ItemGroup>
+
+</Project>

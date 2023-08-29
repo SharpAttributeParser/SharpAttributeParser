@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>SharpAttributeParser.Mappers.Logging</RootNamespace>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Title>SharpAttributeParser.Mappers.Logging.Abstractions</Title>
+        <Description>
+            Provides abstractions of SharpAttributeParser.Mappers.Logging.
+        </Description>
+        <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="README.nupkg.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SharpAttributeParser.Mappers.Abstractions\SharpAttributeParser.Mappers.Abstractions.csproj" />
+        <ProjectReference Include="..\SharpAttributeParser.Mappers.Repositories.Abstractions\SharpAttributeParser.Mappers.Repositories.Abstractions.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <RootNamespace>SharpAttributeParser</RootNamespace>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="OneOf" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="xunit" />
+    </ItemGroup>
+
+</Project>
