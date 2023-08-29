@@ -1,0 +1,10 @@
+[*.cs]
+
+# Identifiers should not contain underscores
+dotnet_diagnostic.CA1707.severity = none
+
+# Identifiers should not have incorrect suffix
+dotnet_diagnostic.CA1711.severity = none
+
+# Identifiers should not match keywords
+dotnet_diagnostic.CA1716.severity = none

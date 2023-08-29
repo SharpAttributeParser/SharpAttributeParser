@@ -1,3 +1,0 @@
-﻿namespace SharpAttributeParser.Recording;
-
-public interface ISimpleConstructorAttributeRecord : ISemanticSimpleConstructorAttributeRecord, ISyntacticSimpleConstructorAttributeRecord { }

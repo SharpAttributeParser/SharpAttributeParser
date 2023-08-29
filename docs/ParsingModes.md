@@ -1,40 +1,19 @@
 # Parsing Modes
 
-`SharpAttributeParser` defines two parsing modes: **semantic** and **syntactic**. These two modes can also be applied simultaneously, to perform **combined** parsing.
-
-The following attribute will be used as an example throughout this article:
-
-```csharp
-[Example<Type>(new[] { 0, 1, 1, 2 }, name: "Fib", Answer = 41 + 1)]
-class Foo { }
-```
+`SharpAttributeParser` defines three parsing modes:
 
 ##### Semantic Parsing
 
-Semantic parsing is the most common mode, and involves recording the actual attribute arguments. The following structure could be used to represent the result of semantically parsing the attribute shown above:
-
-```csharp
-interface ISemanticExampleRecord
-{
-    ITypeSymbol T { get; }
-    IReadOnlyList<int> Sequence { get; }
-    string Name { get; }
-    int? Answer { get; }
-}
-```
+Semantic parsing is the most common mode, and involves recording the actual arguments of attribute parameters.
 
 ##### Syntactic Parsing
 
-> Syntactic parsing is not always possible, as it requires access to the `AttributeSyntax` - which may not be available for imported types.
+> Syntactic parsing is not always possible, as it requires a syntactic description of the attribute - which may not be available for imported attributes. Note that a local attribute of an imported attribute-class is supported.
 
-Syntactic parsing records how each attribute argument was expressed. When using a syntactic `Parser`, the `Recorder` will be provided `Microsoft.CodeAnalysis.CSharp.Syntax.ExpressionSyntax`, which can be further analyzed. For example, the `Microsoft.CodeAnalysis.Location` of each argument can be extracted - useful when issuing diagnostics about some attribute argument. The following structure could be used to represent the result of syntactically parsing the attribute shown above:
+Syntactic parsing is used to record information about how each argument was expressed. A `ISyntacticRecorder` will be provided `ExpressionSyntax`, which can be further analyzed to extract the desired syntactic information. For example, the `Location` of each argument can be extracted - useful when issuing diagnostics about attribute arguments.
 
-```csharp
-interface ISyntacticExampleRecord
-{
-    ExpressionSyntax T { get; }
-    ExpressionSyntax Sequence { get; }
-    ExpressionSyntax Name { get; }
-    ExpressionSyntax Answer { get; }
-}
-```
+##### Combined Parsing
+
+> Combined parsing is not always possible, as it involves syntactic parsing.
+
+Combined parsing is a combination of semantic and syntactic parsing - simultaneously recording arguments and syntactic information about the arguments.

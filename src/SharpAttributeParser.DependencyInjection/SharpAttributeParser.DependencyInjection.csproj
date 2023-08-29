@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>SharpAttributeParser</RootNamespace>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Title>SharpAttributeParser.DependencyInjection</Title>
+        <Description>
+            Allows the services provided by SharpAttributeParser to be registered with DI-containers.
+        </Description>
+        <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="README.nupkg.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SharpAttributeParser.Logging.DependencyInjection\SharpAttributeParser.Logging.DependencyInjection.csproj" />
+        <ProjectReference Include="..\SharpAttributeParser\SharpAttributeParser.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -1,72 +1,73 @@
-# Attribute Mappers
+# Mappers
 
-> `Mappers` are not an essential component of `SharpAttributeParser`, but is used in the [recommended pattern](RecommendedPattern/RecommendedPattern.md). If using another pattern, you will likely need to implement a `Recorder` instead, which you can read more about [here](Recorders.md).
+> `Mappers` are provided by the add-on package [SharpAttributeParser.Mappers](https://www.nuget.org/packages/SharpAttributeParser.Mappers/).
 
-Each `Parser` of `SharpAttributeParser` requires a user-provided `Recorder`-object. The role of `Mappers` is to act as blueprints when constructing such `Recorders`. Below is part of the API of the service `ISemanticAttributeRecorderFactory`, which uses the provided `Mapper` to construct a `ISemanticAttributeRecorder`. Similar patterns exists for each [parsing mode](ParsingModes.md), but this article will only consider semantic parsing.
+Each `Parser`-service of `SharpAttributeParser` requires a user-provided `Recorder`-object. The role of `Mappers` is to act as blueprints for constructing `Recorders`. `SharpAttributeParser` defines three types of `Mappers`, one for each [parsing mode](ParsingModes.md).
+* `ISemanticMapper<TRecord>`
+* `ISyntacticMapper<TRecord>`
+* `ICombinedMapper<TRecord>`
+
+The type parameter of each `Mapper` describes the type to which the parsed data is recorded by the constructed `Recorders`.
+
+### Usage
+
+A `Mapper` can be used to construct a `Recorder` using the following factory-services:
+* `ISemanticRecorderFactory`
+* `ISyntacticRecorderFactory`
+* `ICombinedRecorderFactor`
+
+These can be injected using the add-on package [SharpAttributeParser.Mappers.DependencyInjection](https://www.nuget.org/packages/SharpAttributeParser.Mappers.DependencyInjection/), or through the implementations `SemanticRecorderFactory`, `SyntacticRecorderFactory`, and `CombinedRecorderFactory`.
+
+### Implementation
+
+Typically, each attribute-class will require a separate `Mapper`-implementation. These can be implemented by manually implementing the `Mapper`-API, or by extending one of five abstract base-classes:
+* `ASemanticMapper<TRecord>`
+* `ASyntacticMapper<TRecord>`
+* `ACombinedMapper<TRecord>`
+* `ASplitMapper<TSemanticRecord, TSyntacticRecord>`
+* `AAdaptiveMapper<TCombinedRecord, TSemanticRecord>`
+
+The first three base-classes each directly correspond to a `Recorder`-kind, while the last two base-classes each allow construction of two different kinds of `Recorders` (`ISemanticRecorder` and `ISyntacticRecorder` for `ASplitMapper`, `ICombinedRecorder` and `ISemanticRecorder` for `AAdaptiveMapper`).
+
+##### Extending abstract Mappers
+
+> The following demonstration will use `ASemanticMapper`, but the other four base-`Mappers` have very similar behaviour.
+
+`ASemanticMapper<TRecord>` contains a `Repository` with mappings from parameters to `MappedRecorders`, reponsible for recording arguments of that specific parameter. The `Repository` is modified by overriding the abstract method `AddMappings`:
 
 ```csharp
-ISemanticAttributeRecorder Create<TRecord>(ISemanticAttributeMapper<TRecord>, TRecord);
+void AddMappings(IAppendableSemanticMappingRepository<TRecord>);
 ```
 
-As can be deduced, the `Recorder` is closely linked to the provided `TRecord` (which represents the parsed data), while the `Mapper` is kept separated from the instantiated `TRecord`. This separation is one of the main benefits of using `Mappers` over `Recorders`.
+This method is invoked by the base-class when the `Mapper` is initialized - which occurs the first time the `Mapper` is used. After initialization, new mappings should not be added to the `Repository`. Read more about `Repositories` [here](Repositories.md).
 
-#### Usage
-
-The API of `ISemanticAttributeMapper` is shown below. The produced `ISemanticAttributeArgumentRecorder` is responsible for recording arguments to the provided `TRecord`.
+Below is an example of a simple `Mapper` implemented through `ASemanticMapper<TRecord>`. See the [recommended pattern](docs/RecommendedPattern/RecommendedPattern.md) for a slightly improved pattern. 
 
 ```csharp
-ISemanticAttributeArgumentRecorder? TryMapTypeParameter(ITypeParameterSymbol, TRecord);
-ISemanticAttributeArgumentRecorder? TryMapConstructorParameter(IParameterSymbol, TRecord);
-ISemanticAttributeArgumentRecorder? TryMapNamedParameter(string, TRecord);
-```
-
-The first argument passed to the `Mapper` identifies an attribute parameter, while the second argument represents the `TRecord` to which the parsed argument of that parameter will be recorded (by the produced `ISemanticAttributeArgumentRecorder`).
-
-#### Implementation
-
-Typically, each distinct attribute-type that should be parse-able will require separate `Mapper`-implementations.
-
-In most cases, each implementation of a `Mapper` may extend the abstract class `ASemanticAttributeMapper`. Below is an example of such an implementation. The [recommended pattern](RecommendedPattern/RecommendedPattern.md) presents some minor adjustments to this example.
-
-First, the attribute that is handled by the example:
-
-```csharp
-[Example<Type>(new[] { 0, 1, 1, 2 }, name: "Fib", Answer = 41 + 1)]
-class Foo { }
-```
-
-... the type representing the parsed data:
-
-```csharp
-interface IExampleRecord
+class ExampleMapper : ASemanticMapper<ExampleRecord>
 {
-    ITypeSymbol T { get; set; }
-    IReadOnlyList<int> Sequence { get; set; }
-    string Name { get; set; }
-    int? Answer { get; set; }
-}
-```
-
-... and, finally, the implemented `Mapper`:
-
-```csharp
-class ExampleMapper : ASemanticAttributeMapper<IExampleRecord>
-{
-    protected override IEnumerable<(OneOf<int, string>, DTypeArgumentRecorder)> AddTypeParameterMappings()
+    protected override void AddMappings(IAppendableSemanticMappingRepository<ExampleRecord> repository)
     {
-        yield return (0, Adapters.TypeArgument.For(RecordT));
+        // Add mappings from parameters to recorders
+        repository.TypeParameters.AddIndexedMapping(0, (factory) => factory.Create(RecordTypeArgument));
+        repository.ConstructorParameters.AddNamedMapping("constructorArgument", (factory) => factory.Create(ConstructorArgumentPattern, RecordConstructorArgument));
+        repository.ConstructorParameters.AddNamedMapping("optionalArgument", (factory) => factory.Create(OptionalArgumentPattern, RecordOptionalArgument));
+        repository.ConstructorParameters.AddNamedMapping("paramsArgument", (factory) => factory.Create(ParamsArgumentPattern, RecordParamsArgument));
+        repository.NamedParameters.AddNamedMapping("NamedArgument", (factory) => factory.Create(NamedArgumentPattern, RecordNamedArgument));
     }
 
-    protected override IEnumerable<(string, DArgumentRecorder)> AddParameterMappings()
-    {
-        yield return (nameof(ExampleAttribute<object>.Sequence), Adapters.ArrayArgument.For<int>(RecordSequence));
-        yield return (nameof(ExampleAttribute<object>.Name), Adapters.SimpleArgument.For<string>(RecordName));
-        yield return (nameof(ExampleAttribute<object>.Answer), Adapters.SimpleArgument.For<int>(RecordAnswer));
-    }
+    // Create the patterns used to make arguments strongly typed
+    IArgumentPattern<StringComparison> ConstructorArgumentPattern(IArgumentPatternFactory factory) => factory.Enum<StringComparison>();
+    IArgumentPattern<string?> OptionalArgumentPattern(IArgumentPatternFactory factory) => factory.NullableString();
+    IArgumentPattern<int[]> ParamsArgumentPattern(IArgumentPatternFactory factory) => factory.NonNullableArray(factory.Int());
+    IArgumentPattern<ITypeSymbol?> NamedArgumentPattern(IArgumentPatternFactory factory) => factory.NullableType();
 
-    void RecordT(IExampleRecord dataRecord, ITypeSymbol t) => dataRecord.T = t;
-    void RecordSequence(IExampleRecord dataRecord, IReadOnlyList<int> sequence) => dataRecord.Sequence = sequence;
-    void RecordName(IExampleRecord dataRecord, string name) => dataRecord.Name = name;
-    void RecordAnswer(IExampleRecord dataRecord, int answer) => dataRecord.Answer = answer;
+
+    // Record the arguments of parameters
+    void RecordTypeArgument(ExampleRecord dataRecord, ITypeSymbol typeArgument) => dataRecord.TypeArgument = typeArgument;
+    void RecordConstructorArgument(ExampleRecord dataRecord, StringComparison constructorArgument) => dataRecord.ConstructorArgument = constructorArgument;
+    void RecordOptionalArgument(ExampleRecord dataRecord, string? optionalArgument) => dataRecord.OptionalArgument = optionalArgument;
+    void RecordParamsArgument(ExampleRecord dataRecord, IReadOnlyList<int> paramsArgument) => dataRecord.ParamsArgument = paramsArgument;
+    void RecordNamedArgument(ExampleRecord dataRecord, ITypeSymbol namedArgument) => dataRecord.NamedArgument = namedArgument;
 }
 ```

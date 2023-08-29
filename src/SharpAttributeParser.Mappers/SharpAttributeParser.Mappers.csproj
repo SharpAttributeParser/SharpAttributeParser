@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>SharpAttributeParser.Mappers</RootNamespace>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Title>SharpAttributeParser.Mappers</Title>
+        <Description>
+            Adds mappers to SharpAttributeParser, acting as blueprints for recorders.
+        </Description>
+        <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="README.nupkg.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SharpAttributeParser.Mappers.Abstractions\SharpAttributeParser.Mappers.Abstractions.csproj" />
+        <ProjectReference Include="..\SharpAttributeParser.Mappers.Logging\SharpAttributeParser.Mappers.Logging.csproj" />
+        <ProjectReference Include="..\SharpAttributeParser.Mappers.Repositories\SharpAttributeParser.Mappers.Repositories.csproj" />
+        <ProjectReference Include="..\SharpAttributeParser.Patterns\SharpAttributeParser.Patterns.csproj" />
+    </ItemGroup>
+
+</Project>

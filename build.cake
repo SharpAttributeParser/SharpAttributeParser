@@ -211,6 +211,6 @@ Task("Publish")
     .IsDependentOn("Publish-NuGet");
 
 Task("Default")
-    .IsDependentOn("Test");
+    .IsDependentOn("Pack");
 
 RunTarget(Argument("target", "Default"));

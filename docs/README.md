@@ -1,12 +1,8 @@
 # Documentation
 
-Welcome to the `SharpAttributeParser` documentation!
-
-These are the available articles, roughly ordered by complexity:
-
-1. [Getting Started](GettingStarted.md) - describes how to parse your first attribute
-2. [Parsing Modes](ParsingModes.md) - presents the different modes of parsing attributes.
-3. [Parsers](Parsers.md) - discusses the components used to parse attributes
-4. [Recorders](Recorders.md) - discusses the components used to record the parsed attributes
-5. [Mappers](Mappers.md) - discusses blueprints for recorders
-6. [Recommended Pattern](RecommendedPattern/RecommendedPattern.md) - presents the 'recommended' pattern
+1. [Parsing Modes](ParsingModes.md) - Presents the different modes of parsing attributes.
+2. [Parsers](Parsers.md) - Presents the `Parsers` used to parse attributes.
+3. [Recorders](Recorders.md) - Presents `Recorders`, used by `Parsers` to record attribute arguments.
+4. [Mappers](Mappers.md) - Presents `Mappers`, used as blueprints for constructing `Recorders`.
+5. [Repositories](Repositories.md) - Presents `Repositories`, used by `Mappers` to handle mappings from attribute parameters to `MappedRecorders`.
+6. [Recommended Pattern](RecommendedPattern/RecommendedPattern.md) - Presents the recommended pattern.

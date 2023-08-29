@@ -1,0 +1,4 @@
+[*.cs]
+
+# Identifiers should not contain underscores
+dotnet_diagnostic.CA1707.severity = none

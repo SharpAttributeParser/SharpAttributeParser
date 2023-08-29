@@ -1,3 +1,0 @@
-﻿namespace SharpAttributeParser.Recording;
-
-public interface IQualifiedGenericAttributeRecordBuilder : IRecordBuilder<IQualifiedGenericAttributeRecord>, ISemanticQualifiedGenericAttributeRecordBuilder, ISyntacticQualifiedGenericAttributeRecordBuilder { }

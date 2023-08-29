@@ -1,3 +1,0 @@
-﻿namespace SharpAttributeParser.Recording;
-
-internal interface IArrayConstructorAttributeRecordBuilder : IRecordBuilder<IArrayConstructorAttributeRecord>, ISemanticArrayConstructorAttributeRecordBuilder, ISyntacticArrayConstructorAttributeRecordBuilder { }

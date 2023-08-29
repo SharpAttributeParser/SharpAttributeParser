@@ -1,78 +1,83 @@
 # SharpAttributeParser [![NuGet version](https://img.shields.io/nuget/v/SharpAttributeParser.svg?style=plastic)](https://www.nuget.org/packages/SharpAttributeParser/) ![License](https://img.shields.io/github/license/ErikWe/sharp-attribute-parser?style=plastic) ![.NET Target](https://img.shields.io/badge/.NET%20Standard-2.0-blue?style=plastic)
 
-Parses C\# attributes using the Roslyn API, primarily intended for Analyzers and Source Generators.
+Parses C\# attributes using the Roslyn API, primarily intended for Analyzers and Source Generators - simplifying the process of interpreting `AttributeData` and extracting strongly-typed descriptions of attributes.
 
-## Usage
+### Features
 
-> This example shows the simplest possible usage. See [recommended pattern](docs/RecommendedPattern/RecommendedPattern.md) for an alternative.
+`SharpAttributeParser` allows parsing of the following attribute argument kinds:
+* Type Arguments
+* Constructor Arguments (normal, default, params)
+* Named Arguments
 
-Given the following attribute:
+Attribute arguments can be parsed in three modes:
+* Semantic Mode - Records the actual attribute arguments.
+* Syntactic Mode - Records syntactic information about the attribute arguments, using `ExpressionSyntax`.
+* Combined Mode - Combines the Semantic and Syntactic modes.
+
+### Usage
+
+> The add-on package [SharpAttributeParser.Mappers](https://www.nuget.org/packages/SharpAttributeParser.Mappers/) is required to use the library as demonstrated here.
+
+A `Mapper` is a user-implemented component used to map each parameter of an attribute-class to a `MappedRecorder`, which in turn is responsible for recording the arguments of that specific parameter. Typically, each attribute-class requires a separate `Mapper`-implementation. Below is an implementation of a `Mapper`, used to semantically parse the arguments of an attribute to `ExampleRecord`. See the [recommended pattern](docs/RecommendedPattern/RecommendedPattern.md) for a slightly improved pattern.
 
 ```csharp
-[Example<string>(new[] { 0, 1, 1, 2 }, name: "Fib", Answer = 41 + 1)]
-public class Foo { }
-```
-
-And the following representation of the attribute:
-
-```csharp
-class ExampleRecord
+// Extending ASemanticMapper provides some common functionality
+class ExampleMapper : ASemanticMapper<ExampleRecord>
 {
-    public ITypeSymbol T { get; set; }
-    public IReadOnlyList<int> Sequence { get; set; }
-    public string Name { get; set; }
-    public int? Answer { get; set; }
+    protected override void AddMappings(IAppendableSemanticMappingRepository<ExampleRecord> repository)
+    {
+        // Add mappings from parameters to recorders
+        repository.TypeParameters.AddIndexedMapping(0, (factory) => factory.Create(RecordTypeArgument));
+        repository.ConstructorParameters.AddNamedMapping("constructorArgument", (factory) => factory.Create(ConstructorArgumentPattern, RecordConstructorArgument));
+        repository.ConstructorParameters.AddNamedMapping("optionalArgument", (factory) => factory.Create(OptionalArgumentPattern, RecordOptionalArgument));
+        repository.ConstructorParameters.AddNamedMapping("paramsArgument", (factory) => factory.Create(ParamsArgumentPattern, RecordParamsArgument));
+        repository.NamedParameters.AddNamedMapping("NamedArgument", (factory) => factory.Create(NamedArgumentPattern, RecordNamedArgument));
+    }
+
+    // Create the patterns used to make arguments strongly typed
+    IArgumentPattern<StringComparison> ConstructorArgumentPattern(IArgumentPatternFactory factory) => factory.Enum<StringComparison>();
+    IArgumentPattern<string?> OptionalArgumentPattern(IArgumentPatternFactory factory) => factory.NullableString();
+    IArgumentPattern<int[]> ParamsArgumentPattern(IArgumentPatternFactory factory) => factory.NonNullableArray(factory.Int());
+    IArgumentPattern<ITypeSymbol?> NamedArgumentPattern(IArgumentPatternFactory factory) => factory.NullableType();
+
+
+    // Record the arguments of parameters
+    void RecordTypeArgument(ExampleRecord dataRecord, ITypeSymbol typeArgument) => dataRecord.TypeArgument = typeArgument;
+    void RecordConstructorArgument(ExampleRecord dataRecord, StringComparison constructorArgument) => dataRecord.ConstructorArgument = constructorArgument;
+    void RecordOptionalArgument(ExampleRecord dataRecord, string? optionalArgument) => dataRecord.OptionalArgument = optionalArgument;
+    void RecordParamsArgument(ExampleRecord dataRecord, IReadOnlyList<int> paramsArgument) => dataRecord.ParamsArgument = paramsArgument;
+    void RecordNamedArgument(ExampleRecord dataRecord, ITypeSymbol namedArgument) => dataRecord.NamedArgument = namedArgument;
 }
 ```
 
-A `Mapper` needs to be implemented, responsible for mapping parameters of the target attribute to `Recorders`:
+This `Mapper` can then be used to parse attributes:
 
 ```csharp
-class ExampleMapper : ASemanticAttributeMapper<ExampleRecord>
-{
-    protected override IEnumerable<(OneOf<int, string>, DTypeArgumentRecorder)> AddTypeParameterMappings()
-    {
-        yield return (0, Adapters.TypeArgument.For(RecordT));
-    }
-
-    protected override IEnumerable<(string, DArgumentRecorder)> AddParameterMappings()
-    {
-        yield return (nameof(ExampleAttribute<object>.Sequence), Adapters.ArrayArgument.For<int>(RecordSequence));
-        yield return (nameof(ExampleAttribute<object>.Name), Adapters.SimpleArgument.For<string>(RecordName));
-        yield return (nameof(ExampleAttribute<object>.Answer), Adapters.SimpleArgument.For<int>(RecordAnswer));
-    }
-
-    void RecordT(ExampleRecord dataRecord, ITypeSymbol t) => dataRecord.T = t;
-    void RecordSequence(ExampleRecord dataRecord, IReadOnlyList<int> sequence) => dataRecord.Sequence = sequence;
-    void RecordName(ExampleRecord dataRecord, string name) => datarecord.Name = name;
-    void RecordAnswer(ExampleRecord dataRecord, int answer) => dataRecord.Answer = answer;
-}
-```
-
-Finally, we can use `SharpAttributeParser` to parse the attribute:
-
-```csharp
-// The AttributeData representing the attribute.
+// The AttributeData describing the attribute being parsed
 AttributeData attributeData;
 
-// Services are injected through DI.
-ISemanticAttributeParser parser;
-ISemanticAttributeRecorderFactory factory;
-ISemanticAttributeMapper<ExampleRecord> mapper;
+// The required services. Can be injected using the add-on package SharpAttributeParser.Mappers.DependencyInjection
+ISemanticParser parser; // new SemanticParser();
+ISemanticRecorderFactory recorderFactory; // new SemanticRecorderFactory();
 
-ISemanticAttributeRecorder<ExampleRecord> recorder = factory.Create(mapper, new ExampleRecord());
+// Instantiate the mapper implemented above
+var mapper = new ExampleMapper();
 
-bool outcome = parser.TryParse(recorder, attributeData);
+// Use the mapper to create a recorder
+ISemanticRecorder recorder = recorderFactory.Create(mapper, new ExampleRecord());
 
-if (outcome is true)
+// Use the recorder to parse the attribute
+bool success = parser.TryParse(recorder, attributeData);
+
+if (success)
 {
-    ExampleRecord result = recorder.GetRecord();
+    // Retrieve the ExampleRecord containing the parsed arguments
+    ExampleRecord dataRecord = recorder.GetRecord();
 
-    // 2, string, 42
-    Console.WriteLine($"{result.Sequence[3]}, {result.T.Name}, {result.Answer}");
+    ...
 }
 ```
 
-## Getting Started
+### Documentation
 
-See [Getting Started](docs/GettingStarted.md) and the [docs](docs/README.md) for more information.
+See the [docs](docs/README.md) for more information.

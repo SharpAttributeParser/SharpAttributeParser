@@ -1,143 +1,171 @@
 # Recommended Pattern
 
-This article will present the *recommended* pattern. It is *recommended* in the sense that it is what I use in my personal projects, but it is by no means the only way of doing things. Discussion will be limited to semantic parsing, but the pattern can be modified for syntactic or combined parsing.
+> The add-on packages [SharpAttributeParser.Mappers](https://www.nuget.org/packages/SharpAttributeParser.Mappers/) and [SharpAttributeParser.RecordBuilders](https://www.nuget.org/packages/SharpAttributeParser.RecordBuilders/) are required for the recommended pattern.
 
-1. [Attribute Definition](#1-attribute-definition)
-2. [Representation Structure](#2-representation-structure)
-3. [Representation Builder](#3-representation-builder)
+This article will present the recommended pattern. It is *recommended* in the sense that it is what I use in my personal projects, but is not necessarily the best way of using `SharpAttributeParser`. The article will assume that attributes are parsed semantically, but the pattern can easily be modified for the syntactic and combined [parsing modes](../ParsingModes.md).
+
+1. [Attribute Class](#1-attribute-class)
+2. [Record](#2-record)
+3. [Record Builder](#3-record-builder)
 4. [Mapper Implementation](#4-mapper-implementation)
-5. [Recorder Factory Implementation](#5-recorder-factory-implementation)
+5. [Recorder-factory Implementation](#5-recorder-factory-implementation)
 6. [Usage](#6-usage)
 7. [Dependency Injection](#7-dependency-injection)
-   1. [Recorder Factory Abstraction](#71-recorder-factory-abstraction)
+   1. [Recorder-factory Abstraction](#71-recorder-factory-abstraction)
    2. [Service Registration](#72-service-registration)
    3. [Usage](#73-usage)
 
-#### 1. Attribute Definition
+#### 1. Attribute Class
 
-First, the attribute that will be used as an example throughout this article:
+First, we define the attribute-class.
 
 ```csharp
-[Example<Type>(new[] { 0, 1, 1, 2 }, name: "Fib", Answer = 41 + 1)]
-class Foo { }
+public sealed class ExampleAttribute<T> : Attribute
+{
+    public StringComparison ConstructorArgument { get; }
+    public string? OptionalArgument { get; }
+    public int[] ParamsArgument { get; }
+
+    public Type? NamedArgument { get; init; }
+
+    public ExampleAttribute(StringComparison constructorArgument, string? optionalArgument = null, params int[] paramsArgument)
+    {
+        ConstructorArgument = constructorArgument;
+        OptionalArgument = optionalArgument;
+        ParamsArgument = paramsArgument;
+    }
+}
 ```
 
-#### 2. Representation Structure
+#### 2. Record
 
-The desired result of parsing the attribute is the following structure:
+Next, we define the record - which will represent a parsed attribute.
 
 ```csharp
 interface IExampleRecord
 {
-    ITypeSymbol T { get; }
-    IReadOnlyList<int> Sequence { get; }
-    string Name { get; }
-    int? Answer { get; }
+    ITypeSymbol TypeArgument { get; }
+    StringComparison ConstructorArgument { get; }
+    string? OptionalArgument { get; }
+    IReadOnlyList<int> ParamsArgument { get; }
+    ITypeSymbol? NamedArgument { get; }
+
 }
 ```
 
-#### 3. Representation Builder
+#### 3. Record Builder
 
-Note that the representation shown above, `IExampleRecord`, intentionally lacks setters. We define a builder, responsible for building instances of `IExampleRecord`. The builder extends `IRecordBuilder`, which is provided by `SharpAttributeParser`.
+To construct instances of the record, we define a builder.
 
 ```csharp
 interface IExampleRecordBuilder : IRecordBuilder<IExampleRecord>
 {
-    void WithT(ITypeSymbol t);
-    void WithSequence(IReadOnlyList<int> sequence);
-    void WithName(string name);
-    void WithAnswer(int answer);
+    void WithTypeArgument(ITypeSymbol typeArgument);
+    void WithConstructorArgument(StringComparison constructorArgument);
+    void WithOptionalArgument(string? optionalArgument);
+    void WithParamsArgument(IReadOnlyList<int> paramsArgument);
+    void WithNamedArgument(ITypeSymbol? namedArgument);
 }
 ```
 
 #### 4. Mapper Implementation
 
-We implement our `Mapper`, extending the abstract class `ASemanticAttributeMapper`. Note that the type-argument to the base-class is `IExampleRecordBuilder`, rather than `IExampleRecord`.
+We implement our `Mapper`, extending the abstract class `ASemanticMapper`. Note that the type-argument of the base-class is `IExampleRecordBuilder`, rather than `IExampleRecord`.
+
+It is also recommended to replace the literal `strings` with `nameof`. This will always work for named parameters, and will work for constructor parameters if the name is the same as the corresponding property (different casing is supported).
 
 ```csharp
-class ExampleMapper : ASemanticAttributeMapper<IExampleRecordBuilder>
+class ExampleMapper : ASemanticMapper<IExampleRecordBuilder>
 {
-    protected override IEnumerable<(OneOf<int, string>, DTypeArgumentRecorder)> AddTypeParameterMappings()
+    protected override void AddMappings(IAppendableSemanticMappingRepository<ExampleRecord> repository)
     {
-        yield return (0, Adapters.TypeArgument.For(RecordT));
+        repository.TypeParameters.AddIndexedMapping(0, (factory) => factory.Create(RecordTypeArgument));
+        repository.ConstructorParameters.AddNamedMapping("constructorArgument", (factory) => factory.Create(ConstructorArgumentPattern, RecordConstructorArgument));
+        repository.ConstructorParameters.AddNamedMapping("optionalArgument", (factory) => factory.Create(OptionalArgumentPattern, RecordOptionalArgument));
+        repository.ConstructorParameters.AddNamedMapping("paramsArgument", (factory) => factory.Create(ParamsArgumentPattern, RecordParamsArgument));
+        repository.NamedParameters.AddNamedMapping("NamedArgument", (factory) => factory.Create(NamedArgumentPattern, RecordNamedArgument));
     }
 
-    protected override IEnumerable<(string, DArgumentRecorder)> AddParameterMappings()
-    {
-        yield return (nameof(ExampleAttribute<object>.Sequence), Adapters.ArrayArgument.For<int>(RecordSequence));
-        yield return (nameof(ExampleAttribute<object>.Name), Adapters.SimpleArgument.For<string>(RecordName));
-        yield return (nameof(ExampleAttribute<object>.Answer), Adapters.SimpleArgument.For<int>(RecordAnswer));
-    }
+    IArgumentPattern<StringComparison> ConstructorArgumentPattern(IArgumentPatternFactory factory) => factory.Enum<StringComparison>();
+    IArgumentPattern<string?> OptionalArgumentPattern(IArgumentPatternFactory factory) => factory.NullableString();
+    IArgumentPattern<int[]> ParamsArgumentPattern(IArgumentPatternFactory factory) => factory.NonNullableArray(factory.Int());
+    IArgumentPattern<ITypeSymbol?> NamedArgumentPattern(IArgumentPatternFactory factory) => factory.NullableType();
 
-    void RecordT(IExampleRecordBuilder builder, ITypeSymbol t) => builder.WithT(t);
-    void RecordSequence(IExampleRecordBuilder builder, IReadOnlyList<int> sequence) => builder.WithSequence(sequence);
-    void RecordName(IExampleRecordBuilder builder, string name) => builder.WithName(name);
-    void RecordAnswer(IExampleRecordBuilder builder, int answer) => builder.WithAnswer(answer);
+    void RecordTypeArgument(IExampleRecordBuilder recordBuilder, ITypeSymbol typeArgument) => recordBuilder.WithTypeArgument(typeArgument);
+    void RecordConstructorArgument(IExampleRecordBuilder recordBuilder, StringComparison constructorArgument) => recordBuilder.WithConstructorArgument(constructorArgument);
+    void RecordOptionalArgument(IExampleRecordBuilder recordBuilder, string? optionalArgument) => recordBuilder.WithOptionalArgument(optionalArgument);
+    void RecordParamsArgument(IExampleRecordBuilder recordBuilder, int[] paramsArgument) => recordBuilder.WithParamsArgument(paramsArgument);
+    void RecordNamedArgument(IExampleRecordBuilder recordBuilder, ITypeSymbol? namedArgument) => recordBuilder.WithNamedArgument(namedArgument);
 }
 ```
 
-#### 5. Recorder Factory Implementation
+#### 5. Recorder-factory Implementation
 
-We implement a `Recorder`-factory, which uses a `Mapper` to construct `Recorders`.
+We implement a `Recorder`-factory, which is responsible for constructing `Recorders`, using `Mappers` - and able to create multiple independent `Recorders`.  The factory has an internal implementation of `IExampleRecordBuilder` - with invokations of `VerifyCanModify` that ensure that the `IExampleRecord` has not yet been built when attempting to modify it. The builder also overrides `CanBuildRecord`, which ensures that the `IExampleRecord` is in a valid state before building it. 
 
 ```csharp
 class ExampleRecorderFactory
 {
-    private ISemanticAttributeRecorderFactory Factory { get; }
-    private ISemanticAttributeMapper<IExampleRecordBuilder> Mapper { get; }
+    private ISemanticRecorderFactory Factory { get; }
+    private ISemanticMapper<IExampleRecordBuilder> Mapper { get; }
 
-    public ExampleRecorderFactory(ISemanticAttributeRecorderFactory factory, ISemanticAttributeMapper<IExampleRecordBuilder> mapper)
+    public ExampleRecorderFactory(ISemanticRecorderFactory factory, ISemanticMapper<IExampleRecordBuilder> mapper)
     {
         Factory = factory;
         Mapper = mapper;
     }
 
-    ISemanticAttributeRecorder<IExampleRecord> IExampleRecorderFactory.Create()
-    {
-        return Factory.Create<IExampleRecord, IExampleRecordBuilder>(Mapper, new ExampleRecordBuilder());
-    }
+    public ISemanticRecorder<IExampleRecord> Create() => Factory.Create<IExampleRecord, IExampleRecordBuilder>(Mapper, new ExampleRecordBuilder());
 
-    class ExampleRecordBuilder : ARecordBuilder<IExampleRecord>, IExampleRecordBuilder
+    private sealed class ExampleRecordBuilder : ARecordBuilder<IExampleRecord>, IExampleRecordBuilder
     {
         private ExampleRecord Target { get; } = new();
 
-        public void WithT(ITypeSymbol t)
+        protected override IExampleRecord GetRecord() => Target;
+        protected override bool CanBuildRecord() => Target.TypeArgument is not null && Target.ParamsArgument is not null;
+
+        void IExampleRecordBuilder.WithTypeArgument(ITypeSymbol typeArgument)
         {
             VerifyCanModify();
 
-            Target.T = t;
+            Target.TypeArgument = typeArgument;
         }
 
-        public void WithSequence(IReadOnlyList<int> sequence)
+        void IExampleRecordBuilder.WithConstructorArgument(StringComparison constructorArgument)
         {
             VerifyCanModify();
 
-            Target.Sequence = sequence;
+            Target.ConstructorArgument = constructorArgument;
         }
 
-        public void WithName(string name)
+        void IExampleRecordBuilder.WithOptionalArgument(string? optionalArgument)
         {
             VerifyCanModify();
 
-            Target.Name = name;
+            Target.OptionalArgument = optionalArgument;
         }
 
-        public void WithAnswer(int answer)
+        void IExampleRecordBuilder.WithParamsArgument(IReadOnlyList<int> paramsArgument)
         {
             VerifyCanModify();
 
-            Target.Answer = answer;
+            Target.ParamsArgument = paramsArgument;
         }
 
-        protected override IExampleRecord GetTarget() => Target;
-        protected override bool CheckFullyConstructed() => Target.T is not null && Target.Sequence is not null && Target.Name is not null;
+        void IExampleRecordBuilder.WithNamedArgument(ITypeSymbol? namedArgument)
+        {
+            VerifyCanModify();
+
+            Target.NamedArgument = namedArgument;
+        }
 
         private sealed class ExampleRecord : IExampleRecord
         {
-            public ITypeSymbol T { get; set; } = null!;
-            public IReadOnlyList<int> Sequence { get; set; } = null!;
-            public string Name { get; set; } = null!;
-            public int? Answer { get; set; }
+            public ITypeSymbol TypeArgument { get; set; } = null!;
+            public StringComparison ConstructorArgument { get; set; }
+            public string? OptionalArgument { get; set; }
+            public IReadOnlyList<int> ParamsArgument { get; set; } = null!;
+            public ITypeSymbol? NamedArgument { get; set; }
         }
     }
 }
@@ -145,36 +173,36 @@ class ExampleRecorderFactory
 
 #### 6. Usage
 
-At this point, we are able to parse the attribute:
+At this point, we can parse attributes of type `ExampleAttribute<T>`.
 
 ```csharp
-// The AttributeData representing the attribute.
+// The AttributeData representing the attribute
 AttributeData attributeData;
 
-SemanticAttributeParser parser = new SemanticAttributeParser();
+var parser = new SemanticParser();
 
-ExampleMapper mapper = new ExampleMapper();
+var mapper = new ExampleMapper();
 
-SemanticAttributeRecorderFactory generalFactory = new SemanticAttributeRecorderFactory();
-ExampleRecorderFactory factory = new ExampleRecorderFactory(generalFactory, mapper);
+var recorderFactory = new SemanticRecorderFactory();
+var exampleRecorderFactory = new ExampleRecorderFactory(recorderFactory, mapper);
 
-ISemanticAttributeRecorder<IExampleRecord> recorder = factory.Create();
+ISemanticRecorder<IExampleRecord> recorder = exampleRecorderFactory.Create();
 
-bool outcome = parser.TryParse(recorder, attributeData);
+bool success = parser.TryParse(recorder, attributeData);
 
-if (outcome is true)
+if (success)
 {
-    IExampleRecord result = recorder.GetRecord();
+    IExampleRecord dataRecord = recorder.GetRecord();
 }
 ```
 
 #### 7. Dependency Injection
 
-If Dependency Injection is used, the usage can be further simplified. Otherwise, step 6 presents the final usage.
+If Dependency Injection is used, the pattern can be further improved.
 
-##### 7.1. Recorder Factory Abstraction
+##### 7.1. Recorder-factory Abstraction
 
-We define an abstraction of out `ExampleRecorderFactory`. Of course, the `ExampleRecorderFactory` needs to implement this interface.
+Define an abstraction of `ExampleRecorderFactory`, and apply it to the implementation.
 
 ```csharp
 interface IExampleRecorderFactory
@@ -185,34 +213,33 @@ interface IExampleRecorderFactory
 
 ##### 7.2. Service Registration
 
-The implemented `ExampleMapper` and `ExampleRecorderFactory` can now be registered with a `IServiceCollection`. The other dependencies can be registered by invoking `AddSharpAttributeParser`.
+Register `ExampleMapper` and `ExampleRecorderFactory` with a `IServiceCollection`.
 
 ```csharp
-using SharpAttributeParser.Extensions;
+// Register dependencies provided by SharpAttributeParser.Mappers. Requires the add-on package SharpAttributeParser.Mappers.DependencyInjection
+services.AddSharpAttributeParserMappers();
 
-services.AddSingleton<ISemanticAttributeMapper<IExampleRecordBuilder>, ExampleMapper>();
+services.AddSingleton<ISemanticMapper<IExampleRecordBuilder>, ExampleMapper>();
 services.AddSingleton<IExampleRecorderFactory, ExampleRecorderFactory>();
-
-services.AddSharpAttributeParser();
 ```
 
 ##### 7.3 Usage
 
-The `IExampleRecorderFactory` service can now be injected - and this is how we apply everything:
+The `IExampleRecorderFactory` service can now be injected.
 
 ```csharp
 // The AttributeData representing the attribute.
 AttributeData attributeData;
 
 // Service is injected through DI.
-IExampleRecorderFactory factory;
+IExampleRecorderFactory recorderFactory;
 
-ISemanticAttributeRecorder<IExampleRecord> recorder = factory.Create();
+ISemanticAttributeRecorder<IExampleRecord> recorder = recorderFactory.Create();
 
-bool outcome = parser.TryParse(recorder, attributeData);
+bool success = parser.TryParse(recorder, attributeData);
 
-if (outcome is true)
+if (success)
 {
-    IExampleRecord result = recorder.GetRecord();
+    IExampleRecord dataRecord = recorder.GetRecord();
 }
 ```

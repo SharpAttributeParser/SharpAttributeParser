@@ -8,8 +8,7 @@
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
         <AnalysisMode>all</AnalysisMode>
-        <!-- Broken by dotnet format https://github.com/dotnet/format/issues/1800 -->
-        <!--<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>-->
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
 
