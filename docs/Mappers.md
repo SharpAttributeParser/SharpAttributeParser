@@ -41,7 +41,7 @@ void AddMappings(IAppendableSemanticMappingRepository<TRecord>);
 
 This method is invoked by the base-class when the `Mapper` is initialized - which occurs the first time the `Mapper` is used. After initialization, new mappings should not be added to the `Repository`. Read more about `Repositories` [here](Repositories.md).
 
-Below is an example of a simple `Mapper` implemented through `ASemanticMapper<TRecord>`. See the [recommended pattern](docs/RecommendedPattern/RecommendedPattern.md) for a slightly improved pattern. 
+Below is an example of a simple `Mapper` implemented through `ASemanticMapper<TRecord>`. See the [recommended pattern](docs/RecommendedPattern.md) for a slightly improved pattern. 
 
 ```csharp
 class ExampleMapper : ASemanticMapper<ExampleRecord>

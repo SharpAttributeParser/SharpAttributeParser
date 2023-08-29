@@ -2,7 +2,7 @@
 
 > The add-on packages [SharpAttributeParser.Mappers](https://www.nuget.org/packages/SharpAttributeParser.Mappers/) and [SharpAttributeParser.RecordBuilders](https://www.nuget.org/packages/SharpAttributeParser.RecordBuilders/) are required for the recommended pattern.
 
-This article will present the recommended pattern. It is *recommended* in the sense that it is what I use in my personal projects, but is not necessarily the best way of using `SharpAttributeParser`. The article will assume that attributes are parsed semantically, but the pattern can easily be modified for the syntactic and combined [parsing modes](../ParsingModes.md).
+This article will present the recommended pattern. It is *recommended* in the sense that it is what I use in my personal projects, but is not necessarily the best way of using `SharpAttributeParser`. The article will assume that attributes are parsed semantically, but the pattern can easily be modified for the syntactic and combined [parsing modes](ParsingModes.md).
 
 1. [Attribute Class](#1-attribute-class)
 2. [Record](#2-record)
@@ -207,7 +207,7 @@ Define an abstraction of `ExampleRecorderFactory`, and apply it to the implement
 ```csharp
 interface IExampleRecorderFactory
 {
-    ISemanticAttributeRecorder<IExampleRecord> Create();
+    ISemanticRecorder<IExampleRecord> Create();
 }
 ```
 
@@ -234,7 +234,7 @@ AttributeData attributeData;
 // Service is injected through DI.
 IExampleRecorderFactory recorderFactory;
 
-ISemanticAttributeRecorder<IExampleRecord> recorder = recorderFactory.Create();
+ISemanticRecorder<IExampleRecord> recorder = recorderFactory.Create();
 
 bool success = parser.TryParse(recorder, attributeData);
 

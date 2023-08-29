@@ -18,7 +18,7 @@ Attribute arguments can be parsed in three modes:
 
 > The add-on package [SharpAttributeParser.Mappers](https://www.nuget.org/packages/SharpAttributeParser.Mappers/) is required to use the library as demonstrated here.
 
-A `Mapper` is a user-implemented component used to map each parameter of an attribute-class to a `MappedRecorder`, which in turn is responsible for recording the arguments of that specific parameter. Typically, each attribute-class requires a separate `Mapper`-implementation. Below is an implementation of a `Mapper`, used to semantically parse the arguments of an attribute to `ExampleRecord`. See the [recommended pattern](docs/RecommendedPattern/RecommendedPattern.md) for a slightly improved pattern.
+A `Mapper` is a user-implemented component used to map each parameter of an attribute-class to a `MappedRecorder`, which in turn is responsible for recording the arguments of that specific parameter. Typically, each attribute-class requires a separate `Mapper`-implementation. Below is an implementation of a `Mapper`, used to semantically parse the arguments of an attribute to `ExampleRecord`. See the [recommended pattern](docs/RecommendedPattern.md) for a slightly improved pattern.
 
 ```csharp
 // Extending ASemanticMapper provides some common functionality

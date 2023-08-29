@@ -5,4 +5,4 @@
 3. [Recorders](Recorders.md) - Presents `Recorders`, used by `Parsers` to record attribute arguments.
 4. [Mappers](Mappers.md) - Presents `Mappers`, used as blueprints for constructing `Recorders`.
 5. [Repositories](Repositories.md) - Presents `Repositories`, used by `Mappers` to handle mappings from attribute parameters to `MappedRecorders`.
-6. [Recommended Pattern](RecommendedPattern/RecommendedPattern.md) - Presents the recommended pattern.
+6. [Recommended Pattern](RecommendedPattern.md) - Presents the recommended pattern.
