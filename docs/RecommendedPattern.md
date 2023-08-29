@@ -207,7 +207,7 @@ Define an abstraction of `ExampleRecorderFactory`, and apply it to the implement
 ```csharp
 interface IExampleRecorderFactory
 {
-    ISemanticAttributeRecorder<IExampleRecord> Create();
+    ISemanticRecorder<IExampleRecord> Create();
 }
 ```
 
@@ -234,7 +234,7 @@ AttributeData attributeData;
 // Service is injected through DI.
 IExampleRecorderFactory recorderFactory;
 
-ISemanticAttributeRecorder<IExampleRecord> recorder = recorderFactory.Create();
+ISemanticRecorder<IExampleRecord> recorder = recorderFactory.Create();
 
 bool success = parser.TryParse(recorder, attributeData);
 
