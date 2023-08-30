@@ -32,6 +32,17 @@ public static class SharpAttributeParserMappersServices
         services.AddSingleton<ISemanticRecorderFactory, SemanticRecorderFactory>();
         services.AddSingleton<ISyntacticRecorderFactory, SyntacticRecorderFactory>();
 
+        services.AddSingleton(typeof(ICombinedMapperDependencyProvider<>), typeof(CombinedMapperDependencyProvider<>));
+        services.AddSingleton(typeof(ISemanticMapperDependencyProvider<>), typeof(SemanticMapperDependencyProvider<>));
+        services.AddSingleton(typeof(ISyntacticMapperDependencyProvider<>), typeof(SyntacticMapperDependencyProvider<>));
+        services.AddSingleton(typeof(IAdaptiveMapperDependencyProvider<,>), typeof(AdaptiveMapperDependencyProvider<,>));
+        services.AddSingleton(typeof(ISplitMapperDependencyProvider<,>), typeof(SplitMapperDependencyProvider<,>));
+
+        services.AddSingleton<IParameterComparer, ParameterComparer>();
+        services.AddSingleton<ITypeParameterComparer>(static (provider) => new TypeParameterComparer(StringComparer.OrdinalIgnoreCase));
+        services.AddSingleton<IConstructorParameterComparer>(static (provider) => new ConstructorParameterComparer(StringComparer.OrdinalIgnoreCase));
+        services.AddSingleton<INamedParameterComparer>(static (provider) => new NamedParameterComparer(StringComparer.OrdinalIgnoreCase));
+
         return services;
     }
 }

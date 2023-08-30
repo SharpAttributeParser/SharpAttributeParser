@@ -2,50 +2,29 @@
 
 using Microsoft.CodeAnalysis;
 
-using SharpAttributeParser.Mappers.Logging;
 using SharpAttributeParser.Mappers.MappedRecorders;
 using SharpAttributeParser.Mappers.Repositories.Adaptive;
 using SharpAttributeParser.Mappers.Repositories.Combined;
 using SharpAttributeParser.Mappers.Repositories.Semantic;
 
 using System;
-using System.Collections.Generic;
 
 /// <summary>An abstract <see cref="ICombinedMapper{TRecorder}"/> and <see cref="ISemanticMapper{TRecord}"/>, mapping attribute parameters to recorders responsible for recording arguments of that parameter.</summary>
 /// <typeparam name="TCombinedRecord">The type to which arguments are recorded when parsed with syntactic context.</typeparam>
 /// <typeparam name="TSemanticRecord">The type to which arguments are recorded when parsed without syntactic context.</typeparam>
 public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombinedMapper<TCombinedRecord>, ISemanticMapper<TSemanticRecord>
 {
-    private static Lazy<IAdaptiveMappingRepositoryFactory<TCombinedRecord, TSemanticRecord>> DefaultRepositoryFactory { get; } = new(DefaultRepositoryFactories.AdaptiveFactory<TCombinedRecord, TSemanticRecord>);
-
     private bool IsInitialized { get; set; }
 
     private IBuiltAdaptiveMappingRepository<TCombinedRecord, TSemanticRecord> Mappings { get; set; } = null!;
 
-    private IEqualityComparer<string> ParameterNameComparer { get; }
-    private IMappedCombinedArgumentRecorderFactory CombinedRecorderFactory { get; }
-    private IMappedSemanticArgumentRecorderFactory SemanticRecorderFactory { get; }
-    private IAdaptiveMappingRepositoryFactory<TCombinedRecord, TSemanticRecord> RepositoryFactory { get; }
-
-    private ICombinedMapperLogger CombinedLogger { get; }
-    private ISemanticMapperLogger SemanticLogger { get; }
+    private IAdaptiveMapperDependencyProvider<TCombinedRecord, TSemanticRecord> DependencyProvider { get; }
 
     /// <summary>Instantiates a <see cref="AAdaptiveMapper{TCombinedRecord, TSemanticRecord}"/>, mapping attribute parameters to recorders responsible for recording arguments of that parameter.</summary>
-    /// <param name="parameterNameComparer">Determines equality when comparing parameter names. If <see langword="null"/>, <see cref="StringComparer.OrdinalIgnoreCase"/> is used.</param>
-    /// <param name="combinedRecorderFactory">Handles creation of mapped recorders for recording arguments, together with syntactic information about arguments.</param>
-    /// <param name="semanticRecorderFactory">Handles creation of mapped recorders for recording arguments.</param>
-    /// <param name="repositoryFactory">Handles creation of repositories.</param>
-    /// <param name="combinedLogger">The logger used to log messages when acting as a combined mapper.</param>
-    /// <param name="semanticLogger">The logger used to log messages when acting as a semantic mapper.</param>
-    protected AAdaptiveMapper(IEqualityComparer<string>? parameterNameComparer = null, IMappedCombinedArgumentRecorderFactory? combinedRecorderFactory = null, IMappedSemanticArgumentRecorderFactory? semanticRecorderFactory = null, IAdaptiveMappingRepositoryFactory<TCombinedRecord, TSemanticRecord>? repositoryFactory = null, ICombinedMapperLogger<AAdaptiveMapper<TCombinedRecord, TSemanticRecord>>? combinedLogger = null, ISemanticMapperLogger<AAdaptiveMapper<TCombinedRecord, TSemanticRecord>>? semanticLogger = null)
+    /// <param name="dependencyProvider">Provides the dependencies of the mapper. If <see langword="null"/>, a default provider will be used.</param>
+    protected AAdaptiveMapper(IAdaptiveMapperDependencyProvider<TCombinedRecord, TSemanticRecord>? dependencyProvider = null)
     {
-        ParameterNameComparer = parameterNameComparer ?? StringComparer.OrdinalIgnoreCase;
-        CombinedRecorderFactory = combinedRecorderFactory ?? DefaultRecorderFactories.CombinedFactory();
-        SemanticRecorderFactory = semanticRecorderFactory ?? DefaultRecorderFactories.SemanticFactory();
-        RepositoryFactory = repositoryFactory ?? DefaultRepositoryFactory.Value;
-
-        CombinedLogger = combinedLogger ?? NullCombinedMapperLogger<AAdaptiveMapper<TCombinedRecord, TSemanticRecord>>.Singleton;
-        SemanticLogger = semanticLogger ?? NullSemanticMapperLogger<AAdaptiveMapper<TCombinedRecord, TSemanticRecord>>.Singleton;
+        DependencyProvider = dependencyProvider ?? new AdaptiveMapperDependencyProvider<TCombinedRecord, TSemanticRecord>();
     }
 
     /// <summary>Initializes the mapper. If not yet performed, initialization will occur when the mapper is first used.</summary>
@@ -64,7 +43,7 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
 
     private void InvokeAddMappings()
     {
-        var repository = RepositoryFactory.Create(ParameterNameComparer, throwOnMultipleBuilds: true) ?? throw new InvalidOperationException($"A {nameof(IAdaptiveMappingRepositoryFactory<object, object>)} produced a null {nameof(IAdaptiveMappingRepository<object, object>)}.");
+        var repository = DependencyProvider.RepositoryFactory.Create(DependencyProvider.ParameterComparer, throwOnMultipleBuilds: true) ?? throw new InvalidOperationException($"A {nameof(IAdaptiveMappingRepositoryFactory<object, object>)} produced a null {nameof(IAdaptiveMappingRepository<object, object>)}.");
 
         AddMappings(repository);
 
@@ -92,11 +71,11 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
 
         InitializeMapper();
 
-        using var _ = CombinedLogger.TypeParameter.BeginScopeMappingTypeParameter(parameter, Mappings.TypeParameters);
+        using var _ = DependencyProvider.CombinedLogger.TypeParameter.BeginScopeMappingTypeParameter(parameter, Mappings.TypeParameters);
 
         if (TryGetTypeParameterRecorder(parameter) is not IDetachedMappedAdaptiveTypeArgumentRecorderProvider<TCombinedRecord, TSemanticRecord> recorderProvider)
         {
-            CombinedLogger.TypeParameter.FailedToMapTypeParameter();
+            DependencyProvider.CombinedLogger.TypeParameter.FailedToMapTypeParameter();
 
             return null;
         }
@@ -106,7 +85,7 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
             throw new InvalidOperationException($"The {nameof(IDetachedMappedCombinedTypeArgumentRecorder<object>)} of a {nameof(IDetachedMappedAdaptiveTypeArgumentRecorderProvider<object, object>)} was null.");
         }
 
-        return CombinedRecorderFactory.TypeParameter.Create(dataRecord, recorder);
+        return DependencyProvider.CombinedRecorderFactory.TypeParameter.Create(dataRecord, recorder);
     }
 
     /// <inheritdoc/>
@@ -124,11 +103,11 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
 
         InitializeMapper();
 
-        using var _ = SemanticLogger.TypeParameter.BeginScopeMappingTypeParameter(parameter, Mappings.TypeParameters);
+        using var _ = DependencyProvider.SemanticLogger.TypeParameter.BeginScopeMappingTypeParameter(parameter, Mappings.TypeParameters);
 
         if (TryGetTypeParameterRecorder(parameter) is not IDetachedMappedAdaptiveTypeArgumentRecorderProvider<TCombinedRecord, TSemanticRecord> recorderProvider)
         {
-            SemanticLogger.TypeParameter.FailedToMapTypeParameter();
+            DependencyProvider.SemanticLogger.TypeParameter.FailedToMapTypeParameter();
 
             return null;
         }
@@ -138,7 +117,7 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
             throw new InvalidOperationException($"The {nameof(IDetachedMappedSemanticTypeArgumentRecorder<object>)} of a {nameof(IDetachedMappedAdaptiveTypeArgumentRecorderProvider<object, object>)} was null.");
         }
 
-        return SemanticRecorderFactory.TypeParameter.Create(dataRecord, recorder);
+        return DependencyProvider.SemanticRecorderFactory.TypeParameter.Create(dataRecord, recorder);
     }
 
     /// <inheritdoc/>
@@ -156,11 +135,11 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
 
         InitializeMapper();
 
-        using var _ = CombinedLogger.ConstructorParameter.BeginScopeMappingConstructorParameter(parameter, Mappings.ConstructorParameters);
+        using var _ = DependencyProvider.CombinedLogger.ConstructorParameter.BeginScopeMappingConstructorParameter(parameter, Mappings.ConstructorParameters);
 
         if (Mappings.ConstructorParameters.Named.TryGetValue(parameter.Name, out var recorderProvider) is false)
         {
-            CombinedLogger.ConstructorParameter.FailedToMapConstructorParameter();
+            DependencyProvider.CombinedLogger.ConstructorParameter.FailedToMapConstructorParameter();
 
             return null;
         }
@@ -170,7 +149,7 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
             throw new InvalidOperationException($"The {nameof(IDetachedMappedCombinedConstructorArgumentRecorder<object>)} of a {nameof(IDetachedMappedAdaptiveConstructorArgumentRecorderProvider<object, object>)} was null.");
         }
 
-        return CombinedRecorderFactory.ConstructorParameter.Create(dataRecord, recorder);
+        return DependencyProvider.CombinedRecorderFactory.ConstructorParameter.Create(dataRecord, recorder);
     }
 
     /// <inheritdoc/>
@@ -188,11 +167,11 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
 
         InitializeMapper();
 
-        using var _ = SemanticLogger.ConstructorParameter.BeginScopeMappingConstructorParameter(parameter, Mappings.ConstructorParameters);
+        using var _ = DependencyProvider.SemanticLogger.ConstructorParameter.BeginScopeMappingConstructorParameter(parameter, Mappings.ConstructorParameters);
 
         if (Mappings.ConstructorParameters.Named.TryGetValue(parameter.Name, out var recorderProvider) is false)
         {
-            SemanticLogger.ConstructorParameter.FailedToMapConstructorParameter();
+            DependencyProvider.SemanticLogger.ConstructorParameter.FailedToMapConstructorParameter();
 
             return null;
         }
@@ -202,7 +181,7 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
             throw new InvalidOperationException($"The {nameof(IDetachedMappedSemanticConstructorArgumentRecorder<object>)} of a {nameof(IDetachedMappedAdaptiveConstructorArgumentRecorderProvider<object, object>)} was null.");
         }
 
-        return SemanticRecorderFactory.ConstructorParameter.Create(dataRecord, recorder);
+        return DependencyProvider.SemanticRecorderFactory.ConstructorParameter.Create(dataRecord, recorder);
     }
 
     /// <inheritdoc/>
@@ -220,11 +199,11 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
 
         InitializeMapper();
 
-        using var _ = CombinedLogger.NamedParameter.BeginScopeMappingNamedParameter(parameterName, Mappings.NamedParameters);
+        using var _ = DependencyProvider.CombinedLogger.NamedParameter.BeginScopeMappingNamedParameter(parameterName, Mappings.NamedParameters);
 
         if (Mappings.NamedParameters.Named.TryGetValue(parameterName, out var recorderProvider) is false)
         {
-            CombinedLogger.NamedParameter.FailedToMapNamedParameter();
+            DependencyProvider.CombinedLogger.NamedParameter.FailedToMapNamedParameter();
 
             return null;
         }
@@ -234,7 +213,7 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
             throw new InvalidOperationException($"The {nameof(IDetachedMappedCombinedNamedArgumentRecorder<object>)} of a {nameof(IDetachedMappedAdaptiveNamedArgumentRecorderProvider<object, object>)} was null.");
         }
 
-        return CombinedRecorderFactory.NamedParameter.Create(dataRecord, recorder);
+        return DependencyProvider.CombinedRecorderFactory.NamedParameter.Create(dataRecord, recorder);
     }
 
     /// <inheritdoc/>
@@ -252,11 +231,11 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
 
         InitializeMapper();
 
-        using var _ = SemanticLogger.NamedParameter.BeginScopeMappingNamedParameter(parameterName, Mappings.NamedParameters);
+        using var _ = DependencyProvider.SemanticLogger.NamedParameter.BeginScopeMappingNamedParameter(parameterName, Mappings.NamedParameters);
 
         if (Mappings.NamedParameters.Named.TryGetValue(parameterName, out var recorderProvider) is false)
         {
-            SemanticLogger.NamedParameter.FailedToMapNamedParameter();
+            DependencyProvider.SemanticLogger.NamedParameter.FailedToMapNamedParameter();
 
             return null;
         }
@@ -266,7 +245,7 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
             throw new InvalidOperationException($"The {nameof(IDetachedMappedSemanticNamedArgumentRecorder<object>)} of a {nameof(IDetachedMappedAdaptiveNamedArgumentRecorderProvider<object, object>)} was null.");
         }
 
-        return SemanticRecorderFactory.NamedParameter.Create(dataRecord, recorder);
+        return DependencyProvider.SemanticRecorderFactory.NamedParameter.Create(dataRecord, recorder);
     }
 
     private IDetachedMappedAdaptiveTypeArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>? TryGetTypeParameterRecorder(ITypeParameterSymbol parameter)

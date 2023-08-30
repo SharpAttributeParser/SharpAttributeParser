@@ -2,12 +2,10 @@
 
 using Microsoft.CodeAnalysis;
 
-using SharpAttributeParser.Mappers.Logging;
 using SharpAttributeParser.Mappers.MappedRecorders;
 using SharpAttributeParser.Mappers.Repositories.Combined;
 
 using System;
-using System.Collections.Generic;
 
 /// <summary>An abstract <see cref="ICombinedMapper{TRecorder}"/>, mapping attribute parameters to recorders responsible for recording arguments of that parameter.</summary>
 /// <typeparam name="TRecord">The type to which arguments are recorded.</typeparam>
@@ -19,24 +17,13 @@ public abstract class ACombinedMapper<TRecord> : ICombinedMapper<TRecord>
 
     private IBuiltCombinedMappingRepository<TRecord> Mappings { get; set; } = null!;
 
-    private IEqualityComparer<string> ParameterNameComparer { get; }
-    private IMappedCombinedArgumentRecorderFactory RecorderFactory { get; }
-    private ICombinedMappingRepositoryFactory<TRecord> RepositoryFactory { get; }
-
-    private ICombinedMapperLogger Logger { get; }
+    private ICombinedMapperDependencyProvider<TRecord> DependencyProvider { get; }
 
     /// <summary>Instantiates a <see cref="ACombinedMapper{TRecord}"/>, mapping attribute parameters to recorders responsible for recording arguments of that parameter.</summary>
-    /// <param name="parameterNameComparer">Determines equality when comparing parameter names. If <see langword="null"/>, <see cref="StringComparer.OrdinalIgnoreCase"/> is used.</param>
-    /// <param name="recorderFactory">Handles creation of mapped recorders.</param>
-    /// <param name="repositoryFactory">Handles creation of repositories.</param>
-    /// <param name="logger">The logger used to log messages.</param>
-    protected ACombinedMapper(IEqualityComparer<string>? parameterNameComparer = null, IMappedCombinedArgumentRecorderFactory? recorderFactory = null, ICombinedMappingRepositoryFactory<TRecord>? repositoryFactory = null, ICombinedMapperLogger<ACombinedMapper<TRecord>>? logger = null)
+    /// <param name="dependencyProvider">Provides the dependencies of the mapper. If <see langword="null"/>, a default provider will be used.</param>
+    protected ACombinedMapper(ICombinedMapperDependencyProvider<TRecord>? dependencyProvider = null)
     {
-        ParameterNameComparer = parameterNameComparer ?? StringComparer.OrdinalIgnoreCase;
-        RecorderFactory = recorderFactory ?? DefaultRecorderFactories.CombinedFactory();
-        RepositoryFactory = repositoryFactory ?? DefaultRepositoryFactory.Value;
-
-        Logger = logger ?? NullCombinedMapperLogger<ACombinedMapper<TRecord>>.Singleton;
+        DependencyProvider = dependencyProvider ?? new CombinedMapperDependencyProvider<TRecord>();
     }
 
     /// <summary>Initializes the mapper. If not yet performed, initialization will occur when the mapper is first used.</summary>
@@ -55,7 +42,7 @@ public abstract class ACombinedMapper<TRecord> : ICombinedMapper<TRecord>
 
     private void InvokeAddMappings()
     {
-        var repository = RepositoryFactory.Create(ParameterNameComparer, throwOnMultipleBuilds: true) ?? throw new InvalidOperationException($"A {nameof(ICombinedMappingRepositoryFactory<object>)} produced a null {nameof(ICombinedMappingRepository<object>)}.");
+        var repository = DependencyProvider.RepositoryFactory.Create(DependencyProvider.ParameterComparer, throwOnMultipleBuilds: true) ?? throw new InvalidOperationException($"A {nameof(ICombinedMappingRepositoryFactory<object>)} produced a null {nameof(ICombinedMappingRepository<object>)}.");
 
         AddMappings(repository);
 
@@ -83,16 +70,16 @@ public abstract class ACombinedMapper<TRecord> : ICombinedMapper<TRecord>
 
         InitializeMapper();
 
-        using var _ = Logger.TypeParameter.BeginScopeMappingTypeParameter(parameter, Mappings.TypeParameters);
+        using var _ = DependencyProvider.Logger.TypeParameter.BeginScopeMappingTypeParameter(parameter, Mappings.TypeParameters);
 
         if (TryGetTypeParameterRecorder(parameter) is not IDetachedMappedCombinedTypeArgumentRecorder<TRecord> recorder)
         {
-            Logger.TypeParameter.FailedToMapTypeParameter();
+            DependencyProvider.Logger.TypeParameter.FailedToMapTypeParameter();
 
             return null;
         }
 
-        return RecorderFactory.TypeParameter.Create(dataRecord, recorder);
+        return DependencyProvider.RecorderFactory.TypeParameter.Create(dataRecord, recorder);
     }
 
     /// <inheritdoc/>
@@ -110,16 +97,16 @@ public abstract class ACombinedMapper<TRecord> : ICombinedMapper<TRecord>
 
         InitializeMapper();
 
-        using var _ = Logger.ConstructorParameter.BeginScopeMappingConstructorParameter(parameter, Mappings.ConstructorParameters);
+        using var _ = DependencyProvider.Logger.ConstructorParameter.BeginScopeMappingConstructorParameter(parameter, Mappings.ConstructorParameters);
 
         if (Mappings.ConstructorParameters.Named.TryGetValue(parameter.Name, out var recorder) is false)
         {
-            Logger.ConstructorParameter.FailedToMapConstructorParameter();
+            DependencyProvider.Logger.ConstructorParameter.FailedToMapConstructorParameter();
 
             return null;
         }
 
-        return RecorderFactory.ConstructorParameter.Create(dataRecord, recorder);
+        return DependencyProvider.RecorderFactory.ConstructorParameter.Create(dataRecord, recorder);
     }
 
     /// <inheritdoc/>
@@ -137,16 +124,16 @@ public abstract class ACombinedMapper<TRecord> : ICombinedMapper<TRecord>
 
         InitializeMapper();
 
-        using var _ = Logger.NamedParameter.BeginScopeMappingNamedParameter(parameterName, Mappings.NamedParameters);
+        using var _ = DependencyProvider.Logger.NamedParameter.BeginScopeMappingNamedParameter(parameterName, Mappings.NamedParameters);
 
         if (Mappings.NamedParameters.Named.TryGetValue(parameterName, out var recorder) is false)
         {
-            Logger.NamedParameter.FailedToMapNamedParameter();
+            DependencyProvider.Logger.NamedParameter.FailedToMapNamedParameter();
 
             return null;
         }
 
-        return RecorderFactory.NamedParameter.Create(dataRecord, recorder);
+        return DependencyProvider.RecorderFactory.NamedParameter.Create(dataRecord, recorder);
     }
 
     private IDetachedMappedCombinedTypeArgumentRecorder<TRecord>? TryGetTypeParameterRecorder(ITypeParameterSymbol parameter)

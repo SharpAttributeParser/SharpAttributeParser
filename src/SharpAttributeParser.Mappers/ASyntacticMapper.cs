@@ -2,12 +2,10 @@
 
 using Microsoft.CodeAnalysis;
 
-using SharpAttributeParser.Mappers.Logging;
 using SharpAttributeParser.Mappers.MappedRecorders;
 using SharpAttributeParser.Mappers.Repositories.Syntactic;
 
 using System;
-using System.Collections.Generic;
 
 /// <summary>An abstract <see cref="ISyntacticMapper{TRecorder}"/>, mapping attribute parameters to recorders responsible for recording syntactic information about the arguments of that parameter.</summary>
 /// <typeparam name="TRecord">The type to which syntactic information about arguments is recorded.</typeparam>
@@ -19,24 +17,13 @@ public abstract class ASyntacticMapper<TRecord> : ISyntacticMapper<TRecord>
 
     private IBuiltSyntacticMappingRepository<TRecord> Mappings { get; set; } = null!;
 
-    private IEqualityComparer<string> ParameterNameComparer { get; }
-    private IMappedSyntacticArgumentRecorderFactory RecorderFactory { get; }
-    private ISyntacticMappingRepositoryFactory<TRecord> RepositoryFactory { get; }
-
-    private ISyntacticMapperLogger Logger { get; }
+    private ISyntacticMapperDependencyProvider<TRecord> DependencyProvider { get; }
 
     /// <summary>Instantiates a <see cref="ASyntacticMapper{TRecord}"/>, mapping attribute parameters to recorders responsible for recording syntactic information about the arguments of that parameter.</summary>
-    /// <param name="parameterNameComparer">Determines equality when comparing parameter names. If <see langword="null"/>, <see cref="StringComparer.OrdinalIgnoreCase"/> is used.</param>
-    /// <param name="recorderFactory">Handles creation of mapped recorders.</param>
-    /// <param name="repositoryFactory">Handles creation of repositories.</param>
-    /// <param name="logger">The logger used to log messages.</param>
-    protected ASyntacticMapper(IEqualityComparer<string>? parameterNameComparer = null, IMappedSyntacticArgumentRecorderFactory? recorderFactory = null, ISyntacticMappingRepositoryFactory<TRecord>? repositoryFactory = null, ISyntacticMapperLogger<ASyntacticMapper<TRecord>>? logger = null)
+    /// <param name="dependencyProvider">Provides the dependencies of the mapper. If <see langword="null"/>, a default provider will be used.</param>
+    protected ASyntacticMapper(ISyntacticMapperDependencyProvider<TRecord>? dependencyProvider = null)
     {
-        ParameterNameComparer = parameterNameComparer ?? StringComparer.OrdinalIgnoreCase;
-        RecorderFactory = recorderFactory ?? DefaultRecorderFactories.SyntacticFactory();
-        RepositoryFactory = repositoryFactory ?? DefaultRepositoryFactory.Value;
-
-        Logger = logger ?? NullSyntacticMapperLogger<ASyntacticMapper<TRecord>>.Singleton;
+        DependencyProvider = dependencyProvider ?? new SyntacticMapperDependencyProvider<TRecord>();
     }
 
     /// <summary>Initializes the mapper. If not yet performed, initialization will occur when the mapper is first used.</summary>
@@ -55,7 +42,7 @@ public abstract class ASyntacticMapper<TRecord> : ISyntacticMapper<TRecord>
 
     private void InvokeAddMappings()
     {
-        var repository = RepositoryFactory.Create(ParameterNameComparer, throwOnMultipleBuilds: true) ?? throw new InvalidOperationException($"A {nameof(ISyntacticMappingRepositoryFactory<object>)} produced a null {nameof(ISyntacticMappingRepository<object>)}.");
+        var repository = DependencyProvider.RepositoryFactory.Create(DependencyProvider.ParameterComparer, throwOnMultipleBuilds: true) ?? throw new InvalidOperationException($"A {nameof(ISyntacticMappingRepositoryFactory<object>)} produced a null {nameof(ISyntacticMappingRepository<object>)}.");
 
         AddMappings(repository);
 
@@ -83,16 +70,16 @@ public abstract class ASyntacticMapper<TRecord> : ISyntacticMapper<TRecord>
 
         InitializeMapper();
 
-        using var _ = Logger.TypeParameter.BeginScopeMappingTypeParameter(parameter, Mappings.TypeParameters);
+        using var _ = DependencyProvider.Logger.TypeParameter.BeginScopeMappingTypeParameter(parameter, Mappings.TypeParameters);
 
         if (TryGetTypeParameterRecorder(parameter) is not IDetachedMappedSyntacticTypeArgumentRecorder<TRecord> recorder)
         {
-            Logger.TypeParameter.FailedToMapTypeParameter();
+            DependencyProvider.Logger.TypeParameter.FailedToMapTypeParameter();
 
             return null;
         }
 
-        return RecorderFactory.TypeParameter.Create(dataRecord, recorder);
+        return DependencyProvider.RecorderFactory.TypeParameter.Create(dataRecord, recorder);
     }
 
     /// <inheritdoc/>
@@ -110,16 +97,16 @@ public abstract class ASyntacticMapper<TRecord> : ISyntacticMapper<TRecord>
 
         InitializeMapper();
 
-        using var _ = Logger.ConstructorParameter.BeginScopeMappingConstructorParameter(parameter, Mappings.ConstructorParameters);
+        using var _ = DependencyProvider.Logger.ConstructorParameter.BeginScopeMappingConstructorParameter(parameter, Mappings.ConstructorParameters);
 
         if (Mappings.ConstructorParameters.Named.TryGetValue(parameter.Name, out var recorder) is false)
         {
-            Logger.ConstructorParameter.FailedToMapConstructorParameter();
+            DependencyProvider.Logger.ConstructorParameter.FailedToMapConstructorParameter();
 
             return null;
         }
 
-        return RecorderFactory.ConstructorParameter.Create(dataRecord, recorder);
+        return DependencyProvider.RecorderFactory.ConstructorParameter.Create(dataRecord, recorder);
     }
 
     /// <inheritdoc/>
@@ -137,16 +124,16 @@ public abstract class ASyntacticMapper<TRecord> : ISyntacticMapper<TRecord>
 
         InitializeMapper();
 
-        using var _ = Logger.NamedParameter.BeginScopeMappingNamedParameter(parameterName, Mappings.NamedParameters);
+        using var _ = DependencyProvider.Logger.NamedParameter.BeginScopeMappingNamedParameter(parameterName, Mappings.NamedParameters);
 
         if (Mappings.NamedParameters.Named.TryGetValue(parameterName, out var recorder) is false)
         {
-            Logger.NamedParameter.FailedToMapNamedParameter();
+            DependencyProvider.Logger.NamedParameter.FailedToMapNamedParameter();
 
             return null;
         }
 
-        return RecorderFactory.NamedParameter.Create(dataRecord, recorder);
+        return DependencyProvider.RecorderFactory.NamedParameter.Create(dataRecord, recorder);
     }
 
     private IDetachedMappedSyntacticTypeArgumentRecorder<TRecord>? TryGetTypeParameterRecorder(ITypeParameterSymbol parameter)
