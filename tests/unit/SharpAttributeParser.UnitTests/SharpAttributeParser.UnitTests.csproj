@@ -13,20 +13,24 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
         <PackageReference Include="Microsoft.Extensions.Hosting" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Moq" />
     </ItemGroup>
-    
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
+    </ItemGroup>
+
     <ItemGroup>
         <PackageReference Include="xunit.runner.visualstudio" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\src\SharpAttributeParser.DependencyInjection\SharpAttributeParser.DependencyInjection.csproj" />
-        <ProjectReference Include="..\..\TestUtility\TestUtility.csproj" />
-        <ProjectReference Include="..\SharpAttributeParser.UnitTests.Common\SharpAttributeParser.UnitTests.Common.csproj" />
+        <ProjectReference Include="..\..\SharpAttributeParser.Tests.Common\SharpAttributeParser.Tests.Common.csproj" />
     </ItemGroup>
 
 </Project>

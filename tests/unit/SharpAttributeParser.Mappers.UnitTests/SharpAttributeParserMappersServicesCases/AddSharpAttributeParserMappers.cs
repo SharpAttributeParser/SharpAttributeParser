@@ -3,6 +3,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using SharpAttributeParser.Mappers.Repositories;
+
 using System;
 
 using Xunit;
@@ -38,6 +40,33 @@ public sealed class AddSharpAttributeParserMappers
 
     [Fact]
     public void ISyntacticRecorderFactory_ServiceCanBeResolved() => ServiceCanBeResolved<ISyntacticRecorderFactory>();
+
+    [Fact]
+    public void ICombinedMapperDependencyProvider_ServiceCanBeResolved() => ServiceCanBeResolved<ICombinedMapperDependencyProvider<object>>();
+
+    [Fact]
+    public void ISemanticMapperDependencyProvider_ServiceCanBeResolved() => ServiceCanBeResolved<ISemanticMapperDependencyProvider<object>>();
+
+    [Fact]
+    public void ISyntacticMapperDependencyProvider_ServiceCanBeResolved() => ServiceCanBeResolved<ISyntacticMapperDependencyProvider<object>>();
+
+    [Fact]
+    public void IAdaptiveMapperDependencyProvider_ServiceCanBeResolved() => ServiceCanBeResolved<IAdaptiveMapperDependencyProvider<object, object>>();
+
+    [Fact]
+    public void ISplitMapperDependencyProvider_ServiceCanBeResolved() => ServiceCanBeResolved<ISplitMapperDependencyProvider<object, object>>();
+
+    [Fact]
+    public void IParameterComparer_ServiceCanBeResolved() => ServiceCanBeResolved<IParameterComparer>();
+
+    [Fact]
+    public void ITypeParameterComparer_ServiceCanBeResolved() => ServiceCanBeResolved<ITypeParameterComparer>();
+
+    [Fact]
+    public void IConstructorParameterComparer_ServiceCanBeResolved() => ServiceCanBeResolved<IConstructorParameterComparer>();
+
+    [Fact]
+    public void INamedParameterComparer_ServiceCanBeResolved() => ServiceCanBeResolved<INamedParameterComparer>();
 
     [AssertionMethod]
     private void ServiceCanBeResolved<TService>() where TService : notnull

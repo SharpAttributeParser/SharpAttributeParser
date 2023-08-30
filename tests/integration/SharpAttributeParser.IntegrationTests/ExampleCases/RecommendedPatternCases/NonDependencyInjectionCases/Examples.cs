@@ -1,4 +1,4 @@
-﻿namespace SharpAttributeParser.ExampleCases.RecommendedPatternCases;
+﻿namespace SharpAttributeParser.ExampleCases.RecommendedPatternCases.NonDependencyInjectionCases;
 
 using Microsoft.CodeAnalysis;
 
@@ -30,8 +30,8 @@ public sealed class Examples
         var recorderFactory = new SemanticRecorderFactory();
         var exampleRecorderFactory = new ExampleRecorderFactory(recorderFactory, mapper);
 
-        var recorderA = exampleRecorderFactory.Create();
-        var recorderB = exampleRecorderFactory.Create();
+        var recorderA = ((IExampleRecorderFactory)exampleRecorderFactory).Create();
+        var recorderB = ((IExampleRecorderFactory)exampleRecorderFactory).Create();
 
         var outcome = parser.TryParse(recorderA, attributeData);
 

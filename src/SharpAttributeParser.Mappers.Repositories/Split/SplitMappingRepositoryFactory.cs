@@ -1,7 +1,6 @@
 ﻿namespace SharpAttributeParser.Mappers.Repositories.Split;
 
 using System;
-using System.Collections.Generic;
 
 /// <inheritdoc cref="ISplitMappingRepositoryFactory{TSyntacticRecord, TSyntacticRecord}"/>
 public sealed class SplitMappingRepositoryFactory<TSemanticRecord, TSyntacticRecord> : ISplitMappingRepositoryFactory<TSemanticRecord, TSyntacticRecord>
@@ -24,41 +23,16 @@ public sealed class SplitMappingRepositoryFactory<TSemanticRecord, TSyntacticRec
         NamedMappingRepositoryFactory = namedMappingRepositoryFactory ?? throw new ArgumentNullException(nameof(namedMappingRepositoryFactory));
     }
 
-    ISplitMappingRepository<TSemanticRecord, TSyntacticRecord> IMappingRepositoryFactory<ISplitMappingRepository<TSemanticRecord, TSyntacticRecord>>.Create(IEqualityComparer<string> parameterNameComparer, bool throwOnMultipleBuilds)
+    ISplitMappingRepository<TSemanticRecord, TSyntacticRecord> IMappingRepositoryFactory<ISplitMappingRepository<TSemanticRecord, TSyntacticRecord>>.Create(IParameterComparer comparer, bool throwOnMultipleBuilds)
     {
-        if (parameterNameComparer is null)
+        if (comparer is null)
         {
-            throw new ArgumentNullException(nameof(parameterNameComparer));
+            throw new ArgumentNullException(nameof(comparer));
         }
 
-        return Create(parameterNameComparer, parameterNameComparer, parameterNameComparer, throwOnMultipleBuilds);
-    }
-
-    ISplitMappingRepository<TSemanticRecord, TSyntacticRecord> IMappingRepositoryFactory<ISplitMappingRepository<TSemanticRecord, TSyntacticRecord>>.Create(IEqualityComparer<string> typeParameterNameComparer, IEqualityComparer<string> constructorParameterNameComparer, IEqualityComparer<string> namedParameterNameComparer, bool throwOnMultipleBuilds)
-    {
-        if (typeParameterNameComparer is null)
-        {
-            throw new ArgumentNullException(nameof(typeParameterNameComparer));
-        }
-
-        if (constructorParameterNameComparer is null)
-        {
-            throw new ArgumentNullException(nameof(constructorParameterNameComparer));
-        }
-
-        if (namedParameterNameComparer is null)
-        {
-            throw new ArgumentNullException(nameof(namedParameterNameComparer));
-        }
-
-        return Create(typeParameterNameComparer, constructorParameterNameComparer, namedParameterNameComparer, throwOnMultipleBuilds);
-    }
-
-    private ISplitMappingRepository<TSemanticRecord, TSyntacticRecord> Create(IEqualityComparer<string> typeParameterNameComparer, IEqualityComparer<string> constructorParameterNameComparer, IEqualityComparer<string> namedParameterNameComparer, bool throwOnMultipleBuilds)
-    {
-        var typeParameters = TypeMappingRepositoryFactory.Create(typeParameterNameComparer, throwOnMultipleBuilds) ?? throw new InvalidOperationException($"A {nameof(ITypeMappingRepositoryFactory<object, object>)} produced a null {nameof(ITypeMappingRepository<object, object>)}.");
-        var constructorParameters = ConstructorMappingRepositoryFactory.Create(constructorParameterNameComparer, throwOnMultipleBuilds) ?? throw new InvalidOperationException($"A {nameof(IConstructorMappingRepositoryFactory<object, object>)} produced a null {nameof(IConstructorMappingRepository<object, object>)}.");
-        var namedParameters = NamedMappingRepositoryFactory.Create(namedParameterNameComparer, throwOnMultipleBuilds) ?? throw new InvalidOperationException($"A {nameof(INamedMappingRepositoryFactory<object, object>)} produced a null {nameof(INamedMappingRepository<object, object>)}.");
+        var typeParameters = TypeMappingRepositoryFactory.Create(comparer.TypeParameter, throwOnMultipleBuilds) ?? throw new InvalidOperationException($"A {nameof(ITypeMappingRepositoryFactory<object, object>)} produced a null {nameof(ITypeMappingRepository<object, object>)}.");
+        var constructorParameters = ConstructorMappingRepositoryFactory.Create(comparer.ConstructorParameter, throwOnMultipleBuilds) ?? throw new InvalidOperationException($"A {nameof(IConstructorMappingRepositoryFactory<object, object>)} produced a null {nameof(IConstructorMappingRepository<object, object>)}.");
+        var namedParameters = NamedMappingRepositoryFactory.Create(comparer.NamedParameter, throwOnMultipleBuilds) ?? throw new InvalidOperationException($"A {nameof(INamedMappingRepositoryFactory<object, object>)} produced a null {nameof(INamedMappingRepository<object, object>)}.");
 
         return new Repository(typeParameters, constructorParameters, namedParameters);
     }

@@ -16,14 +16,14 @@ public sealed class NamedMappingRepositoryFactory<TRecorder, TRecorderFactory> :
         RecorderFactory = recorderFactory ?? throw new ArgumentNullException(nameof(recorderFactory));
     }
 
-    INamedMappingRepository<TRecorder, TRecorderFactory> INamedMappingRepositoryFactory<TRecorder, TRecorderFactory>.Create(IEqualityComparer<string> parameterNameComparer, bool throwOnMultipleBuilds)
+    INamedMappingRepository<TRecorder, TRecorderFactory> INamedMappingRepositoryFactory<TRecorder, TRecorderFactory>.Create(INamedParameterComparer comparer, bool throwOnMultipleBuilds)
     {
-        if (parameterNameComparer is null)
+        if (comparer is null)
         {
-            throw new ArgumentNullException(nameof(parameterNameComparer));
+            throw new ArgumentNullException(nameof(comparer));
         }
 
-        return new NamedMappingRepository(RecorderFactory, parameterNameComparer, throwOnMultipleBuilds);
+        return new NamedMappingRepository(RecorderFactory, comparer, throwOnMultipleBuilds);
     }
 
     private sealed class NamedMappingRepository : INamedMappingRepository<TRecorder, TRecorderFactory>
@@ -35,11 +35,11 @@ public sealed class NamedMappingRepositoryFactory<TRecorder, TRecorderFactory> :
         private bool HasBeenBuilt { get; set; }
         private bool ThrowOnMultipleBuilds { get; }
 
-        public NamedMappingRepository(TRecorderFactory recorderFactory, IEqualityComparer<string> parameterNameComparer, bool throwOnMultipleBuilds)
+        public NamedMappingRepository(TRecorderFactory recorderFactory, INamedParameterComparer comparer, bool throwOnMultipleBuilds)
         {
             RecorderFactory = recorderFactory;
 
-            NamedMappings = new(parameterNameComparer);
+            NamedMappings = new(comparer.Name);
             ThrowOnMultipleBuilds = throwOnMultipleBuilds;
         }
 

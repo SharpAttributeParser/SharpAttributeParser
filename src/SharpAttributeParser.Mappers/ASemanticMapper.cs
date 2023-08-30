@@ -2,12 +2,10 @@
 
 using Microsoft.CodeAnalysis;
 
-using SharpAttributeParser.Mappers.Logging;
 using SharpAttributeParser.Mappers.MappedRecorders;
 using SharpAttributeParser.Mappers.Repositories.Semantic;
 
 using System;
-using System.Collections.Generic;
 
 /// <summary>An abstract <see cref="ISemanticMapper{TRecorder}"/>, mapping attribute parameters to recorders responsible for recording arguments of that parameter.</summary>
 /// <typeparam name="TRecord">The type to which arguments are recorded.</typeparam>
@@ -19,24 +17,13 @@ public abstract class ASemanticMapper<TRecord> : ISemanticMapper<TRecord>
 
     private IBuiltSemanticMappingRepository<TRecord> Mappings { get; set; } = null!;
 
-    private IEqualityComparer<string> ParameterNameComparer { get; }
-    private IMappedSemanticArgumentRecorderFactory RecorderFactory { get; }
-    private ISemanticMappingRepositoryFactory<TRecord> RepositoryFactory { get; }
-
-    private ISemanticMapperLogger Logger { get; }
+    private ISemanticMapperDependencyProvider<TRecord> DependencyProvider { get; }
 
     /// <summary>Instantiates a <see cref="ASemanticMapper{TRecord}"/>, mapping attribute parameters to recorders responsible for recording arguments of that parameter.</summary>
-    /// <param name="parameterNameComparer">Determines equality when comparing parameter names. If <see langword="null"/>, <see cref="StringComparer.OrdinalIgnoreCase"/> is used.</param>
-    /// <param name="recorderFactory">Handles creation of mapped recorders.</param>
-    /// <param name="repositoryFactory">Handles creation of repositories.</param>
-    /// <param name="logger">The logger used to log messages.</param>
-    protected ASemanticMapper(IEqualityComparer<string>? parameterNameComparer = null, IMappedSemanticArgumentRecorderFactory? recorderFactory = null, ISemanticMappingRepositoryFactory<TRecord>? repositoryFactory = null, ISemanticMapperLogger<ASemanticMapper<TRecord>>? logger = null)
+    /// <param name="dependencyProvider">Provides the dependencies of the mapper. If <see langword="null"/>, a default provider will be used.</param>
+    protected ASemanticMapper(ISemanticMapperDependencyProvider<TRecord>? dependencyProvider = null)
     {
-        ParameterNameComparer = parameterNameComparer ?? StringComparer.OrdinalIgnoreCase;
-        RecorderFactory = recorderFactory ?? DefaultRecorderFactories.SemanticFactory();
-        RepositoryFactory = repositoryFactory ?? DefaultRepositoryFactory.Value;
-
-        Logger = logger ?? NullSemanticMapperLogger<ASemanticMapper<TRecord>>.Singleton;
+        DependencyProvider = dependencyProvider ?? new SemanticMapperDependencyProvider<TRecord>();
     }
 
     /// <summary>Initializes the mapper. If not yet performed, initialization will occur when the mapper is first used.</summary>
@@ -55,7 +42,7 @@ public abstract class ASemanticMapper<TRecord> : ISemanticMapper<TRecord>
 
     private void InvokeAddMappings()
     {
-        var repository = RepositoryFactory.Create(ParameterNameComparer, throwOnMultipleBuilds: true) ?? throw new InvalidOperationException($"A {nameof(ISemanticMappingRepositoryFactory<object>)} produced a null {nameof(ISemanticMappingRepository<object>)}.");
+        var repository = DependencyProvider.RepositoryFactory.Create(DependencyProvider.ParameterComparer, throwOnMultipleBuilds: true) ?? throw new InvalidOperationException($"A {nameof(ISemanticMappingRepositoryFactory<object>)} produced a null {nameof(ISemanticMappingRepository<object>)}.");
 
         AddMappings(repository);
 
@@ -83,16 +70,16 @@ public abstract class ASemanticMapper<TRecord> : ISemanticMapper<TRecord>
 
         InitializeMapper();
 
-        using var _ = Logger.TypeParameter.BeginScopeMappingTypeParameter(parameter, Mappings.TypeParameters);
+        using var _ = DependencyProvider.Logger.TypeParameter.BeginScopeMappingTypeParameter(parameter, Mappings.TypeParameters);
 
         if (TryGetTypeParameterRecorder(parameter) is not IDetachedMappedSemanticTypeArgumentRecorder<TRecord> recorder)
         {
-            Logger.TypeParameter.FailedToMapTypeParameter();
+            DependencyProvider.Logger.TypeParameter.FailedToMapTypeParameter();
 
             return null;
         }
 
-        return RecorderFactory.TypeParameter.Create(dataRecord, recorder);
+        return DependencyProvider.RecorderFactory.TypeParameter.Create(dataRecord, recorder);
     }
 
     /// <inheritdoc/>
@@ -110,16 +97,16 @@ public abstract class ASemanticMapper<TRecord> : ISemanticMapper<TRecord>
 
         InitializeMapper();
 
-        using var _ = Logger.ConstructorParameter.BeginScopeMappingConstructorParameter(parameter, Mappings.ConstructorParameters);
+        using var _ = DependencyProvider.Logger.ConstructorParameter.BeginScopeMappingConstructorParameter(parameter, Mappings.ConstructorParameters);
 
         if (Mappings.ConstructorParameters.Named.TryGetValue(parameter.Name, out var recorder) is false)
         {
-            Logger.ConstructorParameter.FailedToMapConstructorParameter();
+            DependencyProvider.Logger.ConstructorParameter.FailedToMapConstructorParameter();
 
             return null;
         }
 
-        return RecorderFactory.ConstructorParameter.Create(dataRecord, recorder);
+        return DependencyProvider.RecorderFactory.ConstructorParameter.Create(dataRecord, recorder);
     }
 
     /// <inheritdoc/>
@@ -137,16 +124,16 @@ public abstract class ASemanticMapper<TRecord> : ISemanticMapper<TRecord>
 
         InitializeMapper();
 
-        using var _ = Logger.NamedParameter.BeginScopeMappingNamedParameter(parameterName, Mappings.NamedParameters);
+        using var _ = DependencyProvider.Logger.NamedParameter.BeginScopeMappingNamedParameter(parameterName, Mappings.NamedParameters);
 
         if (Mappings.NamedParameters.Named.TryGetValue(parameterName, out var recorder) is false)
         {
-            Logger.NamedParameter.FailedToMapNamedParameter();
+            DependencyProvider.Logger.NamedParameter.FailedToMapNamedParameter();
 
             return null;
         }
 
-        return RecorderFactory.NamedParameter.Create(dataRecord, recorder);
+        return DependencyProvider.RecorderFactory.NamedParameter.Create(dataRecord, recorder);
     }
 
     private IDetachedMappedSemanticTypeArgumentRecorder<TRecord>? TryGetTypeParameterRecorder(ITypeParameterSymbol parameter)

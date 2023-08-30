@@ -13,7 +13,8 @@ This article will present the recommended pattern. It is *recommended* in the se
 7. [Dependency Injection](#7-dependency-injection)
    1. [Recorder-factory Abstraction](#71-recorder-factory-abstraction)
    2. [Service Registration](#72-service-registration)
-   3. [Usage](#73-usage)
+   3. [Mapper Dependencies](#73-mapper-dependencies)
+   4. [Usage](#74-usage)
 
 #### 1. Attribute Class
 
@@ -72,7 +73,7 @@ interface IExampleRecordBuilder : IRecordBuilder<IExampleRecord>
 
 We implement our `Mapper`, extending the abstract class `ASemanticMapper`. Note that the type-argument of the base-class is `IExampleRecordBuilder`, rather than `IExampleRecord`.
 
-It is also recommended to replace the literal `strings` with `nameof`. This will always work for named parameters, and will work for constructor parameters if the name is the same as the corresponding property (different casing is supported).
+It is also recommended to replace the literal `strings` with `nameof`. This will always work for named parameters, and will work for constructor parameters if the name is the same as the corresponding property (by default, differences in casing are ignored).
 
 ```csharp
 class ExampleMapper : ASemanticMapper<IExampleRecordBuilder>
@@ -101,7 +102,7 @@ class ExampleMapper : ASemanticMapper<IExampleRecordBuilder>
 
 #### 5. Recorder-factory Implementation
 
-We implement a `Recorder`-factory, which is responsible for constructing `Recorders`, using `Mappers` - and able to create multiple independent `Recorders`.  The factory has an internal implementation of `IExampleRecordBuilder` - with invokations of `VerifyCanModify` that ensure that the `IExampleRecord` has not yet been built when attempting to modify it. The builder also overrides `CanBuildRecord`, which ensures that the `IExampleRecord` is in a valid state before building it. 
+We implement a `Recorder`-factory, which is responsible for constructing `Recorders`, using `Mappers`.  The factory has an internal implementation of `IExampleRecordBuilder` - with invokations of `VerifyCanModify` that ensure that the `IExampleRecord` has not yet been built when attempting to modify it. The builder also overrides `CanBuildRecord`, which ensures that the `IExampleRecord` is in a valid state before building it. 
 
 ```csharp
 class ExampleRecorderFactory
@@ -180,10 +181,9 @@ At this point, we can parse attributes of type `ExampleAttribute<T>`.
 AttributeData attributeData;
 
 var parser = new SemanticParser();
+var recorderFactory = new SemanticRecorderFactory();
 
 var mapper = new ExampleMapper();
-
-var recorderFactory = new SemanticRecorderFactory();
 var exampleRecorderFactory = new ExampleRecorderFactory(recorderFactory, mapper);
 
 ISemanticRecorder<IExampleRecord> recorder = exampleRecorderFactory.Create();
@@ -198,7 +198,7 @@ if (success)
 
 #### 7. Dependency Injection
 
-If Dependency Injection is used, the pattern can be further improved.
+If Dependency Injection is used, the pattern can be further improved. Otherwise, step 6. demonstrates the final pattern.
 
 ##### 7.1. Recorder-factory Abstraction
 
@@ -223,15 +223,25 @@ services.AddSingleton<ISemanticMapper<IExampleRecordBuilder>, ExampleMapper>();
 services.AddSingleton<IExampleRecorderFactory, ExampleRecorderFactory>();
 ```
 
-##### 7.3 Usage
+##### 7.3 Mapper Dependencies
+
+Optionally, the abstract `Mapper` has some dependencies that can be injected. A constructor is added to the `ExampleMapper`, which forwards the injected dependencies to the base-class.
+
+```csharp
+
+public ExampleMapper(ISemanticMapperDependencyProvider<IExampleRecordBuilder> dependencyProvider) : base(dependencyProvider) { }
+```
+
+##### 7.4 Usage
 
 The `IExampleRecorderFactory` service can now be injected.
 
 ```csharp
-// The AttributeData representing the attribute.
+// The AttributeData representing the attribute
 AttributeData attributeData;
 
-// Service is injected through DI.
+// Services are injected through DI
+ISemanticParser parser;
 IExampleRecorderFactory recorderFactory;
 
 ISemanticRecorder<IExampleRecord> recorder = recorderFactory.Create();

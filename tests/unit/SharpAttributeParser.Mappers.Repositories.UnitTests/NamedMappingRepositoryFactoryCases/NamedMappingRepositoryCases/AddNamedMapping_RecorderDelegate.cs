@@ -50,7 +50,7 @@ public sealed class AddNamedMapping_RecorderDelegate
 
         var context = RepositoryContext<object, object>.Create();
 
-        context.ParameterNameComparerMock.Setup(static (comparer) => comparer.Equals(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+        context.ComparerMock.Setup(static (comparer) => comparer.Name.Equals(It.IsAny<string>(), It.IsAny<string>())).Returns(true);
 
         context.Repository.AddNamedMapping(parameterAName, Mock.Of<object>());
 
@@ -58,7 +58,7 @@ public sealed class AddNamedMapping_RecorderDelegate
 
         Assert.IsType<ArgumentException>(exception);
 
-        context.ParameterNameComparerMock.Verify((comparer) => comparer.Equals(parameterAName, parameterBName), Times.Once);
+        context.ComparerMock.Verify((comparer) => comparer.Name.Equals(parameterAName, parameterBName), Times.Once);
     }
 
     [Fact]

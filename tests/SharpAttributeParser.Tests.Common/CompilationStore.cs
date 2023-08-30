@@ -57,7 +57,7 @@ public static class CompilationStore
 
         HashSet<string> resolvedAssemblyNames = new();
 
-        unresolvedAssemblies.Enqueue(Assembly.GetEntryAssembly()!);
+        unresolvedAssemblies.Enqueue(Assembly.GetExecutingAssembly());
 
         while (unresolvedAssemblies.Any())
         {

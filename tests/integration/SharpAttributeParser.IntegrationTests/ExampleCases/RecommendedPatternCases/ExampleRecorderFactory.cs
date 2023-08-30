@@ -7,7 +7,7 @@ using SharpAttributeParser.Mappers;
 using System;
 using System.Collections.Generic;
 
-public sealed class ExampleRecorderFactory
+public sealed class ExampleRecorderFactory : IExampleRecorderFactory
 {
     private ISemanticRecorderFactory Factory { get; }
     private ISemanticMapper<IExampleRecordBuilder> Mapper { get; }
@@ -18,7 +18,7 @@ public sealed class ExampleRecorderFactory
         Mapper = mapper;
     }
 
-    public ISemanticRecorder<IExampleRecord> Create() => Factory.Create<IExampleRecord, IExampleRecordBuilder>(Mapper, new ExampleRecordBuilder());
+    ISemanticRecorder<IExampleRecord> IExampleRecorderFactory.Create() => Factory.Create<IExampleRecord, IExampleRecordBuilder>(Mapper, new ExampleRecordBuilder());
 
     private sealed class ExampleRecordBuilder : ARecordBuilder<IExampleRecord>, IExampleRecordBuilder
     {

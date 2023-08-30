@@ -3,11 +3,11 @@
 using Moq;
 
 using SharpAttributeParser.Mappers.MappedRecorders;
+using SharpAttributeParser.Mappers.Repositories;
 using SharpAttributeParser.Mappers.Repositories.Adaptive;
 using SharpAttributeParser.Mappers.Repositories.Combined;
 
 using System;
-using System.Collections.Generic;
 
 using Xunit;
 
@@ -70,13 +70,13 @@ public sealed class TryMapNamedParameter_Combined
         var context = MapperContext<object, object>.Create();
 
         context.CombinedRecorderFactoryMock.Setup(static (factory) => factory.NamedParameter.Create(It.IsAny<object>(), It.IsAny<IDetachedMappedCombinedNamedArgumentRecorder<object>>())).Returns(expectedRecorder);
-        context.RepositoryFactoryMock.Setup((factory) => factory.Create(It.IsAny<IEqualityComparer<string>>(), It.IsAny<bool>()).Build().NamedParameters.Named.TryGetValue(It.IsAny<string>(), out detachedRecorder)).Returns(true);
+        context.RepositoryFactoryMock.Setup((factory) => factory.Create(It.IsAny<IParameterComparer>(), It.IsAny<bool>()).Build().NamedParameters.Named.TryGetValue(It.IsAny<string>(), out detachedRecorder)).Returns(true);
 
         var actualRecorder = Target(context.Mapper, parameterName, dataRecord);
 
         Assert.Same(expectedRecorder, actualRecorder);
 
         context.CombinedRecorderFactoryMock.Verify((factory) => factory.NamedParameter.Create(dataRecord, detachedRecorder.Combined), Times.Once);
-        context.RepositoryFactoryMock.Verify((factory) => factory.Create(context.ParameterNameComparer, true).Build().NamedParameters.Named.TryGetValue(parameterName, out detachedRecorder), Times.Once);
+        context.RepositoryFactoryMock.Verify((factory) => factory.Create(context.ParameterComparer, true).Build().NamedParameters.Named.TryGetValue(parameterName, out detachedRecorder), Times.Once);
     }
 }
