@@ -2,8 +2,8 @@
 
 using SharpAttributeParser.Mappers.Logging;
 using SharpAttributeParser.Mappers.Repositories;
-using SharpAttributeParser.Mappers.Repositories.Split;
 using SharpAttributeParser.Mappers.Repositories.Semantic;
+using SharpAttributeParser.Mappers.Repositories.Split;
 using SharpAttributeParser.Mappers.Repositories.Syntactic;
 
 using System;
