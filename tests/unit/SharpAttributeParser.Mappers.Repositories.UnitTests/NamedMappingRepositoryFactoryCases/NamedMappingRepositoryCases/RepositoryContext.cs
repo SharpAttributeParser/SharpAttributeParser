@@ -3,7 +3,6 @@
 using Moq;
 
 using System;
-using System.Collections.Generic;
 
 internal sealed class RepositoryContext<TRecorder, TRecorderFactory> where TRecorderFactory : class
 {
@@ -11,37 +10,37 @@ internal sealed class RepositoryContext<TRecorder, TRecorderFactory> where TReco
     {
         var factoryContext = FactoryContext<TRecorder, TRecorderFactory>.Create();
 
-        Mock<IEqualityComparer<string>> parameterNameComparerMock = new();
+        Mock<INamedParameterComparer> comparerMock = new();
 
-        parameterNameComparerMock.Setup(static (comparer) => comparer.Equals(It.IsAny<string>(), It.IsAny<string>())).Returns<string, string>(static (x, y) => StringComparer.Ordinal.Equals(x, y));
+        comparerMock.Setup(static (comparer) => comparer.Name.Equals(It.IsAny<string>(), It.IsAny<string>())).Returns<string, string>(static (x, y) => StringComparer.Ordinal.Equals(x, y));
 
-        var repository = ((INamedMappingRepositoryFactory<TRecorder, TRecorderFactory>)factoryContext.Factory).Create(parameterNameComparerMock.Object, throwOnMultipleBuilds);
+        var repository = ((INamedMappingRepositoryFactory<TRecorder, TRecorderFactory>)factoryContext.Factory).Create(comparerMock.Object, throwOnMultipleBuilds);
 
-        return new(repository, parameterNameComparerMock, factoryContext);
+        return new(repository, comparerMock, factoryContext);
     }
 
     public static RepositoryContext<TRecorder, TRecorderFactory> Create(bool throwOnMultipleBuilds = false)
     {
         var factoryContext = FactoryContext<TRecorder, TRecorderFactory>.Create();
 
-        Mock<IEqualityComparer<string>> parameterNameComparerMock = new();
+        Mock<INamedParameterComparer> comparerMock = new() { DefaultValue = DefaultValue.Mock };
 
-        var repository = ((INamedMappingRepositoryFactory<TRecorder, TRecorderFactory>)factoryContext.Factory).Create(parameterNameComparerMock.Object, throwOnMultipleBuilds);
+        var repository = ((INamedMappingRepositoryFactory<TRecorder, TRecorderFactory>)factoryContext.Factory).Create(comparerMock.Object, throwOnMultipleBuilds);
 
-        return new(repository, parameterNameComparerMock, factoryContext);
+        return new(repository, comparerMock, factoryContext);
     }
 
     public INamedMappingRepository<TRecorder, TRecorderFactory> Repository { get; }
 
-    public Mock<IEqualityComparer<string>> ParameterNameComparerMock { get; }
+    public Mock<INamedParameterComparer> ComparerMock { get; }
 
     public FactoryContext<TRecorder, TRecorderFactory> FactoryContext { get; }
 
-    private RepositoryContext(INamedMappingRepository<TRecorder, TRecorderFactory> repository, Mock<IEqualityComparer<string>> parameterNameComparerMock, FactoryContext<TRecorder, TRecorderFactory> factoryContext)
+    private RepositoryContext(INamedMappingRepository<TRecorder, TRecorderFactory> repository, Mock<INamedParameterComparer> comparerMock, FactoryContext<TRecorder, TRecorderFactory> factoryContext)
     {
         Repository = repository;
 
-        ParameterNameComparerMock = parameterNameComparerMock;
+        ComparerMock = comparerMock;
 
         FactoryContext = factoryContext;
     }

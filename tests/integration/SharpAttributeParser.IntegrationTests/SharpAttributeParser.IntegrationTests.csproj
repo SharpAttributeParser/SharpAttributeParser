@@ -26,7 +26,7 @@
         <ProjectReference Include="..\..\..\src\SharpAttributeParser.DependencyInjection\SharpAttributeParser.DependencyInjection.csproj" />
         <ProjectReference Include="..\..\..\src\SharpAttributeParser.Mappers.DependencyInjection\SharpAttributeParser.Mappers.DependencyInjection.csproj" />
         <ProjectReference Include="..\..\..\src\SharpAttributeParser.RecordBuilders\SharpAttributeParser.RecordBuilders.csproj" />
-        <ProjectReference Include="..\..\TestUtility\TestUtility.csproj" />
+        <ProjectReference Include="..\..\SharpAttributeParser.Tests.Common\SharpAttributeParser.Tests.Common.csproj" />
     </ItemGroup>
 
 </Project>

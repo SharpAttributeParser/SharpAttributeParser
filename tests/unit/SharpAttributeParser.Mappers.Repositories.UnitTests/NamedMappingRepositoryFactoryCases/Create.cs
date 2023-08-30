@@ -3,13 +3,12 @@
 using Moq;
 
 using System;
-using System.Collections.Generic;
 
 using Xunit;
 
 public sealed class Create
 {
-    private static INamedMappingRepository<TRecorder, TRecorderFactory> Target<TRecorder, TRecorderFactory>(NamedMappingRepositoryFactory<TRecorder, TRecorderFactory> factory, IEqualityComparer<string> parameterNameComparer, bool throwOnMultipleBuilds) => ((INamedMappingRepositoryFactory<TRecorder, TRecorderFactory>)factory).Create(parameterNameComparer, throwOnMultipleBuilds);
+    private static INamedMappingRepository<TRecorder, TRecorderFactory> Target<TRecorder, TRecorderFactory>(NamedMappingRepositoryFactory<TRecorder, TRecorderFactory> factory, INamedParameterComparer comparer, bool throwOnMultipleBuilds) => ((INamedMappingRepositoryFactory<TRecorder, TRecorderFactory>)factory).Create(comparer, throwOnMultipleBuilds);
 
     [Fact]
     public void NullParameterNameComparer_ArgumentNullException()
@@ -26,7 +25,7 @@ public sealed class Create
     {
         var context = FactoryContext<object, object>.Create();
 
-        var repository = Target(context.Factory, Mock.Of<IEqualityComparer<string>>(), true);
+        var repository = Target(context.Factory, Mock.Of<INamedParameterComparer>(), true);
 
         Assert.NotNull(repository);
     }

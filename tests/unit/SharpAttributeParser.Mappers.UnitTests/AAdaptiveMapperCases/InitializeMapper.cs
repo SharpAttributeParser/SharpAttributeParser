@@ -2,10 +2,10 @@
 
 using Moq;
 
+using SharpAttributeParser.Mappers.Repositories;
 using SharpAttributeParser.Mappers.Repositories.Adaptive;
 
 using System;
-using System.Collections.Generic;
 
 using Xunit;
 
@@ -16,7 +16,7 @@ public sealed class InitializeMapper
     {
         var context = MapperContext<object, object>.Create();
 
-        context.RepositoryFactoryMock.Setup((factory) => factory.Create(It.IsAny<IEqualityComparer<string>>(), It.IsAny<bool>())).Returns((IAdaptiveMappingRepository<object, object>)null!);
+        context.RepositoryFactoryMock.Setup((factory) => factory.Create(It.IsAny<IParameterComparer>(), It.IsAny<bool>())).Returns((IAdaptiveMappingRepository<object, object>)null!);
 
         var exception = Record.Exception(context.Mapper.Initialize);
 
@@ -30,7 +30,7 @@ public sealed class InitializeMapper
 
         var context = MapperContext<object, object>.Create();
 
-        context.RepositoryFactoryMock.Setup((factory) => factory.Create(It.IsAny<IEqualityComparer<string>>(), It.IsAny<bool>())).Returns(repository);
+        context.RepositoryFactoryMock.Setup((factory) => factory.Create(It.IsAny<IParameterComparer>(), It.IsAny<bool>())).Returns(repository);
 
         context.Mapper.Initialize();
 
