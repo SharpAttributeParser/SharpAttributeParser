@@ -20,7 +20,6 @@ public interface IAppendableConstructorMappingRepository<in TRecorder, out TReco
     /// <param name="recorderDelegate">Creates the recorder responsible for recording arguments of the constructor parameter.</param>
     /// <exception cref="ArgumentException"/>
     /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="ArgumentOutOfRangeException"/>
     /// <exception cref="InvalidOperationException"/>
     public abstract void AddNamedMapping(string parameterName, Func<TRecorderFactory, TRecorder> recorderDelegate);
 }

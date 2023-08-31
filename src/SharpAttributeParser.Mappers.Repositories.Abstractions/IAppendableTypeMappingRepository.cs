@@ -12,6 +12,7 @@ public interface IAppendableTypeMappingRepository<TRecorder, TRecorderFactory>
     /// <param name="recorder">The recorder responsible for recording arguments of the type parameter.</param>
     /// <exception cref="ArgumentException"/>
     /// <exception cref="ArgumentNullException"/>
+    /// <exception cref="ArgumentOutOfRangeException"/>
     /// <exception cref="InvalidOperationException"/>
     public abstract void AddIndexedMapping(int parameterIndex, TRecorder recorder);
 
@@ -20,6 +21,7 @@ public interface IAppendableTypeMappingRepository<TRecorder, TRecorderFactory>
     /// <param name="recorderDelegate">Creates the recorder responsible for recording arguments of the type parameter.</param>
     /// <exception cref="ArgumentException"/>
     /// <exception cref="ArgumentNullException"/>
+    /// <exception cref="ArgumentOutOfRangeException"/>
     /// <exception cref="InvalidOperationException"/>
     public abstract void AddIndexedMapping(int parameterIndex, Func<TRecorderFactory, TRecorder> recorderDelegate);
 
@@ -36,7 +38,6 @@ public interface IAppendableTypeMappingRepository<TRecorder, TRecorderFactory>
     /// <param name="recorderDelegate">Creates the recorder responsible for recording arguments of the type parameter.</param>
     /// <exception cref="ArgumentException"/>
     /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="ArgumentOutOfRangeException"/>
     /// <exception cref="InvalidOperationException"/>
     public abstract void AddNamedMapping(string parameterName, Func<TRecorderFactory, TRecorder> recorderDelegate);
 }

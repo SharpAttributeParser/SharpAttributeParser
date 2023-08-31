@@ -20,7 +20,6 @@ public interface IAppendableNamedMappingRepository<in TRecorder, out TRecorderFa
     /// <param name="recorderDelegate">Creates the recorder responsible for recording arguments of the named parameter.</param>
     /// <exception cref="ArgumentException"/>
     /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="ArgumentOutOfRangeException"/>
     /// <exception cref="InvalidOperationException"/>
     public abstract void AddNamedMapping(string parameterName, Func<TRecorderFactory, TRecorder> recorderDelegate);
 }
