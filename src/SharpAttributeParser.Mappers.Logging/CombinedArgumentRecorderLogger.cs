@@ -19,7 +19,6 @@ public sealed class CombinedArgumentRecorderLogger<TCategoryName> : ICombinedArg
 
     /// <summary>Instantiates a <see cref="CombinedArgumentRecorderLogger{TCategoryName}"/>, handling logging for <see cref="ICombinedRecorder"/>.</summary>
     /// <param name="logger">The logger used to log messages.</param>
-    /// <exception cref="ArgumentNullException"/>
     public CombinedArgumentRecorderLogger(ILogger<TCategoryName> logger)
     {
         if (logger is null)

@@ -15,7 +15,6 @@ public sealed class DetachedMappedSemanticNamedArgumentRecorderFactory<TRecord> 
     /// <summary>Instantiates a <see cref="DetachedMappedSemanticNamedArgumentRecorderFactory{TRecord}"/>, handling creation of <see cref="IDetachedMappedSemanticNamedArgumentRecorder{TRecord}"/>.</summary>
     /// <param name="argumentPatternFactory">Handles creation of <see cref="IArgumentPattern{T}"/>.</param>
     /// <param name="loggerFactory">Handles creation of the loggers used by the created recorders.</param>
-    /// <exception cref="ArgumentNullException"/>
     public DetachedMappedSemanticNamedArgumentRecorderFactory(IArgumentPatternFactory argumentPatternFactory, IMappedSemanticNamedArgumentRecorderLoggerFactory? loggerFactory = null)
     {
         ArgumentPatternFactory = argumentPatternFactory ?? throw new ArgumentNullException(nameof(argumentPatternFactory));

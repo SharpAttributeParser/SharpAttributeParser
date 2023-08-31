@@ -13,7 +13,6 @@ public sealed class DetachedMappedSyntacticConstructorArgumentRecorderFactory<TR
     /// <param name="normalFactory">Handles creation of recorders related to non-optional, non-<see langword="params"/> constructor parameters.</param>
     /// <param name="paramsFactory">Handles creation of recorders related to <see langword="params"/> constructor parameters.</param>
     /// <param name="optionalFactory">Handles creation of recorders related to optional constructor parameters.</param>
-    /// <exception cref="ArgumentNullException"/>
     public DetachedMappedSyntacticConstructorArgumentRecorderFactory(IDetachedMappedSyntacticNormalConstructorArgumentRecorderFactory<TRecord> normalFactory, IDetachedMappedSyntacticParamsConstructorArgumentRecorderFactory<TRecord> paramsFactory, IDetachedMappedSyntacticOptionalConstructorArgumentRecorderFactory<TRecord> optionalFactory)
     {
         Normal = normalFactory ?? throw new ArgumentNullException(nameof(normalFactory));

@@ -11,7 +11,6 @@ public sealed class SemanticArgumentRecorderLoggerFactory : ISemanticArgumentRec
 
     /// <summary>Instantiates a <see cref="SemanticArgumentRecorderLoggerFactory"/>, handling creation of <see cref="ISemanticArgumentRecorderLogger"/>.</summary>
     /// <param name="loggerFactory">Handles creation of loggers.</param>
-    /// <exception cref="ArgumentNullException"/>
     public SemanticArgumentRecorderLoggerFactory(ILoggerFactory loggerFactory)
     {
         LoggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));

@@ -11,8 +11,6 @@ using System;
 /// <typeparam name="TRecord">The type to which arguments are recorded.</typeparam>
 public abstract class ASemanticMapper<TRecord> : ISemanticMapper<TRecord>
 {
-    private static Lazy<ISemanticMappingRepositoryFactory<TRecord>> DefaultRepositoryFactory { get; } = new(DefaultRepositoryFactories.SemanticFactory<TRecord>);
-
     private bool IsInitialized { get; set; }
 
     private IBuiltSemanticMappingRepository<TRecord> Mappings { get; set; } = null!;
@@ -27,7 +25,6 @@ public abstract class ASemanticMapper<TRecord> : ISemanticMapper<TRecord>
     }
 
     /// <summary>Initializes the mapper. If not yet performed, initialization will occur when the mapper is first used.</summary>
-    /// <exception cref="InvalidOperationException"/>
     protected void InitializeMapper()
     {
         if (IsInitialized)
@@ -42,7 +39,7 @@ public abstract class ASemanticMapper<TRecord> : ISemanticMapper<TRecord>
 
     private void InvokeAddMappings()
     {
-        var repository = DependencyProvider.RepositoryFactory.Create(DependencyProvider.ParameterComparer, throwOnMultipleBuilds: true) ?? throw new InvalidOperationException($"A {nameof(ISemanticMappingRepositoryFactory<object>)} produced a null {nameof(ISemanticMappingRepository<object>)}.");
+        var repository = DependencyProvider.RepositoryFactory.Create(DependencyProvider.ParameterComparer, throwOnMultipleBuilds: true);
 
         AddMappings(repository);
 
@@ -52,7 +49,6 @@ public abstract class ASemanticMapper<TRecord> : ISemanticMapper<TRecord>
     /// <summary>Allows mappings from parameters to recorders to be added.</summary>
     /// <param name="repository">The repository to which mappings are added.</param>
     /// <remarks>The method will be invoked during initialization of the mapper.</remarks>
-    /// <exception cref="ArgumentNullException"/>
     protected abstract void AddMappings(IAppendableSemanticMappingRepository<TRecord> repository);
 
     /// <inheritdoc/>

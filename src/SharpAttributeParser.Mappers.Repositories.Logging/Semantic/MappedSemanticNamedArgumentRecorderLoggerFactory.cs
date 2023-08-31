@@ -11,7 +11,6 @@ public sealed class MappedSemanticNamedArgumentRecorderLoggerFactory : IMappedSe
 
     /// <summary>Instantiates a <see cref="MappedSemanticNamedArgumentRecorderLoggerFactory"/>, handling creation of <see cref="IMappedSemanticNamedArgumentRecorderLogger"/>.</summary>
     /// <param name="loggerFactory">Handles creation of loggers.</param>
-    /// <exception cref="ArgumentNullException"/>
     public MappedSemanticNamedArgumentRecorderLoggerFactory(ILoggerFactory loggerFactory)
     {
         LoggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));

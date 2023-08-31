@@ -23,22 +23,16 @@ public interface ISemanticParserLogger
     /// <param name="recorderType">The type of the recorder used to record the parsed arguments.</param>
     /// <param name="attributeData">The syntactic description of the attribute.</param>
     /// <returns>The <see cref="IDisposable"/> used to close the log scope.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IDisposable? BeginScopeParsingAttribute(Type recorderType, AttributeData attributeData);
 
     /// <summary>Begins a log scope describing a determined attribute-class.</summary>
     /// <param name="attributeClass">The attribute-class.</param>
     /// <returns>The <see cref="IDisposable"/> used to close the log scope.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IDisposable? BeginScopeDeterminedAttributeClass(INamedTypeSymbol attributeClass);
 
     /// <summary>Begins a log scope describing a determined target constructor.</summary>
     /// <param name="targetConstructor">The target constructor.</param>
     /// <returns>The <see cref="IDisposable"/> used to close the log scope.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IDisposable? BeginScopeDeterminedTargetConstructor(IMethodSymbol targetConstructor);
 
     /// <summary>Logs a message describing the attribute-class of the attribute being undetermined.</summary>

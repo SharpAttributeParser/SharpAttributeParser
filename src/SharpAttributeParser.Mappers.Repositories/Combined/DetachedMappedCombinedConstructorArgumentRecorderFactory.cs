@@ -13,7 +13,6 @@ public sealed class DetachedMappedCombinedConstructorArgumentRecorderFactory<TRe
     /// <param name="normalFactory">Handles creation of recorders related to non-optional, non-<see langword="params"/> constructor parameters.</param>
     /// <param name="paramsFactory">Handles creation of recorders related to <see langword="params"/> constructor parameters.</param>
     /// <param name="optionalFactory">Handles creation of recorders related to optional constructor parameters.</param>
-    /// <exception cref="ArgumentNullException"/>
     public DetachedMappedCombinedConstructorArgumentRecorderFactory(IDetachedMappedCombinedNormalConstructorArgumentRecorderFactory<TRecord> normalFactory, IDetachedMappedCombinedParamsConstructorArgumentRecorderFactory<TRecord> paramsFactory, IDetachedMappedCombinedOptionalConstructorArgumentRecorderFactory<TRecord> optionalFactory)
     {
         Normal = normalFactory ?? throw new ArgumentNullException(nameof(normalFactory));

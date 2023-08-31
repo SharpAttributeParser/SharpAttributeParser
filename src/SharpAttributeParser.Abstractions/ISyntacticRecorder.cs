@@ -1,7 +1,5 @@
 ﻿namespace SharpAttributeParser;
 
-using System;
-
 /// <summary>Records syntactic information about the arguments of attributes.</summary>
 public interface ISyntacticRecorder
 {
@@ -21,6 +19,5 @@ public interface ISyntacticRecorder<out TRecord> : ISyntacticRecorder
 {
     /// <summary>Retrieves a record of the recorded syntactic information.</summary>
     /// <returns>A record of the recorded syntactic information.</returns>
-    /// <exception cref="InvalidOperationException"/>
     public abstract TRecord GetRecord();
 }

@@ -13,29 +13,21 @@ public interface IConstructorArgumentLogger
     /// <param name="attributeData">The syntactic description of the attribute.</param>
     /// <param name="attributeSyntax">The syntactic description of the attribute.</param>
     /// <returns>The <see cref="IDisposable"/> used to close the log scope.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IDisposable? BeginScopeParsingConstructorArguments(AttributeData attributeData, AttributeSyntax attributeSyntax);
 
     /// <summary>Begins a log scope describing an attempt to parse an argument of a constructor parameter.</summary>
     /// <param name="parameter">The constructor parameter.</param>
     /// <returns>The <see cref="IDisposable"/> used to close the log scope.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IDisposable? BeginScopeParsingConstructorArgument(IParameterSymbol parameter);
 
     /// <summary>Begins a log scope describing an attempt to parse an argument of a constructor parameter.</summary>
     /// <param name="syntax">The syntactic description of the argument.</param>
     /// <returns>The <see cref="IDisposable"/> used to close the log scope.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IDisposable? BeginScopeParsingNormalConstructorArgument(ExpressionSyntax syntax);
 
     /// <summary>Begins a log scope describing an attempt to parse a <see langword="params"/>-argument of a constructor parameter.</summary>
     /// <param name="elementSyntax">The syntactic description of each element in the <see langword="params"/>-argument.</param>
     /// <returns>The <see cref="IDisposable"/> used to close the log scope.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IDisposable? BeginScopeParsingParamsConstructorArgument(IReadOnlyList<ExpressionSyntax> elementSyntax);
 
     /// <summary>Begins a log scope describing an attempt to parse an unspecified argument of an optional constructor parameter.</summary>

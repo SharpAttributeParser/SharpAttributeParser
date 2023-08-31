@@ -20,9 +20,6 @@ public interface IDetachedMappedSyntacticOptionalConstructorArgumentRecorderFact
     /// The <see cref="bool"/> returned by the recorder should indicate whether syntactic information was successfully recorded.
     /// </param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSyntacticConstructorArgumentRecorder<TRecord> Create(Func<TRecord, OneOf<None, ExpressionSyntax>, bool> recorder);
 
     /// <summary>Creates a recorder which invokes the provided recorder and returns <see langword="true"/>.</summary>
@@ -32,8 +29,5 @@ public interface IDetachedMappedSyntacticOptionalConstructorArgumentRecorderFact
     /// <item>The syntactic description of the argument, or <see cref="None"/> if the default argument of the optional parameter was used.</item>
     /// </list></param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSyntacticConstructorArgumentRecorder<TRecord> Create(Action<TRecord, OneOf<None, ExpressionSyntax>> recorder);
 }

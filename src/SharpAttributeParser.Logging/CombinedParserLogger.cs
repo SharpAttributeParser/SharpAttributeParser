@@ -20,7 +20,6 @@ public sealed class CombinedParserLogger<TCategoryName> : ICombinedParserLogger<
 
     /// <summary>Instantiates a <see cref="CombinedParserLogger{TCategoryName}"/>, handling logging for <see cref="ICombinedParser"/>.</summary>
     /// <param name="logger">The logger used to log messages.</param>
-    /// <exception cref="ArgumentNullException"/>
     public CombinedParserLogger(ILogger<TCategoryName> logger)
     {
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));

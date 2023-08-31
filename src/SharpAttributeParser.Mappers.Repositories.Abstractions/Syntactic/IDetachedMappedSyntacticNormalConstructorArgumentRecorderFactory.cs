@@ -17,9 +17,6 @@ public interface IDetachedMappedSyntacticNormalConstructorArgumentRecorderFactor
     /// The <see cref="bool"/> returned by the recorder should indicate whether syntactic information was successfully recorded.
     /// </param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSyntacticConstructorArgumentRecorder<TRecord> Create(Func<TRecord, ExpressionSyntax, bool> recorder);
 
     /// <summary>Creates a recorder which invokes the provided recorder and returns <see langword="true"/>.</summary>
@@ -29,8 +26,5 @@ public interface IDetachedMappedSyntacticNormalConstructorArgumentRecorderFactor
     /// <item>The syntactic description of the argument.</item>
     /// </list></param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSyntacticConstructorArgumentRecorder<TRecord> Create(Action<TRecord, ExpressionSyntax> recorder);
 }

@@ -4,8 +4,6 @@ using Microsoft.CodeAnalysis;
 
 using SharpAttributeParser.Mappers.MappedRecorders;
 using SharpAttributeParser.Mappers.Repositories.Adaptive;
-using SharpAttributeParser.Mappers.Repositories.Combined;
-using SharpAttributeParser.Mappers.Repositories.Semantic;
 
 using System;
 
@@ -28,7 +26,6 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
     }
 
     /// <summary>Initializes the mapper. If not yet performed, initialization will occur when the mapper is first used.</summary>
-    /// <exception cref="InvalidOperationException"/>
     protected void InitializeMapper()
     {
         if (IsInitialized)
@@ -43,7 +40,7 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
 
     private void InvokeAddMappings()
     {
-        var repository = DependencyProvider.RepositoryFactory.Create(DependencyProvider.ParameterComparer, throwOnMultipleBuilds: true) ?? throw new InvalidOperationException($"A {nameof(IAdaptiveMappingRepositoryFactory<object, object>)} produced a null {nameof(IAdaptiveMappingRepository<object, object>)}.");
+        var repository = DependencyProvider.RepositoryFactory.Create(DependencyProvider.ParameterComparer, throwOnMultipleBuilds: true);
 
         AddMappings(repository);
 
@@ -53,7 +50,6 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
     /// <summary>Allows mappings from parameters to recorders to be added.</summary>
     /// <param name="repository">The repository to which mappings are added.</param>
     /// <remarks>The method will be invoked during initialization of the mapper.</remarks>
-    /// <exception cref="ArgumentNullException"/>
     protected abstract void AddMappings(IAppendableAdaptiveMappingRepository<TCombinedRecord, TSemanticRecord> repository);
 
     /// <inheritdoc/>
@@ -80,12 +76,7 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
             return null;
         }
 
-        if (recorderProvider.Combined is not IDetachedMappedCombinedTypeArgumentRecorder<TCombinedRecord> recorder)
-        {
-            throw new InvalidOperationException($"The {nameof(IDetachedMappedCombinedTypeArgumentRecorder<object>)} of a {nameof(IDetachedMappedAdaptiveTypeArgumentRecorderProvider<object, object>)} was null.");
-        }
-
-        return DependencyProvider.CombinedRecorderFactory.TypeParameter.Create(dataRecord, recorder);
+        return DependencyProvider.CombinedRecorderFactory.TypeParameter.Create(dataRecord, recorderProvider.Combined);
     }
 
     /// <inheritdoc/>
@@ -112,12 +103,7 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
             return null;
         }
 
-        if (recorderProvider.Semantic is not IDetachedMappedSemanticTypeArgumentRecorder<TSemanticRecord> recorder)
-        {
-            throw new InvalidOperationException($"The {nameof(IDetachedMappedSemanticTypeArgumentRecorder<object>)} of a {nameof(IDetachedMappedAdaptiveTypeArgumentRecorderProvider<object, object>)} was null.");
-        }
-
-        return DependencyProvider.SemanticRecorderFactory.TypeParameter.Create(dataRecord, recorder);
+        return DependencyProvider.SemanticRecorderFactory.TypeParameter.Create(dataRecord, recorderProvider.Semantic);
     }
 
     /// <inheritdoc/>
@@ -144,12 +130,7 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
             return null;
         }
 
-        if (recorderProvider.Combined is not IDetachedMappedCombinedConstructorArgumentRecorder<TCombinedRecord> recorder)
-        {
-            throw new InvalidOperationException($"The {nameof(IDetachedMappedCombinedConstructorArgumentRecorder<object>)} of a {nameof(IDetachedMappedAdaptiveConstructorArgumentRecorderProvider<object, object>)} was null.");
-        }
-
-        return DependencyProvider.CombinedRecorderFactory.ConstructorParameter.Create(dataRecord, recorder);
+        return DependencyProvider.CombinedRecorderFactory.ConstructorParameter.Create(dataRecord, recorderProvider.Combined);
     }
 
     /// <inheritdoc/>
@@ -176,12 +157,7 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
             return null;
         }
 
-        if (recorderProvider.Semantic is not IDetachedMappedSemanticConstructorArgumentRecorder<TSemanticRecord> recorder)
-        {
-            throw new InvalidOperationException($"The {nameof(IDetachedMappedSemanticConstructorArgumentRecorder<object>)} of a {nameof(IDetachedMappedAdaptiveConstructorArgumentRecorderProvider<object, object>)} was null.");
-        }
-
-        return DependencyProvider.SemanticRecorderFactory.ConstructorParameter.Create(dataRecord, recorder);
+        return DependencyProvider.SemanticRecorderFactory.ConstructorParameter.Create(dataRecord, recorderProvider.Semantic);
     }
 
     /// <inheritdoc/>
@@ -208,12 +184,7 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
             return null;
         }
 
-        if (recorderProvider.Combined is not IDetachedMappedCombinedNamedArgumentRecorder<TCombinedRecord> recorder)
-        {
-            throw new InvalidOperationException($"The {nameof(IDetachedMappedCombinedNamedArgumentRecorder<object>)} of a {nameof(IDetachedMappedAdaptiveNamedArgumentRecorderProvider<object, object>)} was null.");
-        }
-
-        return DependencyProvider.CombinedRecorderFactory.NamedParameter.Create(dataRecord, recorder);
+        return DependencyProvider.CombinedRecorderFactory.NamedParameter.Create(dataRecord, recorderProvider.Combined);
     }
 
     /// <inheritdoc/>
@@ -240,12 +211,7 @@ public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombi
             return null;
         }
 
-        if (recorderProvider.Semantic is not IDetachedMappedSemanticNamedArgumentRecorder<TSemanticRecord> recorder)
-        {
-            throw new InvalidOperationException($"The {nameof(IDetachedMappedSemanticNamedArgumentRecorder<object>)} of a {nameof(IDetachedMappedAdaptiveNamedArgumentRecorderProvider<object, object>)} was null.");
-        }
-
-        return DependencyProvider.SemanticRecorderFactory.NamedParameter.Create(dataRecord, recorder);
+        return DependencyProvider.SemanticRecorderFactory.NamedParameter.Create(dataRecord, recorderProvider.Semantic);
     }
 
     private IDetachedMappedAdaptiveTypeArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>? TryGetTypeParameterRecorder(ITypeParameterSymbol parameter)

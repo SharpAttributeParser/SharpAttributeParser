@@ -17,8 +17,6 @@ public interface IDetachedMappedSemanticConstructorArgumentRecorderFactory<TReco
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSemanticConstructorArgumentRecorder<TRecord> Create(Func<TRecord, object?, bool> recorder);
 
     /// <summary>Creates a recorder which invokes the provided recorder and returns <see langword="true"/>.</summary>
@@ -28,8 +26,6 @@ public interface IDetachedMappedSemanticConstructorArgumentRecorderFactory<TReco
     /// <item>The argument that is recorded.</item>
     /// </list></param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSemanticConstructorArgumentRecorder<TRecord> Create(Action<TRecord, object?> recorder);
 
     /// <summary>Creates a recorder which filters arguments using the provided pattern before invoking the provided recorder, and which returns <see langword="false"/> for discarded arguments.</summary>
@@ -43,8 +39,6 @@ public interface IDetachedMappedSemanticConstructorArgumentRecorderFactory<TReco
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSemanticConstructorArgumentRecorder<TRecord> Create<TArgument>(IArgumentPattern<TArgument> pattern, Func<TRecord, TArgument, bool> recorder);
 
     /// <summary>Creates a recorder which filters arguments using the provided pattern before invoking the provided recorder and returning <see langword="true"/>, and which returns <see langword="false"/> for discarded arguments.</summary>
@@ -56,8 +50,6 @@ public interface IDetachedMappedSemanticConstructorArgumentRecorderFactory<TReco
     /// <item>The argument that is recorded.</item>
     /// </list></param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSemanticConstructorArgumentRecorder<TRecord> Create<TArgument>(IArgumentPattern<TArgument> pattern, Action<TRecord, TArgument> recorder);
 
     /// <summary>Creates a recorder which filters arguments using the provided pattern before invoking the provided recorder, and which returns <see langword="false"/> for discarded arguments.</summary>
@@ -71,9 +63,6 @@ public interface IDetachedMappedSemanticConstructorArgumentRecorderFactory<TReco
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSemanticConstructorArgumentRecorder<TRecord> Create<TArgument>(Func<IArgumentPatternFactory, IArgumentPattern<TArgument>> patternDelegate, Func<TRecord, TArgument, bool> recorder);
 
     /// <summary>Creates a recorder which filters arguments using the provided pattern before invoking the provided recorder and returning <see langword="true"/>, and which returns <see langword="false"/> for discarded arguments.</summary>
@@ -85,8 +74,5 @@ public interface IDetachedMappedSemanticConstructorArgumentRecorderFactory<TReco
     /// <item>The argument that is recorded.</item>
     /// </list></param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSemanticConstructorArgumentRecorder<TRecord> Create<TArgument>(Func<IArgumentPatternFactory, IArgumentPattern<TArgument>> patternDelegate, Action<TRecord, TArgument> recorder);
 }

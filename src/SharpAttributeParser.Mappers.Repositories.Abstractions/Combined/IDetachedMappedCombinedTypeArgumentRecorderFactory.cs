@@ -19,9 +19,6 @@ public interface IDetachedMappedCombinedTypeArgumentRecorderFactory<TRecord>
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedCombinedTypeArgumentRecorder<TRecord> Create(Func<TRecord, ITypeSymbol, ExpressionSyntax, bool> recorder);
 
     /// <summary>Creates a recorder which invokes the provided recorder and returns <see langword="true"/>.</summary>
@@ -32,8 +29,5 @@ public interface IDetachedMappedCombinedTypeArgumentRecorderFactory<TRecord>
     /// <item>The syntactic description of the argument.</item>
     /// </list></param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedCombinedTypeArgumentRecorder<TRecord> Create(Action<TRecord, ITypeSymbol, ExpressionSyntax> recorder);
 }

@@ -10,7 +10,6 @@ public sealed class ConstructorParameterComparer : IConstructorParameterComparer
 
     /// <summary>Instantiates a <see cref="ConstructorParameterComparer"/>, determining equality when comparing constructor parameters.</summary>
     /// <param name="name">Determines equality when comparing the names of constructor parameters.</param>
-    /// <exception cref="ArgumentNullException"/>
     public ConstructorParameterComparer(IEqualityComparer<string> name)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));

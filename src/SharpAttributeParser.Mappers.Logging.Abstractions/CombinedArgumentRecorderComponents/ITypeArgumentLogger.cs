@@ -13,8 +13,6 @@ public interface ITypeArgumentLogger
     /// <param name="argument">The argument of the parameter.</param>
     /// <param name="syntax">The syntactic description of the argument.</param>
     /// <returns>The <see cref="IDisposable"/> used to close the log scope.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IDisposable? BeginScopeRecordingTypeArgument(ITypeParameterSymbol parameter, ITypeSymbol argument, ExpressionSyntax syntax);
 
     /// <summary>Logs a message describing a failed attempt to map a type parameter to a recorder.</summary>

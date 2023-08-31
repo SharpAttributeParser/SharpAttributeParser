@@ -17,7 +17,6 @@ public sealed class SemanticArgumentRecorderLogger<TCategoryName> : ISemanticArg
 
     /// <summary>Instantiates a <see cref="SemanticArgumentRecorderLogger{TCategoryName}"/>, handling logging for <see cref="ISemanticRecorder"/>.</summary>
     /// <param name="logger">The logger used to log messages.</param>
-    /// <exception cref="ArgumentNullException"/>
     public SemanticArgumentRecorderLogger(ILogger<TCategoryName> logger)
     {
         if (logger is null)

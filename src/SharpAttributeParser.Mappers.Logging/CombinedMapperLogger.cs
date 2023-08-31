@@ -18,7 +18,6 @@ public sealed class CombinedMapperLogger<TCategoryName> : ICombinedMapperLogger<
 
     /// <summary>Instantiates a <see cref="CombinedMapperLogger{TCategoryName}"/>, handling logging for <see cref="ICombinedMapper{TRecord}"/>.</summary>
     /// <param name="logger">The logger used to log messages.</param>
-    /// <exception cref="ArgumentNullException"/>
     public CombinedMapperLogger(ILogger<TCategoryName> logger)
     {
         if (logger is null)

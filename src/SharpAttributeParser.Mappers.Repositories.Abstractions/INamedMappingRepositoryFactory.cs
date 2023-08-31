@@ -11,6 +11,5 @@ public interface INamedMappingRepositoryFactory<TRecorder, TRecorderFactory>
     /// <param name="comparer">Determines equality when comparing parameters.</param>
     /// <param name="throwOnMultipleBuilds">Indicates whether the created repository should throw an <see cref="InvalidOperationException"/> if build is invoked more than once.</param>
     /// <returns>The created repository.</returns>
-    /// <exception cref="ArgumentNullException"/>
     public abstract INamedMappingRepository<TRecorder, TRecorderFactory> Create(INamedParameterComparer comparer, bool throwOnMultipleBuilds);
 }

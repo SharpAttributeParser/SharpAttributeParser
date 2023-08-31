@@ -20,7 +20,6 @@ public sealed class DetachedMappedSplitParamsConstructorArgumentRecorderFactory<
     /// <summary>Instantiates a <see cref="DetachedMappedSplitParamsConstructorArgumentRecorderFactory{TSemanticRecord, TSyntacticRecord}"/>, handling creation of <see cref="IDetachedMappedSplitConstructorArgumentRecorderProvider{TSemanticRecord, TSyntacticRecord}"/> related to <see langword="params"/> constructor parameters.</summary>
     /// <param name="semanticFactory">Handles creation of the recorders used when arguments are parsed.</param>
     /// <param name="syntacticFactory">Handles creation of the recorders used when syntactic information about arguments is extracted.</param>
-    /// <exception cref="ArgumentNullException"/>
     public DetachedMappedSplitParamsConstructorArgumentRecorderFactory(IDetachedMappedSemanticConstructorArgumentRecorderFactory<TSemanticRecord> semanticFactory, IDetachedMappedSyntacticParamsConstructorArgumentRecorderFactory<TSyntacticRecord> syntacticFactory)
     {
         SemanticFactory = semanticFactory ?? throw new ArgumentNullException(nameof(semanticFactory));
@@ -155,18 +154,5 @@ public sealed class DetachedMappedSplitParamsConstructorArgumentRecorderFactory<
         return Create(semantic, syntactic);
     }
 
-    private static IDetachedMappedSplitConstructorArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord> Create(IDetachedMappedSemanticConstructorArgumentRecorder<TSemanticRecord> semantic, IDetachedMappedSyntacticConstructorArgumentRecorder<TSyntacticRecord> syntactic)
-    {
-        if (semantic is null)
-        {
-            throw new InvalidOperationException($"A {nameof(IDetachedMappedSemanticConstructorArgumentRecorderFactory<object>)} produced a null {nameof(IDetachedMappedSemanticConstructorArgumentRecorder<object>)}.");
-        }
-
-        if (syntactic is null)
-        {
-            throw new InvalidOperationException($"A {nameof(IDetachedMappedSyntacticParamsConstructorArgumentRecorderFactory<object>)} produced a null {nameof(IDetachedMappedSyntacticConstructorArgumentRecorder<object>)}.");
-        }
-
-        return new DetachedMappedSplitConstructorArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord>(semantic, syntactic);
-    }
+    private static IDetachedMappedSplitConstructorArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord> Create(IDetachedMappedSemanticConstructorArgumentRecorder<TSemanticRecord> semantic, IDetachedMappedSyntacticConstructorArgumentRecorder<TSyntacticRecord> syntactic) => new DetachedMappedSplitConstructorArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord>(semantic, syntactic);
 }

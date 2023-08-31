@@ -12,15 +12,11 @@ public interface INamedArgumentLogger
     /// <param name="attributeData">The semantic description of the attribute.</param>
     /// <param name="attributeSyntax">The syntactic description of the attribute.</param>
     /// <returns>The <see cref="IDisposable"/> used to close the log scope.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IDisposable? BeginScopeParsingNamedArguments(AttributeData attributeData, AttributeSyntax attributeSyntax);
 
     /// <summary>Begins a log scope describing an attempt to parse the argument of a named parameter.</summary>
     /// <param name="parameterName">The name of the named parameter.</param>
     /// <param name="syntax">The syntactic description of the argument.</param>
     /// <returns>The <see cref="IDisposable"/> used to close the log scope.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IDisposable? BeginScopeParsingNamedArgument(string parameterName, ExpressionSyntax syntax);
 }

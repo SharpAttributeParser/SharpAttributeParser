@@ -48,12 +48,11 @@ public abstract class ARecordBuilder<TRecord> : IRecordBuilder<TRecord>
     protected bool CanModify() => HasBeenBuilt is false;
 
     /// <summary>Verifies that the data record may be further modified, and throws an <see cref="InvalidOperationException"/> otherwise.</summary>
-    /// <exception cref="InvalidOperationException"/>
     protected void VerifyCanModify()
     {
         if (CanModify() is false)
         {
-            throw new InvalidOperationException($"The {typeof(TRecord).Name} has been built, and may not be further modified.");
+            throw new InvalidOperationException($"The {typeof(TRecord).Name} has been built, and may not be modified.");
         }
     }
 }

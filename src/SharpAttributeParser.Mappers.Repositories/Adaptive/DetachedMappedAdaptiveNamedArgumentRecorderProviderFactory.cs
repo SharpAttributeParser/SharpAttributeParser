@@ -17,7 +17,6 @@ public sealed class DetachedMappedAdaptiveNamedArgumentRecorderProviderFactory<T
     /// <summary>Instantiates a <see cref="DetachedMappedAdaptiveNamedArgumentRecorderProviderFactory{TCombinedRecord, TSemanticRecord}"/>, handling creation of <see cref="IDetachedMappedAdaptiveNamedArgumentRecorderProvider{TCombinedRecord, TSemanticRecord}"/> related to named parameters.</summary>
     /// <param name="combinedFactory">Handles creation of the recorders used when arguments are parsed with syntactic context.</param>
     /// <param name="semanticFactory">Handles creation of the recorders used when arguments are parsed without syntactic context.</param>
-    /// <exception cref="ArgumentNullException"/>
     public DetachedMappedAdaptiveNamedArgumentRecorderProviderFactory(IDetachedMappedCombinedNamedArgumentRecorderFactory<TCombinedRecord> combinedFactory, IDetachedMappedSemanticNamedArgumentRecorderFactory<TSemanticRecord> semanticFactory)
     {
         CombinedFactory = combinedFactory ?? throw new ArgumentNullException(nameof(combinedFactory));
@@ -152,20 +151,7 @@ public sealed class DetachedMappedAdaptiveNamedArgumentRecorderProviderFactory<T
         return Create(combined, semantic);
     }
 
-    private static IDetachedMappedAdaptiveNamedArgumentRecorderProvider<TCombinedRecord, TSemanticRecord> Create(IDetachedMappedCombinedNamedArgumentRecorder<TCombinedRecord> combined, IDetachedMappedSemanticNamedArgumentRecorder<TSemanticRecord> semantic)
-    {
-        if (combined is null)
-        {
-            throw new InvalidOperationException($"A {nameof(IDetachedMappedCombinedNamedArgumentRecorderFactory<object>)} produced a null {nameof(IDetachedMappedCombinedNamedArgumentRecorder<object>)}.");
-        }
-
-        if (semantic is null)
-        {
-            throw new InvalidOperationException($"A {nameof(IDetachedMappedSemanticNamedArgumentRecorderFactory<object>)} produced a null {nameof(IDetachedMappedSemanticNamedArgumentRecorder<object>)}.");
-        }
-
-        return new Provider(combined, semantic);
-    }
+    private static IDetachedMappedAdaptiveNamedArgumentRecorderProvider<TCombinedRecord, TSemanticRecord> Create(IDetachedMappedCombinedNamedArgumentRecorder<TCombinedRecord> combined, IDetachedMappedSemanticNamedArgumentRecorder<TSemanticRecord> semantic) => new Provider(combined, semantic);
 
     private sealed class Provider : IDetachedMappedAdaptiveNamedArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>
     {

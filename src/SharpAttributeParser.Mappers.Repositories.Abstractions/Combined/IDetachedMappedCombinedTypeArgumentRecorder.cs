@@ -3,8 +3,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-using System;
-
 /// <summary>Records the arguments of some type parameter, together with syntactic information about the arguments, to provided records.</summary>
 /// <typeparam name="TRecord">The type to which arguments are recorded.</typeparam>
 public interface IDetachedMappedCombinedTypeArgumentRecorder<in TRecord>
@@ -14,8 +12,5 @@ public interface IDetachedMappedCombinedTypeArgumentRecorder<in TRecord>
     /// <param name="argument">The argument of the type parameter.</param>
     /// <param name="syntax">The syntactic description of the argument.</param>
     /// <returns>A <see cref="bool"/> indicating whether the argument was successfully recorded.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract bool TryRecordArgument(TRecord dataRecord, ITypeSymbol argument, ExpressionSyntax syntax);
 }

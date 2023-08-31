@@ -27,8 +27,6 @@ public interface IDetachedMappedAdaptiveTypeArgumentRecorderProviderFactory<TCom
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedAdaptiveTypeArgumentRecorderProvider<TCombinedRecord, TSemanticRecord> Create(Func<TCombinedRecord, ITypeSymbol, ExpressionSyntax, bool> combinedRecorder, Func<TSemanticRecord, ITypeSymbol, bool> semanticRecorder);
 
     /// <summary>Creates a provider of recorders which invoke the provided recorder and return <see langword="true"/>.</summary>
@@ -44,7 +42,5 @@ public interface IDetachedMappedAdaptiveTypeArgumentRecorderProviderFactory<TCom
     /// <item>The argument that is recorded.</item>
     /// </list></param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedAdaptiveTypeArgumentRecorderProvider<TCombinedRecord, TSemanticRecord> Create(Action<TCombinedRecord, ITypeSymbol, ExpressionSyntax> combinedRecorder, Action<TSemanticRecord, ITypeSymbol> semanticRecorder);
 }

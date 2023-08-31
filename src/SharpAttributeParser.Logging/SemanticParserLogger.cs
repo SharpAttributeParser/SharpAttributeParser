@@ -19,7 +19,6 @@ public sealed class SemanticParserLogger<TCategoryName> : ISemanticParserLogger<
 
     /// <summary>Instantiates a <see cref="SemanticParserLogger{TCategoryName}"/>, handling logging for <see cref="ISemanticParser"/>.</summary>
     /// <param name="logger">The logger used to log messages.</param>
-    /// <exception cref="ArgumentNullException"/>
     public SemanticParserLogger(ILogger<TCategoryName> logger)
     {
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));

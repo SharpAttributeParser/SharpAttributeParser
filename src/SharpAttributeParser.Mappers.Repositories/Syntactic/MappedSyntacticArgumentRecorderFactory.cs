@@ -13,7 +13,6 @@ public sealed class MappedSyntacticArgumentRecorderFactory : IMappedSyntacticArg
     /// <param name="typeParameter">Handles creation of attached recorders related to type parameters.</param>
     /// <param name="constructorParameter">Handles creation of attached recorders related to constructor parameters.</param>
     /// <param name="namedParameter">Handles creation of attached recorders related to named parameters.</param>
-    /// <exception cref="ArgumentNullException"/>
     public MappedSyntacticArgumentRecorderFactory(IMappedSyntacticTypeArgumentRecorderFactory typeParameter, IMappedSyntacticConstructorArgumentRecorderFactory constructorParameter, IMappedSyntacticNamedArgumentRecorderFactory namedParameter)
     {
         TypeParameter = typeParameter ?? throw new ArgumentNullException(nameof(typeParameter));

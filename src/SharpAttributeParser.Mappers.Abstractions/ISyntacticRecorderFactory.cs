@@ -1,7 +1,5 @@
 ﻿namespace SharpAttributeParser.Mappers;
 
-using System;
-
 /// <summary>Handles creation of <see cref="ISyntacticRecorder"/> using mappers.</summary>
 public interface ISyntacticRecorderFactory
 {
@@ -10,8 +8,6 @@ public interface ISyntacticRecorderFactory
     /// <param name="mapper">Maps parameters of the attribute to recorders, responsible for recording syntactic information about arguments of that parameter.</param>
     /// <param name="dataRecord">The record to which syntactic information about arguments is recorded by the created recorder.</param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract ISyntacticRecorder<TRecord> Create<TRecord>(ISyntacticMapper<TRecord> mapper, TRecord dataRecord);
 
     /// <summary>Creates a recorder which records syntactic information about the arguments of attributes through the provided record builder.</summary>
@@ -20,7 +16,5 @@ public interface ISyntacticRecorderFactory
     /// <param name="mapper">Maps parameters of the attribute to recorders, responsible for recording syntactic information about arguments of that parameter.</param>
     /// <param name="recordBuilder">The record builder through which syntactic information about arguments is recorded by the created recorder.</param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract ISyntacticRecorder<TRecord> Create<TRecord, TRecordBuilder>(ISyntacticMapper<TRecordBuilder> mapper, TRecordBuilder recordBuilder) where TRecordBuilder : IRecordBuilder<TRecord>;
 }
