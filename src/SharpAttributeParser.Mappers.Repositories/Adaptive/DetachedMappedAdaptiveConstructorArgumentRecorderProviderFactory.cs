@@ -13,7 +13,6 @@ public sealed class DetachedMappedAdaptiveConstructorArgumentRecorderProviderFac
     /// <param name="normalFactory">Handles creation of recorders related to non-optional, non-<see langword="params"/> constructor parameters.</param>
     /// <param name="paramsFactory">Handles creation of recorders related to <see langword="params"/> constructor parameters.</param>
     /// <param name="optionalFactory">Handles creation of recorders related to optional constructor parameters.</param>
-    /// <exception cref="ArgumentNullException"/>
     public DetachedMappedAdaptiveConstructorArgumentRecorderProviderFactory(IDetachedMappedAdaptiveNormalConstructorArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord> normalFactory, IDetachedMappedAdaptiveParamsConstructorArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord> paramsFactory, IDetachedMappedAdaptiveOptionalConstructorArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord> optionalFactory)
     {
         NormalFactory = normalFactory ?? throw new ArgumentNullException(nameof(normalFactory));

@@ -18,7 +18,6 @@ public sealed class SemanticMapperLogger<TCategoryName> : ISemanticMapperLogger<
 
     /// <summary>Instantiates a <see cref="SemanticMapperLogger{TCategoryName}"/>, handling logging for <see cref="ISemanticMapper{TRecord}"/>.</summary>
     /// <param name="logger">The logger used to log messages.</param>
-    /// <exception cref="ArgumentNullException"/>
     public SemanticMapperLogger(ILogger<TCategoryName> logger)
     {
         if (logger is null)

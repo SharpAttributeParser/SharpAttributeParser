@@ -14,7 +14,6 @@ public sealed class MappedSemanticConstructorArgumentRecorderLogger<TCategoryNam
 
     /// <summary>Instantiates a <see cref="MappedSemanticConstructorArgumentRecorderLogger{TCategoryName}"/>, handling logging for <see cref="IDetachedMappedSemanticConstructorArgumentRecorder{TRecord}"/>.</summary>
     /// <param name="logger">The logger used to log messages.</param>
-    /// <exception cref="ArgumentNullException"/>
     public MappedSemanticConstructorArgumentRecorderLogger(ILogger<TCategoryName> logger)
     {
         Logger = logger;

@@ -17,9 +17,6 @@ public interface IDetachedMappedSemanticTypeArgumentRecorderFactory<TRecord>
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSemanticTypeArgumentRecorder<TRecord> Create(Func<TRecord, ITypeSymbol, bool> recorder);
 
     /// <summary>Creates a recorder which invokes the provided recorder and returns <see langword="true"/>.</summary>
@@ -29,8 +26,5 @@ public interface IDetachedMappedSemanticTypeArgumentRecorderFactory<TRecord>
     /// <item>The argument that is recorded.</item>
     /// </list></param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSemanticTypeArgumentRecorder<TRecord> Create(Action<TRecord, ITypeSymbol> recorder);
 }

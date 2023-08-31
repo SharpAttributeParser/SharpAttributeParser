@@ -25,22 +25,16 @@ public interface ISyntacticParserLogger
     /// <param name="attributeData">The semantic description of the attribute.</param>
     /// <param name="attributeSyntax">The syntactic description of the attribute.</param>
     /// <returns>The <see cref="IDisposable"/> used to close the log scope.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IDisposable? BeginScopeParsingAttribute(Type recorderType, AttributeData attributeData, AttributeSyntax attributeSyntax);
 
     /// <summary>Begins a log scope describing a determined attribute-class.</summary>
     /// <param name="attributeClass">The attribute-class.</param>
     /// <returns>The <see cref="IDisposable"/> used to close the log scope.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IDisposable? BeginScopeDeterminedAttributeClass(INamedTypeSymbol attributeClass);
 
     /// <summary>Begins a log scope describing a determined target constructor.</summary>
     /// <param name="targetConstructor">The target constructor.</param>
     /// <returns>The <see cref="IDisposable"/> used to close the log scope.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IDisposable? BeginScopeDeterminedTargetConstructor(IMethodSymbol targetConstructor);
 
     /// <summary>Logs a message describing the attribute-class of the attribute being undetermined.</summary>

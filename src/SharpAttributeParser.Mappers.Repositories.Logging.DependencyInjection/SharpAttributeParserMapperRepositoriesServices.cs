@@ -14,7 +14,6 @@ public static class SharpAttributeParserMapperRepositoriesServices
     /// <summary>Registers the services of <i>SharpAttributeParser.Mappers.Repositories.Logging</i> with the provided <see cref="IServiceCollection"/>.</summary>
     /// <param name="services">The <see cref="IServiceCollection"/> with which services are registered.</param>
     /// <returns>The provided <see cref="IServiceCollection"/>, so that calls can be chained.</returns>
-    /// <exception cref="ArgumentNullException"/>
     public static IServiceCollection AddSharpAttributeParserMapperRepositoriesLogging(this IServiceCollection services)
     {
         if (services is null)

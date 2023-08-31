@@ -1,7 +1,5 @@
 ﻿namespace SharpAttributeParser.Mappers;
 
-using System;
-
 /// <summary>Handles creation of <see cref="ISemanticRecorder"/> using mappers.</summary>
 public interface ISemanticRecorderFactory
 {
@@ -10,8 +8,6 @@ public interface ISemanticRecorderFactory
     /// <param name="mapper">Maps parameters of the attribute to recorders, responsible for recording arguments of that parameter.</param>
     /// <param name="dataRecord">The record to which arguments are recorded by the created recorder.</param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract ISemanticRecorder<TRecord> Create<TRecord>(ISemanticMapper<TRecord> mapper, TRecord dataRecord);
 
     /// <summary>Creates a recorder which records the arguments of attributes through the provided record builder.</summary>
@@ -20,7 +16,5 @@ public interface ISemanticRecorderFactory
     /// <param name="mapper">Maps parameters of the attribute to recorders, responsible for recording arguments of that parameter.</param>
     /// <param name="recordBuilder">The record builder through which arguments are recorded by the created recorder.</param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract ISemanticRecorder<TRecord> Create<TRecord, TRecordBuilder>(ISemanticMapper<TRecordBuilder> mapper, TRecordBuilder recordBuilder) where TRecordBuilder : IRecordBuilder<TRecord>;
 }

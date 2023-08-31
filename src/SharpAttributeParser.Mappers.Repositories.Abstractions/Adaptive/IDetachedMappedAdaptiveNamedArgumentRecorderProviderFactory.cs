@@ -28,8 +28,6 @@ public interface IDetachedMappedAdaptiveNamedArgumentRecorderProviderFactory<TCo
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedAdaptiveNamedArgumentRecorderProvider<TCombinedRecord, TSemanticRecord> Create(Func<TCombinedRecord, object?, ExpressionSyntax, bool> combinedRecorder, Func<TSemanticRecord, object?, bool> semanticRecorder);
 
     /// <summary>Creates a provider of recorders which invoke the provided recorders and return <see langword="true"/>.</summary>
@@ -45,8 +43,6 @@ public interface IDetachedMappedAdaptiveNamedArgumentRecorderProviderFactory<TCo
     /// <item>The argument that is recorded.</item>
     /// </list></param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedAdaptiveNamedArgumentRecorderProvider<TCombinedRecord, TSemanticRecord> Create(Action<TCombinedRecord, object?, ExpressionSyntax> combinedRecorder, Action<TSemanticRecord, object?> semanticRecorder);
 
     /// <summary>Creates a provider of recorders which filter arguments using the provided pattern before invoking the provided recorders, and which return <see langword="false"/> for discarded arguments.</summary>
@@ -68,8 +64,6 @@ public interface IDetachedMappedAdaptiveNamedArgumentRecorderProviderFactory<TCo
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedAdaptiveNamedArgumentRecorderProvider<TCombinedRecord, TSemanticRecord> Create<TArgument>(IArgumentPattern<TArgument> pattern, Func<TCombinedRecord, TArgument, ExpressionSyntax, bool> combinedRecorder, Func<TSemanticRecord, TArgument, bool> semanticRecorder);
 
     /// <summary>Creates a provider of recorders which filter arguments using the provided pattern before invoking the provided recorders and returning <see langword="true"/>, and which return <see langword="false"/> for discarded arguments.</summary>
@@ -87,8 +81,6 @@ public interface IDetachedMappedAdaptiveNamedArgumentRecorderProviderFactory<TCo
     /// <item>The argument that is recorded.</item>
     /// </list></param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedAdaptiveNamedArgumentRecorderProvider<TCombinedRecord, TSemanticRecord> Create<TArgument>(IArgumentPattern<TArgument> pattern, Action<TCombinedRecord, TArgument, ExpressionSyntax> combinedRecorder, Action<TSemanticRecord, TArgument> semanticRecorder);
 
     /// <summary>Creates a provider of recorders which filter arguments using the provided pattern before invoking the provided recorders, and which return <see langword="false"/> for discarded arguments.</summary>
@@ -110,9 +102,6 @@ public interface IDetachedMappedAdaptiveNamedArgumentRecorderProviderFactory<TCo
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedAdaptiveNamedArgumentRecorderProvider<TCombinedRecord, TSemanticRecord> Create<TArgument>(Func<IArgumentPatternFactory, IArgumentPattern<TArgument>> patternDelegate, Func<TCombinedRecord, TArgument, ExpressionSyntax, bool> combinedRecorder, Func<TSemanticRecord, TArgument, bool> semanticRecorder);
 
     /// <summary>Creates a provider of recorders which filter arguments using the provided pattern before invoking the provided recorders and returning <see langword="true"/>, and which return <see langword="false"/> for discarded arguments.</summary>
@@ -130,8 +119,5 @@ public interface IDetachedMappedAdaptiveNamedArgumentRecorderProviderFactory<TCo
     /// <item>The argument that is recorded.</item>
     /// </list></param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedAdaptiveNamedArgumentRecorderProvider<TCombinedRecord, TSemanticRecord> Create<TArgument>(Func<IArgumentPatternFactory, IArgumentPattern<TArgument>> patternDelegate, Action<TCombinedRecord, TArgument, ExpressionSyntax> combinedRecorder, Action<TSemanticRecord, TArgument> semanticRecorder);
 }

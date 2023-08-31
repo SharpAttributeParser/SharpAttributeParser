@@ -23,8 +23,6 @@ public interface IDetachedMappedCombinedOptionalConstructorArgumentRecorderFacto
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedCombinedConstructorArgumentRecorder<TRecord> Create(Func<TRecord, object?, OneOf<None, ExpressionSyntax>, bool> recorder);
 
     /// <summary>Creates a recorder which invokes the provided recorder and returns <see langword="true"/>.</summary>
@@ -35,8 +33,6 @@ public interface IDetachedMappedCombinedOptionalConstructorArgumentRecorderFacto
     /// <item>The syntactic description of the argument, or <see cref="None"/> if the default argument of the optional parameter was used.</item>
     /// </list></param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedCombinedConstructorArgumentRecorder<TRecord> Create(Action<TRecord, object?, OneOf<None, ExpressionSyntax>> recorder);
 
     /// <summary>Creates a recorder which filters arguments using the provided pattern before invoking the provided recorder, and which returns <see langword="false"/> for discarded arguments.</summary>
@@ -51,8 +47,6 @@ public interface IDetachedMappedCombinedOptionalConstructorArgumentRecorderFacto
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedCombinedConstructorArgumentRecorder<TRecord> Create<TArgument>(IArgumentPattern<TArgument> pattern, Func<TRecord, TArgument, OneOf<None, ExpressionSyntax>, bool> recorder);
 
     /// <summary>Creates a recorder which filters arguments using the provided pattern before invoking the provided recorder and returning <see langword="true"/>, and which returns <see langword="false"/> for discarded arguments.</summary>
@@ -65,8 +59,6 @@ public interface IDetachedMappedCombinedOptionalConstructorArgumentRecorderFacto
     /// <item>The syntactic description of the argument, or <see cref="None"/> if the default argument of the optional parameter was used.</item>
     /// </list></param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedCombinedConstructorArgumentRecorder<TRecord> Create<TArgument>(IArgumentPattern<TArgument> pattern, Action<TRecord, TArgument, OneOf<None, ExpressionSyntax>> recorder);
 
     /// <summary>Creates a recorder which filters arguments using the provided pattern before invoking the provided recorder, and which returns <see langword="false"/> for discarded arguments.</summary>
@@ -81,9 +73,6 @@ public interface IDetachedMappedCombinedOptionalConstructorArgumentRecorderFacto
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedCombinedConstructorArgumentRecorder<TRecord> Create<TArgument>(Func<IArgumentPatternFactory, IArgumentPattern<TArgument>> patternDelegate, Func<TRecord, TArgument, OneOf<None, ExpressionSyntax>, bool> recorder);
 
     /// <summary>Creates a recorder which filters arguments using the provided pattern before invoking the provided recorder and returning <see langword="true"/>, and which returns <see langword="false"/> for discarded arguments.</summary>
@@ -96,8 +85,5 @@ public interface IDetachedMappedCombinedOptionalConstructorArgumentRecorderFacto
     /// <item>The syntactic description of the argument, or <see cref="None"/> if the default argument of the optional parameter was used.</item>
     /// </list></param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedCombinedConstructorArgumentRecorder<TRecord> Create<TArgument>(Func<IArgumentPatternFactory, IArgumentPattern<TArgument>> patternDelegate, Action<TRecord, TArgument, OneOf<None, ExpressionSyntax>> recorder);
 }

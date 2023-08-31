@@ -11,7 +11,6 @@ public sealed class SyntacticArgumentRecorderLoggerFactory : ISyntacticArgumentR
 
     /// <summary>Instantiates a <see cref="SyntacticArgumentRecorderLoggerFactory"/>, handling creation of <see cref="ISyntacticArgumentRecorderLogger"/>.</summary>
     /// <param name="loggerFactory">Handles creation of loggers.</param>
-    /// <exception cref="ArgumentNullException"/>
     public SyntacticArgumentRecorderLoggerFactory(ILoggerFactory loggerFactory)
     {
         LoggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));

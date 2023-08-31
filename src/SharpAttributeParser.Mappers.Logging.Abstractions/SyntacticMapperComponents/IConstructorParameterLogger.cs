@@ -14,8 +14,6 @@ public interface IConstructorParameterLogger
     /// <param name="parameter">The constructor parameter.</param>
     /// <param name="mappingRepository">The repository for mappings from constructor parameters to recorders.</param>
     /// <returns>The <see cref="IDisposable"/> used to close the log scope.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IDisposable? BeginScopeMappingConstructorParameter<TRecorder>(IParameterSymbol parameter, IBuiltConstructorMappingRepository<TRecorder> mappingRepository);
 
     /// <summary>Logs a message describing a failed attempt to map a constructor parameter to a recorder.</summary>

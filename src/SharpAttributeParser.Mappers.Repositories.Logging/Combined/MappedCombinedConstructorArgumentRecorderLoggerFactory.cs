@@ -11,7 +11,6 @@ public sealed class MappedCombinedConstructorArgumentRecorderLoggerFactory : IMa
 
     /// <summary>Instantiates a <see cref="MappedCombinedConstructorArgumentRecorderLoggerFactory"/>, handling creation of <see cref="IMappedCombinedConstructorArgumentRecorderLogger"/>.</summary>
     /// <param name="loggerFactory">Handles creation of loggers.</param>
-    /// <exception cref="ArgumentNullException"/>
     public MappedCombinedConstructorArgumentRecorderLoggerFactory(ILoggerFactory loggerFactory)
     {
         LoggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));

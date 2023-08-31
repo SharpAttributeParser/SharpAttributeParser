@@ -2,8 +2,6 @@
 
 using Microsoft.Extensions.Logging;
 
-using System;
-
 /// <summary>Handles creation of <see cref="IMappedSemanticNamedArgumentRecorderLogger"/>.</summary>
 public interface IMappedSemanticNamedArgumentRecorderLoggerFactory
 {
@@ -16,6 +14,5 @@ public interface IMappedSemanticNamedArgumentRecorderLoggerFactory
     /// <typeparam name="TCategoryName">The name of the logging category.</typeparam>
     /// <param name="logger">The logger used to log messages.</param>
     /// <returns>The created logger.</returns>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IMappedSemanticNamedArgumentRecorderLogger<TCategoryName> Create<TCategoryName>(ILogger<TCategoryName> logger);
 }

@@ -10,7 +10,6 @@ public sealed class TypeMappingRepositoryFactory<TRecorder, TRecorderFactory> : 
 
     /// <summary>Instantiates a <see cref="TypeMappingRepositoryFactory{TRecorder, TRecorderFactory}"/>, handling creation of <see cref="ITypeMappingRepository{TRecorder, TRecorderFactory}"/>.</summary>
     /// <param name="recorderFactory">Handles creation of recorders for the created repositories.</param>
-    /// <exception cref="ArgumentNullException"/>
     public TypeMappingRepositoryFactory(TRecorderFactory recorderFactory)
     {
         RecorderFactory = recorderFactory ?? throw new ArgumentNullException(nameof(recorderFactory));

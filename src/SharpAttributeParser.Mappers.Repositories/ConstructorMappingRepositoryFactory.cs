@@ -10,7 +10,6 @@ public sealed class ConstructorMappingRepositoryFactory<TRecorder, TRecorderFact
 
     /// <summary>Instantiates a <see cref="ConstructorMappingRepositoryFactory{TRecorder, TRecorderFactory}"/>, handling creation of <see cref="IConstructorMappingRepository{TRecorder, TRecorderFactory}"/>.</summary>
     /// <param name="recorderFactory">Handles creation of recorders for the created repositories.</param>
-    /// <exception cref="ArgumentNullException"/>
     public ConstructorMappingRepositoryFactory(TRecorderFactory recorderFactory)
     {
         RecorderFactory = recorderFactory ?? throw new ArgumentNullException(nameof(recorderFactory));

@@ -27,8 +27,6 @@ public interface IDetachedMappedSplitNamedArgumentRecorderProviderFactory<TSeman
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSplitNamedArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord> Create(Func<TSemanticRecord, object?, bool> semanticRecorder, Func<TSyntacticRecord, ExpressionSyntax, bool> syntacticRecorder);
 
     /// <summary>Creates a provider of recorders which invoke the provided recorders and return <see langword="true"/>.</summary>
@@ -43,8 +41,6 @@ public interface IDetachedMappedSplitNamedArgumentRecorderProviderFactory<TSeman
     /// <item>The syntactic description of the argument.</item>
     /// </list></param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSplitNamedArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord> Create(Action<TSemanticRecord, object?> semanticRecorder, Action<TSyntacticRecord, ExpressionSyntax> syntacticRecorder);
 
     /// <summary>Creates a provider of recorders which filter arguments using the provided pattern before invoking the provided recorders, and which return <see langword="false"/> for discarded arguments.</summary>
@@ -65,8 +61,6 @@ public interface IDetachedMappedSplitNamedArgumentRecorderProviderFactory<TSeman
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSplitNamedArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord> Create<TArgument>(IArgumentPattern<TArgument> pattern, Func<TSemanticRecord, TArgument, bool> semanticRecorder, Func<TSyntacticRecord, ExpressionSyntax, bool> syntacticRecorder);
 
     /// <summary>Creates a provider of recorders which filter arguments using the provided pattern before invoking the provided recorders and returning <see langword="true"/>, and which return <see langword="false"/> for discarded arguments.</summary>
@@ -83,8 +77,6 @@ public interface IDetachedMappedSplitNamedArgumentRecorderProviderFactory<TSeman
     /// <item>The syntactic description of the argument.</item>
     /// </list></param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSplitNamedArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord> Create<TArgument>(IArgumentPattern<TArgument> pattern, Action<TSemanticRecord, TArgument> semanticRecorder, Action<TSyntacticRecord, ExpressionSyntax> syntacticRecorder);
 
     /// <summary>Creates a provider of recorders which filter arguments using the provided pattern before invoking the provided recorders, and which return <see langword="false"/> for discarded arguments.</summary>
@@ -105,9 +97,6 @@ public interface IDetachedMappedSplitNamedArgumentRecorderProviderFactory<TSeman
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSplitNamedArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord> Create<TArgument>(Func<IArgumentPatternFactory, IArgumentPattern<TArgument>> patternDelegate, Func<TSemanticRecord, TArgument, bool> semanticRecorder, Func<TSyntacticRecord, ExpressionSyntax, bool> syntacticRecorder);
 
     /// <summary>Creates a provider of recorders which filters arguments using the provided pattern before invoking the provided recorders and returning <see langword="true"/>, and which returns <see langword="false"/> for discarded arguments.</summary>
@@ -124,8 +113,5 @@ public interface IDetachedMappedSplitNamedArgumentRecorderProviderFactory<TSeman
     /// <item>The syntactic description of the argument.</item>
     /// </list></param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSplitNamedArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord> Create<TArgument>(Func<IArgumentPatternFactory, IArgumentPattern<TArgument>> patternDelegate, Action<TSemanticRecord, TArgument> semanticRecorder, Action<TSyntacticRecord, ExpressionSyntax> syntacticRecorder);
 }

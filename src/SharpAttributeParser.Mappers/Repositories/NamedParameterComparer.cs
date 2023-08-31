@@ -10,7 +10,6 @@ public sealed class NamedParameterComparer : INamedParameterComparer
 
     /// <summary>Instantiates a <see cref="NamedParameterComparer"/>, determining equality when comparing named parameters.</summary>
     /// <param name="name">Determines equality when comparing the names of named parameters.</param>
-    /// <exception cref="ArgumentNullException"/>
     public NamedParameterComparer(IEqualityComparer<string> name)
     {
         Name = name ?? throw new ArgumentNullException(nameof(name));

@@ -13,7 +13,6 @@ public sealed class ParameterComparer : IParameterComparer
     /// <param name="typeParameter">Determines equality when comparing type parameters.</param>
     /// <param name="constructorParameter">Determines equality when comparing constructor parameters.</param>
     /// <param name="namedParameter">Determines equality when comparing named parameters.</param>
-    /// <exception cref="ArgumentNullException"/>
     public ParameterComparer(ITypeParameterComparer typeParameter, IConstructorParameterComparer constructorParameter, INamedParameterComparer namedParameter)
     {
         TypeParameter = typeParameter ?? throw new ArgumentNullException(nameof(typeParameter));

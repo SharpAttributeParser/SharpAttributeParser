@@ -13,7 +13,6 @@ public sealed class DetachedMappedSplitConstructorArgumentRecorderProviderFactor
     /// <param name="normalFactory">Handles creation of recorders related to non-optional, non-<see langword="params"/> constructor parameters.</param>
     /// <param name="paramsFactory">Handles creation of recorders related to <see langword="params"/> constructor parameters.</param>
     /// <param name="optionalFactory">Handles creation of recorders related to optional constructor parameters.</param>
-    /// <exception cref="ArgumentNullException"/>
     public DetachedMappedSplitConstructorArgumentRecorderProviderFactory(IDetachedMappedSplitNormalConstructorArgumentRecorderProviderFactory<TSemanticRecord, TSyntacticRecord> normalFactory, IDetachedMappedSplitParamsConstructorArgumentRecorderProviderFactory<TSemanticRecord, TSyntacticRecord> paramsFactory, IDetachedMappedSplitOptionalConstructorArgumentRecorderProviderFactory<TSemanticRecord, TSyntacticRecord> optionalFactory)
     {
         NormalFactory = normalFactory ?? throw new ArgumentNullException(nameof(normalFactory));

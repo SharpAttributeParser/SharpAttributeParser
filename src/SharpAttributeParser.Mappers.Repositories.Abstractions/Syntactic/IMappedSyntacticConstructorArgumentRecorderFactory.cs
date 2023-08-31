@@ -2,8 +2,6 @@
 
 using SharpAttributeParser.Mappers.MappedRecorders;
 
-using System;
-
 /// <summary>Handles creation of <see cref="IMappedSyntacticConstructorArgumentRecorder"/> using detached recorders.</summary>
 public interface IMappedSyntacticConstructorArgumentRecorderFactory
 {
@@ -12,6 +10,5 @@ public interface IMappedSyntacticConstructorArgumentRecorderFactory
     /// <param name="dataRecord">The record to which syntactic information about arguments is recorded.</param>
     /// <param name="detachedRecorder">The detached recorder, recording syntactic information about arguments to provided records.</param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IMappedSyntacticConstructorArgumentRecorder Create<TRecord>(TRecord dataRecord, IDetachedMappedSyntacticConstructorArgumentRecorder<TRecord> detachedRecorder);
 }

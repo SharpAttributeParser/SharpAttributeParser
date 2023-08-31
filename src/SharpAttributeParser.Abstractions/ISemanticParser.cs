@@ -2,8 +2,6 @@
 
 using Microsoft.CodeAnalysis;
 
-using System;
-
 /// <summary>Parses the arguments of attributes without syntactic context.</summary>
 public interface ISemanticParser
 {
@@ -11,8 +9,5 @@ public interface ISemanticParser
     /// <param name="recorder">The recorder responsible for recording the parsed arguments.</param>
     /// <param name="attributeData">The semantic description of the attribute.</param>
     /// <returns>A <see cref="bool"/> indicating whether the attempt was successful.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract bool TryParse(ISemanticRecorder recorder, AttributeData attributeData);
 }

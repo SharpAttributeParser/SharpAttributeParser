@@ -2,8 +2,6 @@
 
 using Microsoft.Extensions.Logging;
 
-using System;
-
 /// <summary>Handles construction of <see cref="ICombinedArgumentRecorderLogger"/>.</summary>
 public interface ICombinedArgumentRecorderLoggerFactory
 {
@@ -16,6 +14,5 @@ public interface ICombinedArgumentRecorderLoggerFactory
     /// <typeparam name="TCategoryName">The name of the logging category.</typeparam>
     /// <param name="logger">The logger used to log messages.</param>
     /// <returns>The created logger.</returns>
-    /// <exception cref="ArgumentNullException"/>
     public abstract ICombinedArgumentRecorderLogger<TCategoryName> Create<TCategoryName>(ILogger<TCategoryName> logger);
 }

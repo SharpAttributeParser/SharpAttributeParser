@@ -13,7 +13,6 @@ public sealed class MappedSemanticArgumentRecorderFactory : IMappedSemanticArgum
     /// <param name="typeParameter">Handles creation of attached recorders related to type parameters.</param>
     /// <param name="constructorParameter">Handles creation of attached recorders related to constructor parameters.</param>
     /// <param name="namedParameter">Handles creation of attached recorders related to named parameters.</param>
-    /// <exception cref="ArgumentNullException"/>
     public MappedSemanticArgumentRecorderFactory(IMappedSemanticTypeArgumentRecorderFactory typeParameter, IMappedSemanticConstructorArgumentRecorderFactory constructorParameter, IMappedSemanticNamedArgumentRecorderFactory namedParameter)
     {
         TypeParameter = typeParameter ?? throw new ArgumentNullException(nameof(typeParameter));

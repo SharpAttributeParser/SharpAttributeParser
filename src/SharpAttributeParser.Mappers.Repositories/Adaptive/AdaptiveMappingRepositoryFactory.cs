@@ -13,7 +13,6 @@ public sealed class AdaptiveMappingRepositoryFactory<TCombinedRecord, TSemanticR
     /// <param name="typeMappingRepositoryFactory">Handles creation of repositories for mappings from type parameters to recorders.</param>
     /// <param name="constructorMappingRepositoryFactory">Handles creation of repositories for mappings from constructor parameters to recorders.</param>
     /// <param name="namedMappingRepositoryFactory">Handles creation of repositories for mappings from constructor parameters to recorders.</param>
-    /// <exception cref="ArgumentNullException"/>
     public AdaptiveMappingRepositoryFactory(ITypeMappingRepositoryFactory<IDetachedMappedAdaptiveTypeArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>, IDetachedMappedAdaptiveTypeArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>> typeMappingRepositoryFactory,
         IConstructorMappingRepositoryFactory<IDetachedMappedAdaptiveConstructorArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>, IDetachedMappedAdaptiveConstructorArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>> constructorMappingRepositoryFactory,
         INamedMappingRepositoryFactory<IDetachedMappedAdaptiveNamedArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>, IDetachedMappedAdaptiveNamedArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>> namedMappingRepositoryFactory)
@@ -30,9 +29,9 @@ public sealed class AdaptiveMappingRepositoryFactory<TCombinedRecord, TSemanticR
             throw new ArgumentNullException(nameof(comparer));
         }
 
-        var typeParameters = TypeMappingRepositoryFactory.Create(comparer.TypeParameter, throwOnMultipleBuilds) ?? throw new InvalidOperationException($"A {nameof(ITypeMappingRepositoryFactory<object, object>)} produced a null {nameof(ITypeMappingRepository<object, object>)}.");
-        var constructorParameters = ConstructorMappingRepositoryFactory.Create(comparer.ConstructorParameter, throwOnMultipleBuilds) ?? throw new InvalidOperationException($"A {nameof(IConstructorMappingRepositoryFactory<object, object>)} produced a null {nameof(IConstructorMappingRepository<object, object>)}.");
-        var namedParameters = NamedMappingRepositoryFactory.Create(comparer.NamedParameter, throwOnMultipleBuilds) ?? throw new InvalidOperationException($"A {nameof(INamedMappingRepositoryFactory<object, object>)} produced a null {nameof(INamedMappingRepository<object, object>)}.");
+        var typeParameters = TypeMappingRepositoryFactory.Create(comparer.TypeParameter, throwOnMultipleBuilds);
+        var constructorParameters = ConstructorMappingRepositoryFactory.Create(comparer.ConstructorParameter, throwOnMultipleBuilds);
+        var namedParameters = NamedMappingRepositoryFactory.Create(comparer.NamedParameter, throwOnMultipleBuilds);
 
         return new Repository(typeParameters, constructorParameters, namedParameters);
     }
@@ -62,9 +61,9 @@ public sealed class AdaptiveMappingRepositoryFactory<TCombinedRecord, TSemanticR
 
         IBuiltAdaptiveMappingRepository<TCombinedRecord, TSemanticRecord> IBuildableMappingRepository<IBuiltAdaptiveMappingRepository<TCombinedRecord, TSemanticRecord>>.Build()
         {
-            var typeParameterRepository = TypeParameters.Build() ?? throw new InvalidOperationException($"Building a {nameof(ITypeMappingRepository<object, object>)} resulted in a null {nameof(IBuiltTypeMappingRepository<object>)}.");
-            var constructorParameterRepository = ConstructorParameters.Build() ?? throw new InvalidOperationException($"Building a {nameof(IConstructorMappingRepositoryFactory<object, object>)} resulted in a null {nameof(IBuiltConstructorMappingRepository<object>)}.");
-            var namedParameterRepository = NamedParameters.Build() ?? throw new InvalidOperationException($"Building a {nameof(INamedMappingRepositoryFactory<object, object>)} resulted in a null {nameof(IBuiltNamedMappingRepository<object>)}.");
+            var typeParameterRepository = TypeParameters.Build();
+            var constructorParameterRepository = ConstructorParameters.Build();
+            var namedParameterRepository = NamedParameters.Build();
 
             return new BuiltRepository(typeParameterRepository, constructorParameterRepository, namedParameterRepository);
         }

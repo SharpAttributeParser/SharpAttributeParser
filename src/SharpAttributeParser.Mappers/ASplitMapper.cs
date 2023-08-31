@@ -3,9 +3,7 @@
 using Microsoft.CodeAnalysis;
 
 using SharpAttributeParser.Mappers.MappedRecorders;
-using SharpAttributeParser.Mappers.Repositories.Semantic;
 using SharpAttributeParser.Mappers.Repositories.Split;
-using SharpAttributeParser.Mappers.Repositories.Syntactic;
 
 using System;
 
@@ -14,8 +12,6 @@ using System;
 /// <typeparam name="TSyntacticRecord">The type to which syntactic information about arguments is recorded.</typeparam>
 public abstract class ASplitMapper<TSemanticRecord, TSyntacticRecord> : ISemanticMapper<TSemanticRecord>, ISyntacticMapper<TSyntacticRecord>
 {
-    private static Lazy<ISplitMappingRepositoryFactory<TSemanticRecord, TSyntacticRecord>> DefaultRepositoryFactory { get; } = new(DefaultRepositoryFactories.SplitFactory<TSemanticRecord, TSyntacticRecord>);
-
     private bool IsInitialized { get; set; }
 
     private IBuiltSplitMappingRepository<TSemanticRecord, TSyntacticRecord> Mappings { get; set; } = null!;
@@ -30,7 +26,6 @@ public abstract class ASplitMapper<TSemanticRecord, TSyntacticRecord> : ISemanti
     }
 
     /// <summary>Initializes the mapper. If not yet performed, initialization will occur when the mapper is first used.</summary>
-    /// <exception cref="InvalidOperationException"/>
     protected void InitializeMapper()
     {
         if (IsInitialized)
@@ -45,7 +40,7 @@ public abstract class ASplitMapper<TSemanticRecord, TSyntacticRecord> : ISemanti
 
     private void InvokeAddMappings()
     {
-        var repository = DependencyProvider.RepositoryFactory.Create(DependencyProvider.ParameterComparer, throwOnMultipleBuilds: true) ?? throw new InvalidOperationException($"A {nameof(ISplitMappingRepositoryFactory<object, object>)} produced a null {nameof(ISplitMappingRepository<object, object>)}.");
+        var repository = DependencyProvider.RepositoryFactory.Create(DependencyProvider.ParameterComparer, throwOnMultipleBuilds: true);
 
         AddMappings(repository);
 
@@ -55,7 +50,6 @@ public abstract class ASplitMapper<TSemanticRecord, TSyntacticRecord> : ISemanti
     /// <summary>Allows mappings from parameters to recorders to be added.</summary>
     /// <param name="repository">The repository to which mappings are added.</param>
     /// <remarks>The method will be invoked during initialization of the mapper.</remarks>
-    /// <exception cref="ArgumentNullException"/>
     protected abstract void AddMappings(IAppendableSplitMappingRepository<TSemanticRecord, TSyntacticRecord> repository);
 
     /// <inheritdoc/>
@@ -82,12 +76,7 @@ public abstract class ASplitMapper<TSemanticRecord, TSyntacticRecord> : ISemanti
             return null;
         }
 
-        if (recorderProvider.Semantic is not IDetachedMappedSemanticTypeArgumentRecorder<TSemanticRecord> recorder)
-        {
-            throw new InvalidOperationException($"The {nameof(IDetachedMappedSemanticTypeArgumentRecorder<object>)} of a {nameof(IDetachedMappedSplitTypeArgumentRecorderProvider<object, object>)} was null.");
-        }
-
-        return DependencyProvider.SemanticRecorderFactory.TypeParameter.Create(dataRecord, recorder);
+        return DependencyProvider.SemanticRecorderFactory.TypeParameter.Create(dataRecord, recorderProvider.Semantic);
     }
 
     /// <inheritdoc/>
@@ -114,12 +103,7 @@ public abstract class ASplitMapper<TSemanticRecord, TSyntacticRecord> : ISemanti
             return null;
         }
 
-        if (recorderProvider.Syntactic is not IDetachedMappedSyntacticTypeArgumentRecorder<TSyntacticRecord> recorder)
-        {
-            throw new InvalidOperationException($"The {nameof(IDetachedMappedSyntacticTypeArgumentRecorder<object>)} of a {nameof(IDetachedMappedSplitTypeArgumentRecorderProvider<object, object>)} was null.");
-        }
-
-        return DependencyProvider.SyntacticRecorderFactory.TypeParameter.Create(dataRecord, recorder);
+        return DependencyProvider.SyntacticRecorderFactory.TypeParameter.Create(dataRecord, recorderProvider.Syntactic);
     }
 
     /// <inheritdoc/>
@@ -146,12 +130,7 @@ public abstract class ASplitMapper<TSemanticRecord, TSyntacticRecord> : ISemanti
             return null;
         }
 
-        if (recorderProvider.Semantic is not IDetachedMappedSemanticConstructorArgumentRecorder<TSemanticRecord> recorder)
-        {
-            throw new InvalidOperationException($"The {nameof(IDetachedMappedSemanticConstructorArgumentRecorder<object>)} of a {nameof(IDetachedMappedSplitConstructorArgumentRecorderProvider<object, object>)} was null.");
-        }
-
-        return DependencyProvider.SemanticRecorderFactory.ConstructorParameter.Create(dataRecord, recorder);
+        return DependencyProvider.SemanticRecorderFactory.ConstructorParameter.Create(dataRecord, recorderProvider.Semantic);
     }
 
     /// <inheritdoc/>
@@ -178,12 +157,7 @@ public abstract class ASplitMapper<TSemanticRecord, TSyntacticRecord> : ISemanti
             return null;
         }
 
-        if (recorderProvider.Syntactic is not IDetachedMappedSyntacticConstructorArgumentRecorder<TSyntacticRecord> recorder)
-        {
-            throw new InvalidOperationException($"The {nameof(IDetachedMappedSyntacticConstructorArgumentRecorder<object>)} of a {nameof(IDetachedMappedSplitConstructorArgumentRecorderProvider<object, object>)} was null.");
-        }
-
-        return DependencyProvider.SyntacticRecorderFactory.ConstructorParameter.Create(dataRecord, recorder);
+        return DependencyProvider.SyntacticRecorderFactory.ConstructorParameter.Create(dataRecord, recorderProvider.Syntactic);
     }
 
     /// <inheritdoc/>
@@ -210,12 +184,7 @@ public abstract class ASplitMapper<TSemanticRecord, TSyntacticRecord> : ISemanti
             return null;
         }
 
-        if (recorderProvider.Semantic is not IDetachedMappedSemanticNamedArgumentRecorder<TSemanticRecord> recorder)
-        {
-            throw new InvalidOperationException($"The {nameof(IDetachedMappedSemanticNamedArgumentRecorder<object>)} of a {nameof(IDetachedMappedSplitNamedArgumentRecorderProvider<object, object>)} was null.");
-        }
-
-        return DependencyProvider.SemanticRecorderFactory.NamedParameter.Create(dataRecord, recorder);
+        return DependencyProvider.SemanticRecorderFactory.NamedParameter.Create(dataRecord, recorderProvider.Semantic);
     }
 
     /// <inheritdoc/>
@@ -242,12 +211,7 @@ public abstract class ASplitMapper<TSemanticRecord, TSyntacticRecord> : ISemanti
             return null;
         }
 
-        if (recorderProvider.Syntactic is not IDetachedMappedSyntacticNamedArgumentRecorder<TSyntacticRecord> recorder)
-        {
-            throw new InvalidOperationException($"The {nameof(IDetachedMappedSyntacticNamedArgumentRecorder<object>)} of a {nameof(IDetachedMappedSplitNamedArgumentRecorderProvider<object, object>)} was null.");
-        }
-
-        return DependencyProvider.SyntacticRecorderFactory.NamedParameter.Create(dataRecord, recorder);
+        return DependencyProvider.SyntacticRecorderFactory.NamedParameter.Create(dataRecord, recorderProvider.Syntactic);
     }
 
     private IDetachedMappedSplitTypeArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord>? TryGetTypeParameterRecorder(ITypeParameterSymbol parameter)

@@ -10,16 +10,10 @@ public interface IAppendableConstructorMappingRepository<in TRecorder, out TReco
     /// <summary>Adds a mapping from a constructor parameter, identified by a name, to a recorder.</summary>
     /// <param name="parameterName">The name of the constructor parameter.</param>
     /// <param name="recorder">The recorder responsible for recording arguments of the constructor parameter.</param>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract void AddNamedMapping(string parameterName, TRecorder recorder);
 
     /// <summary>Adds a mapping from a constructor parameter, identified by a name, to a recorder.</summary>
     /// <param name="parameterName">The name of the constructor parameter.</param>
     /// <param name="recorderDelegate">Creates the recorder responsible for recording arguments of the constructor parameter.</param>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract void AddNamedMapping(string parameterName, Func<TRecorderFactory, TRecorder> recorderDelegate);
 }

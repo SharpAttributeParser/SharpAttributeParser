@@ -20,7 +20,6 @@ public sealed class DetachedMappedAdaptiveOptionalConstructorArgumentRecorderPro
     /// <summary>Instantiates a <see cref="DetachedMappedAdaptiveOptionalConstructorArgumentRecorderProviderFactory{TCombinedRecord, TSemanticRecord}"/>, handling creation of <see cref="IDetachedMappedAdaptiveConstructorArgumentRecorderProvider{TCombinedRecord, TSemanticRecord}"/> related to optional constructor parameters.</summary>
     /// <param name="combinedFactory">Handles creation of the recorders used when arguments are parsed with syntactic context.</param>
     /// <param name="semanticFactory">Handles creation of the recorders used when arguments are parsed without syntactic context.</param>
-    /// <exception cref="ArgumentNullException"/>
     public DetachedMappedAdaptiveOptionalConstructorArgumentRecorderProviderFactory(IDetachedMappedCombinedOptionalConstructorArgumentRecorderFactory<TCombinedRecord> combinedFactory, IDetachedMappedSemanticConstructorArgumentRecorderFactory<TSemanticRecord> semanticFactory)
     {
         CombinedFactory = combinedFactory ?? throw new ArgumentNullException(nameof(combinedFactory));
@@ -155,18 +154,5 @@ public sealed class DetachedMappedAdaptiveOptionalConstructorArgumentRecorderPro
         return Create(combined, semantic);
     }
 
-    private static IDetachedMappedAdaptiveConstructorArgumentRecorderProvider<TCombinedRecord, TSemanticRecord> Create(IDetachedMappedCombinedConstructorArgumentRecorder<TCombinedRecord> combined, IDetachedMappedSemanticConstructorArgumentRecorder<TSemanticRecord> semantic)
-    {
-        if (combined is null)
-        {
-            throw new InvalidOperationException($"A {nameof(IDetachedMappedCombinedOptionalConstructorArgumentRecorderFactory<object>)} produced a null {nameof(IDetachedMappedCombinedConstructorArgumentRecorder<object>)}.");
-        }
-
-        if (semantic is null)
-        {
-            throw new InvalidOperationException($"A {nameof(IDetachedMappedSemanticConstructorArgumentRecorderFactory<object>)} produced a null {nameof(IDetachedMappedSemanticConstructorArgumentRecorder<object>)}.");
-        }
-
-        return new DetachedMappedAdaptiveConstructorArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>(combined, semantic);
-    }
+    private static IDetachedMappedAdaptiveConstructorArgumentRecorderProvider<TCombinedRecord, TSemanticRecord> Create(IDetachedMappedCombinedConstructorArgumentRecorder<TCombinedRecord> combined, IDetachedMappedSemanticConstructorArgumentRecorder<TSemanticRecord> semantic) => new DetachedMappedAdaptiveConstructorArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>(combined, semantic);
 }

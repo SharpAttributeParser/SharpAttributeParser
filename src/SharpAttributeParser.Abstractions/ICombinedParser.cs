@@ -3,8 +3,6 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-using System;
-
 /// <summary>Parses the arguments of attributes, and extracts syntactic information about the arguments.</summary>
 public interface ICombinedParser
 {
@@ -13,8 +11,5 @@ public interface ICombinedParser
     /// <param name="attributeData">The semantic description of the attribute.</param>
     /// <param name="attributeSyntax">The syntactic description of the attribute.</param>
     /// <returns>A <see cref="bool"/> indicating whether the attempt was successful.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract bool TryParse(ICombinedRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax);
 }

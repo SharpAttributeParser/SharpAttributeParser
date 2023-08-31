@@ -30,8 +30,6 @@ public interface IDetachedMappedSplitOptionalConstructorArgumentRecorderProvider
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSplitConstructorArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord> Create(Func<TSemanticRecord, object?, bool> semanticRecorder, Func<TSyntacticRecord, OneOf<None, ExpressionSyntax>, bool> syntacticRecorder);
 
     /// <summary>Creates a provider of recorders which invoke the provided recorders and return <see langword="true"/>.</summary>
@@ -46,8 +44,6 @@ public interface IDetachedMappedSplitOptionalConstructorArgumentRecorderProvider
     /// <item>The syntactic description of the argument, or <see cref="None"/> if the default argument of the optional parameter was used.</item>
     /// </list></param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSplitConstructorArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord> Create(Action<TSemanticRecord, object?> semanticRecorder, Action<TSyntacticRecord, OneOf<None, ExpressionSyntax>> syntacticRecorder);
 
     /// <summary>Creates a provider of recorders which filter arguments using the provided pattern before invoking the provided recorders, and which return <see langword="false"/> for discarded arguments.</summary>
@@ -68,8 +64,6 @@ public interface IDetachedMappedSplitOptionalConstructorArgumentRecorderProvider
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSplitConstructorArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord> Create<TArgument>(IArgumentPattern<TArgument> pattern, Func<TSemanticRecord, TArgument, bool> semanticRecorder, Func<TSyntacticRecord, OneOf<None, ExpressionSyntax>, bool> syntacticRecorder);
 
     /// <summary>Creates a provider of recorders which filter arguments using the provided pattern before invoking the provided recorders and returning <see langword="true"/>, and which returns <see langword="false"/> for discarded arguments.</summary>
@@ -86,8 +80,6 @@ public interface IDetachedMappedSplitOptionalConstructorArgumentRecorderProvider
     /// <item>The syntactic description of the argument, or <see cref="None"/> if the default argument of the optional parameter was used.</item>
     /// </list></param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSplitConstructorArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord> Create<TArgument>(IArgumentPattern<TArgument> pattern, Action<TSemanticRecord, TArgument> semanticRecorder, Action<TSyntacticRecord, OneOf<None, ExpressionSyntax>> syntacticRecorder);
 
     /// <summary>Creates a provider of recorders which filter arguments using the provided pattern before invoking the provided recorders, and which return <see langword="false"/> for discarded arguments.</summary>
@@ -108,9 +100,6 @@ public interface IDetachedMappedSplitOptionalConstructorArgumentRecorderProvider
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSplitConstructorArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord> Create<TArgument>(Func<IArgumentPatternFactory, IArgumentPattern<TArgument>> patternDelegate, Func<TSemanticRecord, TArgument, bool> semanticRecorder, Func<TSyntacticRecord, OneOf<None, ExpressionSyntax>, bool> syntacticRecorder);
 
     /// <summary>Creates a provider of recorders which filter arguments using the provided pattern before invoking the provided recorders and returning <see langword="true"/>, and which return <see langword="false"/> for discarded arguments.</summary>
@@ -127,8 +116,5 @@ public interface IDetachedMappedSplitOptionalConstructorArgumentRecorderProvider
     /// <item>The syntactic description of the argument, or <see cref="None"/> if the default argument of the optional parameter was used.</item>
     /// </list></param>
     /// <returns>The created provider.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedSplitConstructorArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord> Create<TArgument>(Func<IArgumentPatternFactory, IArgumentPattern<TArgument>> patternDelegate, Action<TSemanticRecord, TArgument> semanticRecorder, Action<TSyntacticRecord, OneOf<None, ExpressionSyntax>> syntacticRecorder);
 }

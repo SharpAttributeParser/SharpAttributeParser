@@ -1,7 +1,5 @@
 ﻿namespace SharpAttributeParser;
 
-using System;
-
 /// <summary>Records the arguments of attributes.</summary>
 public interface ISemanticRecorder
 {
@@ -21,6 +19,5 @@ public interface ISemanticRecorder<out TRecord> : ISemanticRecorder
 {
     /// <summary>Retrieves a record of the recorded arguments.</summary>
     /// <returns>A record of the recorded arguments.</returns>
-    /// <exception cref="InvalidOperationException"/>
     public abstract TRecord GetRecord();
 }

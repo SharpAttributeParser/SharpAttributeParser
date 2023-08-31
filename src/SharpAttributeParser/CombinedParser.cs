@@ -34,7 +34,6 @@ public sealed class CombinedParser : ICombinedParser
     /// <param name="semanticParser">The parser used to semantically parse attribute arguments.</param>
     /// <param name="syntacticParser">The parser used to syntactically parse attribute arguments.</param>
     /// <param name="logger">The logger used to log messages.</param>
-    /// <exception cref="ArgumentNullException"/>
     public CombinedParser(ISemanticParser semanticParser, ISyntacticParser syntacticParser, ICombinedParserLogger<CombinedParser>? logger = null)
     {
         SemanticParser = semanticParser ?? throw new ArgumentNullException(nameof(semanticParser));

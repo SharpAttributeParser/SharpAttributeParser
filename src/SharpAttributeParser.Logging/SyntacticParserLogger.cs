@@ -20,7 +20,6 @@ public sealed class SyntacticParserLogger<TCategoryName> : ISyntacticParserLogge
 
     /// <summary>Instantiates a <see cref="SyntacticParserLogger{TCategoryName}"/>, handling logging for <see cref="ISyntacticParser"/>.</summary>
     /// <param name="logger">The logger used to log messages.</param>
-    /// <exception cref="ArgumentNullException"/>
     public SyntacticParserLogger(ILogger<TCategoryName> logger)
     {
         Logger = logger ?? throw new ArgumentNullException(nameof(logger));

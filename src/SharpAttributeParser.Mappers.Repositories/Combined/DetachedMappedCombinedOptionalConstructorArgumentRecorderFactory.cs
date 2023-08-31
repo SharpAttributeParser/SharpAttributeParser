@@ -21,7 +21,6 @@ public sealed class DetachedMappedCombinedOptionalConstructorArgumentRecorderFac
     /// <summary>Instantiates a <see cref="DetachedMappedCombinedOptionalConstructorArgumentRecorderFactory{TRecord}"/>, handling creation of <see cref="IDetachedMappedCombinedConstructorArgumentRecorder{TRecord}"/> related to optional constructor parameters.</summary>
     /// <param name="argumentPatternFactory">Handles creation of <see cref="IArgumentPattern{T}"/>.</param>
     /// <param name="loggerFactory">Handles creation of the loggers used by the created recorders.</param>
-    /// <exception cref="ArgumentNullException"/>
     public DetachedMappedCombinedOptionalConstructorArgumentRecorderFactory(IArgumentPatternFactory argumentPatternFactory, IMappedCombinedConstructorArgumentRecorderLoggerFactory? loggerFactory = null)
     {
         ArgumentPatternFactory = argumentPatternFactory ?? throw new ArgumentNullException(nameof(argumentPatternFactory));

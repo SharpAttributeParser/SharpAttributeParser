@@ -12,16 +12,12 @@ public interface IConstructorArgumentLogger
     /// <param name="parameters">The constructor parameters.</param>
     /// <param name="arguments">The arguments of the constructor parameters.</param>
     /// <returns>The <see cref="IDisposable"/> used to close the log scope.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IDisposable? BeginScopeParsingConstructorArguments(IReadOnlyList<IParameterSymbol> parameters, IReadOnlyList<TypedConstant> arguments);
 
     /// <summary>Begins a log scope describing an attempt to parse an argument of a constructor parameter.</summary>
     /// <param name="parameter">The constructor parameter.</param>
     /// <param name="argument">The argument of the constructor parameter.</param>
     /// <returns>The <see cref="IDisposable"/> used to close the log scope.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IDisposable? BeginScopeParsingConstructorArgument(IParameterSymbol parameter, TypedConstant argument);
 
     /// <summary>Logs a message describing an unexpected number of constructor arguments.</summary>

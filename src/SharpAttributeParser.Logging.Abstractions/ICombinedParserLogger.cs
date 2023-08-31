@@ -25,8 +25,6 @@ public interface ICombinedParserLogger
     /// <param name="attributeData">The semantic description of the attribute.</param>
     /// <param name="attributeSyntax">The syntactic description of the attribute.</param>
     /// <returns>The <see cref="IDisposable"/> used to close the log scope.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IDisposable? BeginScopeParsingAttribute(Type recorderType, AttributeData attributeData, AttributeSyntax attributeSyntax);
 
     /// <summary>Logs a message describing a <see cref="ISemanticParser"/> failing to parse an attribute.</summary>

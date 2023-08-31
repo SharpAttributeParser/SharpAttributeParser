@@ -12,8 +12,6 @@ public interface INamedArgumentLogger
     /// <param name="argument">The named argument.</param>
     /// <param name="syntax">The syntactic description of the named argument.</param>
     /// <returns>The <see cref="IDisposable"/> used to close the log scope.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IDisposable? BeginScopeRecordingNamedArgument(string parameterName, object? argument, ExpressionSyntax syntax);
 
     /// <summary>Logs a message describing a failed attempt to map a named parameter to a recorder.</summary>

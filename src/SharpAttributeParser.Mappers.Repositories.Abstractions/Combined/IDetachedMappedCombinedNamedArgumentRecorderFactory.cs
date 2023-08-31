@@ -20,8 +20,6 @@ public interface IDetachedMappedCombinedNamedArgumentRecorderFactory<TRecord>
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedCombinedNamedArgumentRecorder<TRecord> Create(Func<TRecord, object?, ExpressionSyntax, bool> recorder);
 
     /// <summary>Creates a recorder which invokes the provided recorder and returns <see langword="true"/>.</summary>
@@ -32,8 +30,6 @@ public interface IDetachedMappedCombinedNamedArgumentRecorderFactory<TRecord>
     /// <item>The syntactic description of the argument.</item>
     /// </list></param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedCombinedNamedArgumentRecorder<TRecord> Create(Action<TRecord, object?, ExpressionSyntax> recorder);
 
     /// <summary>Creates a recorder which filters arguments using the provided pattern before invoking the provided recorder, and which returns <see langword="false"/> for discarded arguments.</summary>
@@ -48,8 +44,6 @@ public interface IDetachedMappedCombinedNamedArgumentRecorderFactory<TRecord>
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedCombinedNamedArgumentRecorder<TRecord> Create<TArgument>(IArgumentPattern<TArgument> pattern, Func<TRecord, TArgument, ExpressionSyntax, bool> recorder);
 
     /// <summary>Creates a recorder which filters arguments using the provided pattern before invoking the provided recorder and returning <see langword="true"/>, and which returns <see langword="false"/> for discarded arguments.</summary>
@@ -62,8 +56,6 @@ public interface IDetachedMappedCombinedNamedArgumentRecorderFactory<TRecord>
     /// <item>The syntactic description of the argument.</item>
     /// </list></param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedCombinedNamedArgumentRecorder<TRecord> Create<TArgument>(IArgumentPattern<TArgument> pattern, Action<TRecord, TArgument, ExpressionSyntax> recorder);
 
     /// <summary>Creates a recorder which filters arguments using the provided pattern before invoking the provided recorder, and which returns <see langword="false"/> for discarded arguments.</summary>
@@ -78,9 +70,6 @@ public interface IDetachedMappedCombinedNamedArgumentRecorderFactory<TRecord>
     /// The <see cref="bool"/> returned by the recorder should indicate whether the argument was successfully recorded.
     /// </param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedCombinedNamedArgumentRecorder<TRecord> Create<TArgument>(Func<IArgumentPatternFactory, IArgumentPattern<TArgument>> patternDelegate, Func<TRecord, TArgument, ExpressionSyntax, bool> recorder);
 
     /// <summary>Creates a recorder which filters arguments using the provided pattern before invoking the provided recorder and returning <see langword="true"/>, and which returns <see langword="false"/> for discarded arguments.</summary>
@@ -93,8 +82,5 @@ public interface IDetachedMappedCombinedNamedArgumentRecorderFactory<TRecord>
     /// <item>The syntactic description of the argument.</item>
     /// </list></param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentException"/>
-    /// <exception cref="ArgumentNullException"/>
-    /// <exception cref="InvalidOperationException"/>
     public abstract IDetachedMappedCombinedNamedArgumentRecorder<TRecord> Create<TArgument>(Func<IArgumentPatternFactory, IArgumentPattern<TArgument>> patternDelegate, Action<TRecord, TArgument, ExpressionSyntax> recorder);
 }

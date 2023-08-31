@@ -19,7 +19,6 @@ public sealed class SyntacticArgumentRecorderLogger<TCategoryName> : ISyntacticA
 
     /// <summary>Instantiates a <see cref="SyntacticArgumentRecorderLogger{TCategoryName}"/>, handling logging for <see cref="ISyntacticRecorder"/>.</summary>
     /// <param name="logger">The logger used to log messages.</param>
-    /// <exception cref="ArgumentNullException"/>
     public SyntacticArgumentRecorderLogger(ILogger<TCategoryName> logger)
     {
         if (logger is null)

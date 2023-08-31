@@ -90,13 +90,11 @@ public interface IArgumentPatternFactory
     /// <typeparam name="TElement">The element-type of the arguments matched by the created pattern.</typeparam>
     /// <param name="elementPattern">The pattern of each element of the matched arguments.</param>
     /// <returns>The created pattern.</returns>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IArgumentPattern<TElement[]> NonNullableArray<TElement>(IArgumentPattern<TElement> elementPattern);
 
     /// <summary>Creates a pattern which ensures that arguments are either <see langword="null"/> or arrays with elements that all match the provided pattern.</summary>
     /// <typeparam name="TElement">The element-type of the arguments matched by the created pattern.</typeparam>
     /// <param name="elementPattern">The pattern of each element of the matched arguments.</param>
     /// <returns>The created pattern.</returns>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IArgumentPattern<TElement[]?> NullableArray<TElement>(IArgumentPattern<TElement> elementPattern);
 }

@@ -11,7 +11,6 @@ public sealed class MappedSemanticConstructorArgumentRecorderLoggerFactory : IMa
 
     /// <summary>Instantiates a <see cref="MappedSemanticConstructorArgumentRecorderLoggerFactory"/>, handling creation of <see cref="IMappedSemanticConstructorArgumentRecorderLogger"/>.</summary>
     /// <param name="loggerFactory">Handles creation of loggers.</param>
-    /// <exception cref="ArgumentNullException"/>
     public MappedSemanticConstructorArgumentRecorderLoggerFactory(ILoggerFactory loggerFactory)
     {
         LoggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));

@@ -2,8 +2,6 @@
 
 using SharpAttributeParser.Mappers.MappedRecorders;
 
-using System;
-
 /// <summary>Handles creation of <see cref="IMappedCombinedTypeArgumentRecorder"/> using detached recorders.</summary>
 public interface IMappedCombinedTypeArgumentRecorderFactory
 {
@@ -12,6 +10,5 @@ public interface IMappedCombinedTypeArgumentRecorderFactory
     /// <param name="dataRecord">The record to which arguments are recorded.</param>
     /// <param name="detachedRecorder">The detached recorder, recording arguments to provided records.</param>
     /// <returns>The created recorder.</returns>
-    /// <exception cref="ArgumentNullException"/>
     public abstract IMappedCombinedTypeArgumentRecorder Create<TRecord>(TRecord dataRecord, IDetachedMappedCombinedTypeArgumentRecorder<TRecord> detachedRecorder);
 }

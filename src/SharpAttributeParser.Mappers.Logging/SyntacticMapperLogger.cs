@@ -18,7 +18,6 @@ public sealed class SyntacticMapperLogger<TCategoryName> : ISyntacticMapperLogge
 
     /// <summary>Instantiates a <see cref="SyntacticMapperLogger{TCategoryName}"/>, handling logging for <see cref="ISyntacticMapper{TRecord}"/>.</summary>
     /// <param name="logger">The logger used to log messages.</param>
-    /// <exception cref="ArgumentNullException"/>
     public SyntacticMapperLogger(ILogger<TCategoryName> logger)
     {
         if (logger is null)

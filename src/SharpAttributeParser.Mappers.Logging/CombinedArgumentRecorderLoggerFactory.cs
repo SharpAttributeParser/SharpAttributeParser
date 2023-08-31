@@ -11,7 +11,6 @@ public sealed class CombinedArgumentRecorderLoggerFactory : ICombinedArgumentRec
 
     /// <summary>Instantiates a <see cref="CombinedArgumentRecorderLoggerFactory"/>, handling creation of <see cref="ICombinedArgumentRecorderLogger"/>.</summary>
     /// <param name="loggerFactory">Handles creation of loggers.</param>
-    /// <exception cref="ArgumentNullException"/>
     public CombinedArgumentRecorderLoggerFactory(ILoggerFactory loggerFactory)
     {
         LoggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));

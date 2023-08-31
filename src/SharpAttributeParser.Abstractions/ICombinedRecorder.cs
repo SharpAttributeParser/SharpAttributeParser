@@ -1,7 +1,5 @@
 ﻿namespace SharpAttributeParser;
 
-using System;
-
 /// <summary>Records the arguments of attributes, together with syntactic information about the arguments.</summary>
 public interface ICombinedRecorder
 {
@@ -21,6 +19,5 @@ public interface ICombinedRecorder<out TRecord> : ICombinedRecorder
 {
     /// <summary>Retrieves a record of the recorded arguments.</summary>
     /// <returns>A record of the recorded arguments.</returns>
-    /// <exception cref="InvalidOperationException"/>
     public abstract TRecord GetRecord();
 }

@@ -14,7 +14,6 @@ public sealed class MappedCombinedConstructorArgumentRecorderLogger<TCategoryNam
 
     /// <summary>Instantiates a <see cref="MappedCombinedConstructorArgumentRecorderLogger{TCategoryName}"/>, handling logging for <see cref="IDetachedMappedCombinedConstructorArgumentRecorder{TRecord}"/>.</summary>
     /// <param name="logger">The logger used to log messages.</param>
-    /// <exception cref="ArgumentNullException"/>
     public MappedCombinedConstructorArgumentRecorderLogger(ILogger<TCategoryName> logger)
     {
         Logger = logger;
