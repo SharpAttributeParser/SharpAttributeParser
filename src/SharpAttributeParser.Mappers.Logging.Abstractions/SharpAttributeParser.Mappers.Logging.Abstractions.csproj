@@ -22,6 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\SharpAttributeParser.Abstractions\SharpAttributeParser.Abstractions.csproj" />
         <ProjectReference Include="..\SharpAttributeParser.Mappers.Abstractions\SharpAttributeParser.Mappers.Abstractions.csproj" />
         <ProjectReference Include="..\SharpAttributeParser.Mappers.Repositories.Abstractions\SharpAttributeParser.Mappers.Repositories.Abstractions.csproj" />
     </ItemGroup>

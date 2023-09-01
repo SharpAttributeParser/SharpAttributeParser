@@ -18,8 +18,11 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\SharpAttributeParser.Mappers.Abstractions\SharpAttributeParser.Mappers.Abstractions.csproj" />
         <ProjectReference Include="..\SharpAttributeParser.Mappers.Repositories.Abstractions\SharpAttributeParser.Mappers.Repositories.Abstractions.csproj" />
+        <ProjectReference Include="..\SharpAttributeParser.Mappers.Repositories.Logging.Abstractions\SharpAttributeParser.Mappers.Repositories.Logging.Abstractions.csproj" />
         <ProjectReference Include="..\SharpAttributeParser.Mappers.Repositories.Logging\SharpAttributeParser.Mappers.Repositories.Logging.csproj" />
+        <ProjectReference Include="..\SharpAttributeParser.Patterns.Abstractions\SharpAttributeParser.Patterns.Abstractions.csproj" />
     </ItemGroup>
 
 </Project>

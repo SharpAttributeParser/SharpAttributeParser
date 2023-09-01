@@ -18,8 +18,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\SharpAttributeParser.Abstractions\SharpAttributeParser.Abstractions.csproj" />
         <ProjectReference Include="..\SharpAttributeParser.Logging.Abstractions\SharpAttributeParser.Logging.Abstractions.csproj" />
-        <ProjectReference Include="..\SharpAttributeParser.Logging.Common\SharpAttributeParser.Logging.Common.csproj" PrivateAssets="all" />
+        <ProjectReference Include="..\SharpAttributeParser.Logging.Common\SharpAttributeParser.Logging.Common.csproj" PrivateAssets="compile" />
     </ItemGroup>
 
 </Project>

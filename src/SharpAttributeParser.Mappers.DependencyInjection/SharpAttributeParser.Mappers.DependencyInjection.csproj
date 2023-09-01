@@ -21,6 +21,7 @@
         <ProjectReference Include="..\SharpAttributeParser.DependencyInjection\SharpAttributeParser.DependencyInjection.csproj" />
         <ProjectReference Include="..\SharpAttributeParser.Mappers.Abstractions\SharpAttributeParser.Mappers.Abstractions.csproj" />
         <ProjectReference Include="..\SharpAttributeParser.Mappers.Logging.DependencyInjection\SharpAttributeParser.Mappers.Logging.DependencyInjection.csproj" />
+        <ProjectReference Include="..\SharpAttributeParser.Mappers.Repositories.Abstractions\SharpAttributeParser.Mappers.Repositories.Abstractions.csproj" />
         <ProjectReference Include="..\SharpAttributeParser.Mappers.Repositories.DependencyInjection\SharpAttributeParser.Mappers.Repositories.DependencyInjection.csproj" />
         <ProjectReference Include="..\SharpAttributeParser.Mappers\SharpAttributeParser.Mappers.csproj" />
         <ProjectReference Include="..\SharpAttributeParser.Patterns.DependencyInjection\SharpAttributeParser.Patterns.DependencyInjection.csproj" />
