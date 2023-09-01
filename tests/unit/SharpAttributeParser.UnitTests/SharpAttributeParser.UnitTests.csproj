@@ -29,7 +29,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\src\SharpAttributeParser.Abstractions\SharpAttributeParser.Abstractions.csproj" />
         <ProjectReference Include="..\..\..\src\SharpAttributeParser.DependencyInjection\SharpAttributeParser.DependencyInjection.csproj" />
+        <ProjectReference Include="..\..\..\src\SharpAttributeParser.Logging.Abstractions\SharpAttributeParser.Logging.Abstractions.csproj" />
+        <ProjectReference Include="..\..\..\src\SharpAttributeParser\SharpAttributeParser.csproj" />
         <ProjectReference Include="..\..\SharpAttributeParser.Tests.Common\SharpAttributeParser.Tests.Common.csproj" />
     </ItemGroup>
 

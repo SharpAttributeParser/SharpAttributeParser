@@ -19,6 +19,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\SharpAttributeParser.Logging.DependencyInjection\SharpAttributeParser.Logging.DependencyInjection.csproj" />
+        <ProjectReference Include="..\SharpAttributeParser.Mappers.Logging.Abstractions\SharpAttributeParser.Mappers.Logging.Abstractions.csproj" />
         <ProjectReference Include="..\SharpAttributeParser.Mappers.Logging\SharpAttributeParser.Mappers.Logging.csproj" />
         <ProjectReference Include="..\SharpAttributeParser.Mappers.Repositories.Logging.DependencyInjection\SharpAttributeParser.Mappers.Repositories.Logging.DependencyInjection.csproj" />
     </ItemGroup>

@@ -25,7 +25,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\src\SharpAttributeParser.Patterns.Abstractions\SharpAttributeParser.Patterns.Abstractions.csproj" />
         <ProjectReference Include="..\..\..\src\SharpAttributeParser.Patterns.DependencyInjection\SharpAttributeParser.Patterns.DependencyInjection.csproj" />
+        <ProjectReference Include="..\..\..\src\SharpAttributeParser.Patterns\SharpAttributeParser.Patterns.csproj" />
         <ProjectReference Include="..\..\SharpAttributeParser.Tests.Common\SharpAttributeParser.Tests.Common.csproj" />
     </ItemGroup>
 

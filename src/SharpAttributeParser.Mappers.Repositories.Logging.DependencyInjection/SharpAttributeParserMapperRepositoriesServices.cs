@@ -2,7 +2,6 @@
 
 using Microsoft.Extensions.DependencyInjection;
 
-using SharpAttributeParser.Logging;
 using SharpAttributeParser.Mappers.Repositories.Logging.Combined;
 using SharpAttributeParser.Mappers.Repositories.Logging.Semantic;
 
@@ -21,7 +20,7 @@ public static class SharpAttributeParserMapperRepositoriesServices
             throw new ArgumentNullException(nameof(services));
         }
 
-        services.AddSharpAttributeParserLogging();
+        services.AddLogging();
 
         services.AddSingleton(typeof(IMappedCombinedConstructorArgumentRecorderLogger<>), typeof(MappedCombinedConstructorArgumentRecorderLogger<>));
         services.AddSingleton(typeof(IMappedCombinedNamedArgumentRecorderLogger<>), typeof(MappedCombinedNamedArgumentRecorderLogger<>));

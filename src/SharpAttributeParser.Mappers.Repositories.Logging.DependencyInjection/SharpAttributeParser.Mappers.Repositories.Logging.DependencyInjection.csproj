@@ -17,8 +17,12 @@
         <None Include="README.nupkg.md" Pack="true" PackagePath="\" />
     </ItemGroup>
 
+    <ItemGroup>    
+        <PackageReference Include="Microsoft.Extensions.Logging" />
+    </ItemGroup>
+
     <ItemGroup>
-        <ProjectReference Include="..\SharpAttributeParser.Logging.DependencyInjection\SharpAttributeParser.Logging.DependencyInjection.csproj" />
+        <ProjectReference Include="..\SharpAttributeParser.Mappers.Repositories.Logging.Abstractions\SharpAttributeParser.Mappers.Repositories.Logging.Abstractions.csproj" />
         <ProjectReference Include="..\SharpAttributeParser.Mappers.Repositories.Logging\SharpAttributeParser.Mappers.Repositories.Logging.csproj" />
     </ItemGroup>
 

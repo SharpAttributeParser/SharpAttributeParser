@@ -23,9 +23,18 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\src\SharpAttributeParser.Abstractions\SharpAttributeParser.Abstractions.csproj" />
         <ProjectReference Include="..\..\..\src\SharpAttributeParser.DependencyInjection\SharpAttributeParser.DependencyInjection.csproj" />
+        <ProjectReference Include="..\..\..\src\SharpAttributeParser.Logging.Abstractions\SharpAttributeParser.Logging.Abstractions.csproj" />
+        <ProjectReference Include="..\..\..\src\SharpAttributeParser.Mappers.Abstractions\SharpAttributeParser.Mappers.Abstractions.csproj" />
         <ProjectReference Include="..\..\..\src\SharpAttributeParser.Mappers.DependencyInjection\SharpAttributeParser.Mappers.DependencyInjection.csproj" />
+        <ProjectReference Include="..\..\..\src\SharpAttributeParser.Mappers.Logging.Abstractions\SharpAttributeParser.Mappers.Logging.Abstractions.csproj" />
+        <ProjectReference Include="..\..\..\src\SharpAttributeParser.Mappers.Repositories.Abstractions\SharpAttributeParser.Mappers.Repositories.Abstractions.csproj" />
+        <ProjectReference Include="..\..\..\src\SharpAttributeParser.Mappers\SharpAttributeParser.Mappers.csproj" />
+        <ProjectReference Include="..\..\..\src\SharpAttributeParser.Patterns.Abstractions\SharpAttributeParser.Patterns.Abstractions.csproj" />
+        <ProjectReference Include="..\..\..\src\SharpAttributeParser.RecordBuilders.Abstractions\SharpAttributeParser.RecordBuilders.Abstractions.csproj" />
         <ProjectReference Include="..\..\..\src\SharpAttributeParser.RecordBuilders\SharpAttributeParser.RecordBuilders.csproj" />
+        <ProjectReference Include="..\..\..\src\SharpAttributeParser\SharpAttributeParser.csproj" />
         <ProjectReference Include="..\..\SharpAttributeParser.Tests.Common\SharpAttributeParser.Tests.Common.csproj" />
     </ItemGroup>
 
