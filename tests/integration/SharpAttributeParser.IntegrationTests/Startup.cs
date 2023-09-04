@@ -3,7 +3,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
 using SharpAttributeParser.ExampleCases.RecommendedPatternCases;
-using SharpAttributeParser.ExampleCases.RecommendedPatternCases.DependencyInjectionCases;
 using SharpAttributeParser.Mappers;
 
 internal static class Startup
@@ -15,5 +14,6 @@ internal static class Startup
 
         services.AddSingleton<ISemanticMapper<IExampleRecordBuilder>, ExampleMapper>();
         services.AddSingleton<IExampleRecorderFactory, ExampleRecorderFactory>();
+        services.AddSingleton<IExampleParser, ExampleParser>();
     }
 }

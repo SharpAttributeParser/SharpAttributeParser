@@ -1,4 +1,4 @@
-﻿namespace SharpAttributeParser.ExampleCases.RecommendedPatternCases.DependencyInjectionCases;
+﻿namespace SharpAttributeParser.ExampleCases.RecommendedPatternCases;
 
 using Microsoft.CodeAnalysis;
 
@@ -10,6 +10,7 @@ using System;
 
 public sealed class ExampleMapper : ASemanticMapper<IExampleRecordBuilder>
 {
+    public ExampleMapper() { }
     public ExampleMapper(ISemanticMapperDependencyProvider<IExampleRecordBuilder> dependencyProvider) : base(dependencyProvider) { }
 
     protected override void AddMappings(IAppendableSemanticMappingRepository<IExampleRecordBuilder> repository)
