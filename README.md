@@ -56,7 +56,7 @@ This `Mapper` can then be used to parse attributes:
 // The AttributeData describing the attribute being parsed
 AttributeData attributeData;
 
-// The required services. Can be injected using the add-on package SharpAttributeParser.Mappers.DependencyInjection
+// The required services. Can be injected using the add-on package 'SharpAttributeParser.Mappers.DependencyInjection'
 ISemanticParser parser; // new SemanticParser();
 ISemanticRecorderFactory recorderFactory; // new SemanticRecorderFactory();
 

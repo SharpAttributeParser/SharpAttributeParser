@@ -24,7 +24,7 @@ The provided `Recorder`-objects are responsible for recording the parsed data - 
 Below is a demonstration of how a `ISemanticParser` can be used to semantically parse an attribute. The services `ISyntacticParser` and `ICombinedParser` are used in very similar fashion, but also requires an `AttributeSyntax` with the syntactic description of the attribute.
 
 ```csharp
-// The parser. Can be injected using the add-on package SharpAttributeParser.DependencyInjection
+// The parser. Can be injected using the add-on package 'SharpAttributeParser.DependencyInjection'
 ISemanticParser parser; // new SemanticParser();
 
 // The AttributeData describing the attribute being parsed
