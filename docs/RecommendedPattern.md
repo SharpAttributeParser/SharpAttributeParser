@@ -9,16 +9,18 @@ This article will present the recommended pattern. It is *recommended* in the se
 3. [Record Builder](#3-record-builder)
 4. [Mapper Implementation](#4-mapper-implementation)
 5. [Recorder-factory Implementation](#5-recorder-factory-implementation)
-6. [Usage](#6-usage)
-7. [Dependency Injection](#7-dependency-injection)
-   1. [Recorder-factory Abstraction](#71-recorder-factory-abstraction)
-   2. [Service Registration](#72-service-registration)
-   3. [Mapper Dependencies](#73-mapper-dependencies)
-   4. [Usage](#74-usage)
+6. [Parser Implementation](#6-parser-implementation)
+7. [Usage](#7-usage)
+8. [Dependency Injection](#8-dependency-injection)
+   1. [Recorder-factory Abstraction](#81-recorder-factory-abstraction)
+   2. [Parser Abstraction](#82-parser-abstraction)
+   3. [Service Registration](#83-service-registration)
+   4. [Mapper Dependencies](#84-mapper-dependencies)
+   5. [Usage](#85-usage)
 
 #### 1. Attribute Class
 
-First, we define the attribute-class.
+First, the attribute-class is defined.
 
 ```csharp
 public sealed class ExampleAttribute<T> : Attribute
@@ -40,7 +42,7 @@ public sealed class ExampleAttribute<T> : Attribute
 
 #### 2. Record
 
-Next, we define the record - which will represent a parsed attribute.
+Next, the record representing parsed attributes is defined.
 
 ```csharp
 interface IExampleRecord
@@ -56,7 +58,7 @@ interface IExampleRecord
 
 #### 3. Record Builder
 
-To construct instances of the record, we define a builder.
+To construct instances of the record, a builder is defined.
 
 ```csharp
 interface IExampleRecordBuilder : IRecordBuilder<IExampleRecord>
@@ -71,7 +73,7 @@ interface IExampleRecordBuilder : IRecordBuilder<IExampleRecord>
 
 #### 4. Mapper Implementation
 
-We implement our `Mapper`, extending the abstract class `ASemanticMapper`. Note that the type-argument of the base-class is `IExampleRecordBuilder`, rather than `IExampleRecord`.
+A `Mapper` is implemented, extending the abstract class `ASemanticMapper`. Note that the type-argument of the base-class is `IExampleRecordBuilder`, rather than `IExampleRecord`.
 
 It is also recommended to replace the literal `strings` with `nameof`. This will always work for named parameters, and will work for constructor parameters if the name is the same as the corresponding property (by default, differences in casing are ignored).
 
@@ -102,7 +104,7 @@ class ExampleMapper : ASemanticMapper<IExampleRecordBuilder>
 
 #### 5. Recorder-factory Implementation
 
-We implement a `Recorder`-factory, which is responsible for constructing `Recorders`, using `Mappers`.  The factory has an internal implementation of `IExampleRecordBuilder` - with invokations of `VerifyCanModify` that ensure that the `IExampleRecord` has not yet been built when attempting to modify it. The builder also overrides `CanBuildRecord`, which ensures that the `IExampleRecord` is in a valid state before building it. 
+A `Recorder`-factory is implemented, which is responsible for constructing `Recorders`, using the `Mapper` implemented in the previous step.  The factory has an internal implementation of `IExampleRecordBuilder` - with invokations of `VerifyCanModify` that ensure that the `IExampleRecord` has not yet been built when attempting to modify it. The builder also overrides `CanBuildRecord`, which ensures that the `IExampleRecord` is in a valid state before building it. 
 
 ```csharp
 class ExampleRecorderFactory
@@ -172,7 +174,38 @@ class ExampleRecorderFactory
 }
 ```
 
-#### 6. Usage
+#### 6. Parser Implementation
+
+A `Parser` is implemented, connecting the `Parser` provided by `SharpAttributeParser` with the `Recorder`-factory defined in the previous step.
+
+```csharp
+class ExampleParser
+{
+    private ISemanticParser Parser { get; }
+    private ExampleRecorderFactory RecorderFactory { get; }
+
+    public ExampleParser(ISemanticParser parser, ExampleRecorderFactory recorderFactory)
+    {
+        Parser = parser;
+        RecorderFactory = recorderFactory;
+    }
+
+    public IExampleRecord? TryParse(AttributeData attributeData)
+    {
+        var recorder = RecorderFactory.Create();
+
+        if (Parser.TryParse(recorder, attributeData) is false)
+        {
+            return null;
+        }
+
+        return recorder.GetRecord();
+    }
+}
+
+```
+
+#### 7. Usage
 
 At this point, we can parse attributes of type `ExampleAttribute<T>`.
 
@@ -185,24 +218,21 @@ var recorderFactory = new SemanticRecorderFactory();
 
 var mapper = new ExampleMapper();
 var exampleRecorderFactory = new ExampleRecorderFactory(recorderFactory, mapper);
+var exampleParser = new ExampleParser(parser, exampleRecorderFactory);
 
-ISemanticRecorder<IExampleRecord> recorder = exampleRecorderFactory.Create();
-
-bool success = parser.TryParse(recorder, attributeData);
-
-if (success)
+if (exampleParser.TryParse(attributeData) is IExampleRecord dataRecord)
 {
-    IExampleRecord dataRecord = recorder.GetRecord();
+    // Attribute was successfully parsed
 }
 ```
 
-#### 7. Dependency Injection
+#### 8. Dependency Injection
 
-If Dependency Injection is used, the pattern can be further improved. Otherwise, step 6. demonstrates the final pattern.
+If Dependency Injection is used, the pattern can be further improved. Otherwise, the previous step demonstrates the final pattern.
 
-##### 7.1. Recorder-factory Abstraction
+##### 8.1. Recorder-factory Abstraction
 
-Define an abstraction of `ExampleRecorderFactory`, and apply it to the implementation.
+Define an abstraction of `ExampleRecorderFactory`, and apply it to the implementation. The constructor for `ExampleParser` should also be modified to use this interface rather than the implementation.
 
 ```csharp
 interface IExampleRecorderFactory
@@ -211,45 +241,52 @@ interface IExampleRecorderFactory
 }
 ```
 
-##### 7.2. Service Registration
+##### 8.2. Parser Abstraction
 
-Register `ExampleMapper` and `ExampleRecorderFactory` with a `IServiceCollection`.
+Define an abstraction of `ExampleParser`, and apply it to the implementation.
 
 ```csharp
-// Register dependencies provided by SharpAttributeParser.Mappers. Requires the add-on package SharpAttributeParser.Mappers.DependencyInjection
+interface IExampleParser
+{
+    IExampleRecord? TryParse(AttributeData attributeData);
+}
+```
+
+##### 8.3. Service Registration
+
+Register `ExampleMapper`, `ExampleRecorderFactory`, and `ExampleParser` with a `IServiceCollection`.
+
+```csharp
+// Register dependencies provided by 'SharpAttributeParser.Mappers'. Requires the add-on package 'SharpAttributeParser.Mappers.DependencyInjection'
 services.AddSharpAttributeParserMappers();
 
 services.AddSingleton<ISemanticMapper<IExampleRecordBuilder>, ExampleMapper>();
 services.AddSingleton<IExampleRecorderFactory, ExampleRecorderFactory>();
+services.AddSingleton<IExampleParser, ExampleParser>();
 ```
 
-##### 7.3 Mapper Dependencies
+##### 8.4 Mapper Dependencies
 
-Optionally, the abstract `Mapper` has some dependencies that can be injected. A constructor is added to the `ExampleMapper`, which forwards the injected dependencies to the base-class.
+Optionally, the abstract `Mapper` has some dependencies that can be injected. Add a constructor to `ExampleMapper` which passes the dependencies to the base-class.
 
 ```csharp
 
 public ExampleMapper(ISemanticMapperDependencyProvider<IExampleRecordBuilder> dependencyProvider) : base(dependencyProvider) { }
 ```
 
-##### 7.4 Usage
+##### 8.5 Usage
 
-The `IExampleRecorderFactory` service can now be injected.
+The `IExampleParser` service can now be injected.
 
 ```csharp
 // The AttributeData representing the attribute
 AttributeData attributeData;
 
-// Services are injected through DI
-ISemanticParser parser;
-IExampleRecorderFactory recorderFactory;
+// Service is injected
+IExampleParser parser;
 
-ISemanticRecorder<IExampleRecord> recorder = recorderFactory.Create();
-
-bool success = parser.TryParse(recorder, attributeData);
-
-if (success)
+if (parser.TryParse(attributeData) is IExampleRecord dataRecord)
 {
-    IExampleRecord dataRecord = recorder.GetRecord();
+    // Attribute was successfully parsed
 }
 ```

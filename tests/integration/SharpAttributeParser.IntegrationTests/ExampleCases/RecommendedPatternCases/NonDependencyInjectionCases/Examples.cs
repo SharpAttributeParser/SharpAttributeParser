@@ -14,14 +14,22 @@ public sealed class Examples
     [Fact]
     public async Task CreatedRecordActuallyContainsArguments()
     {
-        var source = """
-            using SharpAttributeParser.ExampleCases.MainReadmeCases;
+        var sourceA = """
+            using SharpAttributeParser.ExampleCases.RecommendedPatternCases;
 
             [Example<string>(System.StringComparison.Ordinal, "41", 42, 43, NamedArgument = typeof(double))]
             public class Foo { }
             """;
 
-        var (compilation, attributeData, _) = await CompilationStore.GetComponents(source, "Foo");
+        var sourceB = """
+            using SharpAttributeParser.ExampleCases.RecommendedPatternCases;
+
+            [Example<int>(System.StringComparison.Ordinal, "41", 42, 43, NamedArgument = typeof(double))]
+            public class Foo { }
+            """;
+
+        var (compilationA, attributeDataA, _) = await CompilationStore.GetComponents(sourceA, "Foo");
+        var (compilationB, attributeDataB, _) = await CompilationStore.GetComponents(sourceB, "Foo");
 
         var parser = new SemanticParser();
 
@@ -29,23 +37,19 @@ public sealed class Examples
 
         var recorderFactory = new SemanticRecorderFactory();
         var exampleRecorderFactory = new ExampleRecorderFactory(recorderFactory, mapper);
+        var exampleParser = new ExampleParser(parser, exampleRecorderFactory);
 
-        var recorderA = ((IExampleRecorderFactory)exampleRecorderFactory).Create();
-        var recorderB = ((IExampleRecorderFactory)exampleRecorderFactory).Create();
+        var dataRecordA = ((IExampleParser)exampleParser).TryParse(attributeDataA);
+        var dataRecordB = ((IExampleParser)exampleParser).TryParse(attributeDataB);
 
-        var outcome = parser.TryParse(recorderA, attributeData);
-
-        var dataRecordA = recorderA.GetRecord();
-
-        var exceptionBuildRecordB = Record.Exception(recorderB.GetRecord);
-
-        Assert.True(outcome);
-        Assert.Equal(compilation.GetSpecialType(SpecialType.System_String), dataRecordA.TypeArgument);
+        Assert.NotNull(dataRecordA);
+        Assert.Equal(compilationA.GetSpecialType(SpecialType.System_String), dataRecordA.TypeArgument);
         Assert.Equal(StringComparison.Ordinal, dataRecordA.ConstructorArgument);
         Assert.Equal("41", dataRecordA.OptionalArgument);
         Assert.Equal(new[] { 42, 43 }, dataRecordA.ParamsArgument);
-        Assert.Equal(compilation.GetSpecialType(SpecialType.System_Double), dataRecordA.NamedArgument);
+        Assert.Equal(compilationA.GetSpecialType(SpecialType.System_Double), dataRecordA.NamedArgument);
 
-        Assert.IsType<InvalidOperationException>(exceptionBuildRecordB);
+        Assert.NotNull(dataRecordB);
+        Assert.Equal(compilationB.GetSpecialType(SpecialType.System_Int32), dataRecordB.TypeArgument);
     }
 }
