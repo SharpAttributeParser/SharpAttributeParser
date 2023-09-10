@@ -8,7 +8,7 @@
     <PropertyGroup>
         <Title>SharpAttributeParser.Logging.Abstractions</Title>
         <Description>
-            Provides abstractions of SharpAttributeParser.Logging.
+            Provides abstractions of 'SharpAttributeParser.Logging'.
         </Description>
         <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
     </PropertyGroup>

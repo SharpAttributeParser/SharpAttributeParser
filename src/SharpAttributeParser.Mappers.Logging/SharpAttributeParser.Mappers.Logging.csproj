@@ -8,7 +8,7 @@
     <PropertyGroup>
         <Title>SharpAttributeParser.Mappers.Logging</Title>
         <Description>
-            Handles logging for SharpAttributeParser.Mappers.
+            Handles logging for 'SharpAttributeParser.Mappers'.
         </Description>
         <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
     </PropertyGroup>

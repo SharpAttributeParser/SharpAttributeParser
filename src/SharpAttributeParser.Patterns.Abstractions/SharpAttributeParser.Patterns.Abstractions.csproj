@@ -8,7 +8,7 @@
     <PropertyGroup>
         <Title>SharpAttributeParser.Patterns.Abstractions</Title>
         <Description>
-            Provides abstractions of SharpAttributeParser.Patterns.
+            Provides abstractions of 'SharpAttributeParser.Patterns'.
         </Description>
         <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
     </PropertyGroup>

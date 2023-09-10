@@ -8,7 +8,7 @@
     <PropertyGroup>
         <Title>SharpAttributeParser.Mappers</Title>
         <Description>
-            Adds mappers to SharpAttributeParser, acting as blueprints for recorders.
+            Adds mappers to 'SharpAttributeParser', acting as blueprints for recorders.
         </Description>
         <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
     </PropertyGroup>

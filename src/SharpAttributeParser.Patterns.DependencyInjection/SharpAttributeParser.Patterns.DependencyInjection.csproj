@@ -8,7 +8,7 @@
     <PropertyGroup>
         <Title>SharpAttributeParser.Patterns.DependencyInjection</Title>
         <Description>
-            Allows the services provided by SharpAttributeParser.Patterns to be registered with DI-containers.
+            Allows the services provided by 'SharpAttributeParser.Patterns' to be registered with DI-containers.
         </Description>
         <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
     </PropertyGroup>

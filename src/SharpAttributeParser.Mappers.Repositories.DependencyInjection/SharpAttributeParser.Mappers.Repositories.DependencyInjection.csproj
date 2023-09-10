@@ -8,7 +8,7 @@
     <PropertyGroup>
         <Title>SharpAttributeParser.Mappers.Repositories.DependencyInjection</Title>
         <Description>
-            Allows the services provided by SharpAttributeParser.Mappers.Repositories to be registered with DI-containers.
+            Allows the services provided by 'SharpAttributeParser.Mappers.Repositories' to be registered with DI-containers.
         </Description>
         <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
     </PropertyGroup>

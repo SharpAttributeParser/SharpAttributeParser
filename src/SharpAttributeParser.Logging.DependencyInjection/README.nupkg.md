@@ -1,6 +1,6 @@
 # SharpAttributeParser.Logging.DependencyInjection
 
-Allows the services provided by SharpAttributeParser.Logging to be registered with DI-containers:
+Allows the services provided by `SharpAttributeParser.Logging` to be registered with DI-containers:
 
 ```csharp
 using SharpAttributeParser.Logging;
