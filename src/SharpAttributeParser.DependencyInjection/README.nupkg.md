@@ -1,6 +1,6 @@
 # SharpAttributeParser.DependencyInjection
 
-Allows the services provided by SharpAttributeParser to be registered with DI-containers:
+Allows the services provided by `SharpAttributeParser` to be registered with DI-containers:
 
 ```csharp
 using SharpAttributeParser;

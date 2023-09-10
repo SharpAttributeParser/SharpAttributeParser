@@ -8,7 +8,7 @@
     <PropertyGroup>
         <Title>SharpAttributeParser.Logging.Common</Title>
         <Description>
-            Provides SharpAttributeParser with common functionality related to logging.
+            Provides 'SharpAttributeParser' with common functionality related to logging.
         </Description>
         <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
     </PropertyGroup>

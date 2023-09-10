@@ -8,7 +8,7 @@
     <PropertyGroup>
         <Title>SharpAttributeParser.Mappers.Repositories</Title>
         <Description>
-            Adds repositories to SharpAttributeParser.Mappers, handling collections of mapped argument recorders.
+            Adds repositories to 'SharpAttributeParser.Mappers', handling collections of mapped argument recorders.
         </Description>
         <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
     </PropertyGroup>

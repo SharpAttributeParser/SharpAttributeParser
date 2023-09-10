@@ -1,6 +1,6 @@
 # SharpAttributeParser.Mappers.DependencyInjection
 
-Allows the services provided by SharpAttributeParser.Mappers to be registered with DI-containers:
+Allows the services provided by `SharpAttributeParser.Mappers` to be registered with DI-containers:
 
 ```csharp
 using SharpAttributeParser.Mappers;

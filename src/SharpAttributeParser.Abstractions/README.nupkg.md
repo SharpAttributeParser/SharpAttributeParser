@@ -1,5 +1,5 @@
 # SharpAttributeParser.Abstractions
 
-Provides abstractions of SharpAttributeParser.
+Provides abstractions of `SharpAttributeParser`.
 
 See [GitHub](https://github.com/ErikWe/sharp-attribute-parser) for more information.

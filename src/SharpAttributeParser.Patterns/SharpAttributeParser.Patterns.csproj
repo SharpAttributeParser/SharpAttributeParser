@@ -8,7 +8,7 @@
     <PropertyGroup>
         <Title>SharpAttributeParser.Patterns</Title>
         <Description>
-            Adds patterns to SharpAttributeParser, allowing attribute arguments to be filtered.
+            Adds patterns to 'SharpAttributeParser', allowing attribute arguments to be filtered.
         </Description>
         <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
     </PropertyGroup>
