@@ -3,6 +3,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
+using Moq;
+
 using SharpAttributeParser.Mappers.Repositories;
 
 using System;
@@ -30,6 +32,16 @@ public sealed class AddSharpAttributeParserMappers
         var exception = Record.Exception(() => Target(null!));
 
         Assert.IsType<ArgumentNullException>(exception);
+    }
+
+    [Fact]
+    public void ValidServiceCollection_ReturnsSameServiceCollection()
+    {
+        var serviceCollection = Mock.Of<IServiceCollection>();
+
+        var actual = Target(serviceCollection);
+
+        Assert.Same(serviceCollection, actual);
     }
 
     [Fact]
