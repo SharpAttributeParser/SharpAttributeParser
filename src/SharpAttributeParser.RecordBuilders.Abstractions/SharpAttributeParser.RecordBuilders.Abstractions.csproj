@@ -8,7 +8,7 @@
     <PropertyGroup>
         <Title>SharpAttributeParser.RecordBuilders.Abstractions</Title>
         <Description>
-            Provides abstractions of 'SharpAttributeParser.RecordBuilders'.
+            Provides abstractions related to 'SharpAttributeParser' record-builders.
         </Description>
         <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
     </PropertyGroup>

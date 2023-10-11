@@ -11,7 +11,7 @@ public sealed class TryFit_Long
 {
     private OneOf<Error, long> Target(object? argument) => Pattern.TryFit(argument);
 
-    private IArgumentPattern<long> Pattern { get; } = ((IArgumentPatternFactory)FactoryContext.Create().Factory).Long();
+    private readonly IArgumentPattern<long> Pattern = ((IArgumentPatternFactory)FactoryContext.Create().Factory).Long();
 
     [Fact]
     public void Long_0_ResultsInMatch() => ResultsInMatch(0, (long)0);

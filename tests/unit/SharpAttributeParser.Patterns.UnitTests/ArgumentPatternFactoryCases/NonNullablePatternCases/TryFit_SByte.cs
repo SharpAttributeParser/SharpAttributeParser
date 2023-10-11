@@ -11,7 +11,7 @@ public sealed class TryFit_SByte
 {
     private OneOf<Error, sbyte> Target(object? argument) => Pattern.TryFit(argument);
 
-    private IArgumentPattern<sbyte> Pattern { get; } = ((IArgumentPatternFactory)FactoryContext.Create().Factory).SByte();
+    private readonly IArgumentPattern<sbyte> Pattern = ((IArgumentPatternFactory)FactoryContext.Create().Factory).SByte();
 
     [Fact]
     public void SByte_0_ResultsInMatch() => ResultsInMatch(0, (sbyte)0);

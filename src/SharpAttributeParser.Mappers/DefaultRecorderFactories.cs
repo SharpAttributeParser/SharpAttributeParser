@@ -7,9 +7,9 @@ using SharpAttributeParser.Mappers.Repositories.Syntactic;
 /// <summary>Provides common functionality related to creating default recorders.</summary>
 internal static class DefaultRecorderFactories
 {
-    private static IMappedSemanticArgumentRecorderFactory? CachedSemanticFactory { get; set; }
-    private static IMappedSyntacticArgumentRecorderFactory? CachedSyntacticFactory { get; set; }
-    private static IMappedCombinedArgumentRecorderFactory? CachedCombinedFactory { get; set; }
+    private static IMappedSemanticArgumentRecorderFactory? CachedSemanticFactory;
+    private static IMappedSyntacticArgumentRecorderFactory? CachedSyntacticFactory;
+    private static IMappedCombinedArgumentRecorderFactory? CachedCombinedFactory;
 
     /// <summary>Creates the default <see cref="IMappedSemanticArgumentRecorderFactory"/>.</summary>
     /// <returns>The default <see cref="IMappedSemanticArgumentRecorderFactory"/>.</returns>

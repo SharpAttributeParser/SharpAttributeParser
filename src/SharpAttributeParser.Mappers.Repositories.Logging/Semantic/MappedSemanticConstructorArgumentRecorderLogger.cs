@@ -10,7 +10,7 @@ using System;
 /// <inheritdoc cref="IMappedSemanticConstructorArgumentRecorderLogger{TCategoryName}"/>
 public sealed class MappedSemanticConstructorArgumentRecorderLogger<TCategoryName> : IMappedSemanticConstructorArgumentRecorderLogger<TCategoryName>
 {
-    private ILogger Logger { get; }
+    private readonly ILogger Logger;
 
     /// <summary>Instantiates a <see cref="MappedSemanticConstructorArgumentRecorderLogger{TCategoryName}"/>, handling logging for <see cref="IDetachedMappedSemanticConstructorArgumentRecorder{TRecord}"/>.</summary>
     /// <param name="logger">The logger used to log messages.</param>

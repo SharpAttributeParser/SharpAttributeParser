@@ -14,7 +14,7 @@ public sealed class TryParse_Combined
 {
     private bool Target(ISemanticRecorder recorder, AttributeData attributeData) => Context.Parser.TryParse(recorder, attributeData);
 
-    private ParserContext Context { get; } = ParserContext.Create();
+    private readonly ParserContext Context = ParserContext.Create();
 
     [Fact]
     public async Task ParamsWithNamed_ReturnsTrueAndRecords()
@@ -199,11 +199,11 @@ public sealed class TryParse_Combined
         public int SimpleNamedValueSetCount => SimpleNamedValueSet ? 1 : 0;
         public int ArrayNamedValueSetCount => ArrayNamedValueSet ? 1 : 0;
 
-        private bool SimpleNamedValueSet { get; init; }
-        private bool ArrayNamedValueSet { get; init; }
+        private readonly bool SimpleNamedValueSet;
+        private readonly bool ArrayNamedValueSet;
 
-        private object? RawSimpleNamedValue { get; init; }
-        private IReadOnlyList<object?>? RawArrayNamedValue { get; init; }
+        private readonly object? RawSimpleNamedValue;
+        private readonly IReadOnlyList<object?>? RawArrayNamedValue;
 
         public ExpectedArguments(object? simpleValue, IReadOnlyList<object?>? arrayValue, IReadOnlyList<object?>? paramsValue)
         {

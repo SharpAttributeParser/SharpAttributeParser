@@ -7,7 +7,7 @@ using System;
 /// <inheritdoc cref="IMappedSemanticNamedArgumentRecorderLoggerFactory"/>
 public sealed class MappedSemanticNamedArgumentRecorderLoggerFactory : IMappedSemanticNamedArgumentRecorderLoggerFactory
 {
-    private ILoggerFactory LoggerFactory { get; }
+    private readonly ILoggerFactory LoggerFactory;
 
     /// <summary>Instantiates a <see cref="MappedSemanticNamedArgumentRecorderLoggerFactory"/>, handling creation of <see cref="IMappedSemanticNamedArgumentRecorderLogger"/>.</summary>
     /// <param name="loggerFactory">Handles creation of loggers.</param>

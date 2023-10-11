@@ -13,10 +13,10 @@ using System.Threading.Tasks;
 
 public static class CompilationStore
 {
-    private static Compilation? EmptyCompilation { get; set; }
+    private static Compilation? EmptyCompilation;
 
-    private static CSharpParseOptions ParseOptions { get; } = new(languageVersion: LanguageVersion.CSharp11);
-    private static CSharpCompilationOptions CompilationOptions { get; } = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary);
+    private static readonly CSharpParseOptions ParseOptions = new(languageVersion: LanguageVersion.CSharp11);
+    private static readonly CSharpCompilationOptions CompilationOptions = new(OutputKind.DynamicallyLinkedLibrary);
 
     public static Compilation GetCompilation(string source)
     {

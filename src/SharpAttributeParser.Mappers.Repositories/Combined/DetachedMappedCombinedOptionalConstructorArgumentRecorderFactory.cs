@@ -14,9 +14,9 @@ using System.Collections.Generic;
 /// <inheritdoc cref="IDetachedMappedCombinedOptionalConstructorArgumentRecorderFactory{TRecord}"/>
 public sealed class DetachedMappedCombinedOptionalConstructorArgumentRecorderFactory<TRecord> : IDetachedMappedCombinedOptionalConstructorArgumentRecorderFactory<TRecord>
 {
-    private IArgumentPatternFactory ArgumentPatternFactory { get; }
+    private readonly IArgumentPatternFactory ArgumentPatternFactory;
 
-    private IMappedCombinedConstructorArgumentRecorderLoggerFactory LoggerFactory { get; }
+    private readonly IMappedCombinedConstructorArgumentRecorderLoggerFactory LoggerFactory;
 
     /// <summary>Instantiates a <see cref="DetachedMappedCombinedOptionalConstructorArgumentRecorderFactory{TRecord}"/>, handling creation of <see cref="IDetachedMappedCombinedConstructorArgumentRecorder{TRecord}"/> related to optional constructor parameters.</summary>
     /// <param name="argumentPatternFactory">Handles creation of <see cref="IArgumentPattern{T}"/>.</param>
@@ -122,7 +122,7 @@ public sealed class DetachedMappedCombinedOptionalConstructorArgumentRecorderFac
 
     private sealed class UnpatternedArgumentRecorder : IDetachedMappedCombinedConstructorArgumentRecorder<TRecord>
     {
-        private Func<TRecord, object?, OneOf<None, ExpressionSyntax>, bool> Recorder { get; }
+        private readonly Func<TRecord, object?, OneOf<None, ExpressionSyntax>, bool> Recorder;
 
         public UnpatternedArgumentRecorder(Func<TRecord, object?, OneOf<None, ExpressionSyntax>, bool> recorder)
         {
@@ -159,10 +159,10 @@ public sealed class DetachedMappedCombinedOptionalConstructorArgumentRecorderFac
 
     private sealed class PatternedArgumentRecorder<TArgument> : IDetachedMappedCombinedConstructorArgumentRecorder<TRecord>
     {
-        private IArgumentPattern<TArgument> Pattern { get; }
-        private Func<TRecord, TArgument, OneOf<None, ExpressionSyntax>, bool> Recorder { get; }
+        private readonly IArgumentPattern<TArgument> Pattern;
+        private readonly Func<TRecord, TArgument, OneOf<None, ExpressionSyntax>, bool> Recorder;
 
-        private IMappedCombinedConstructorArgumentRecorderLogger Logger { get; }
+        private readonly IMappedCombinedConstructorArgumentRecorderLogger Logger;
 
         public PatternedArgumentRecorder(IArgumentPattern<TArgument> pattern, Func<TRecord, TArgument, OneOf<None, ExpressionSyntax>, bool> recorder, IMappedCombinedConstructorArgumentRecorderLogger logger)
         {

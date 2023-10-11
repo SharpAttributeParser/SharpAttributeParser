@@ -21,6 +21,8 @@ public class BuildParameters
 
     public PublishData Publish { get; }
 
+    public FilePathCollection TestProjectPaths { get; }
+
     public BuildParameters(ISetupContext context)
     {
         IsRunningOnGitHubActions = context.BuildSystem().GitHubActions.IsRunningOnGitHubActions;
@@ -31,5 +33,9 @@ public class BuildParameters
         Version = BuildVersion.ExtractVersion(context);
         Paths = BuildPaths.ExtractPaths(context);
         Publish = PublishData.ExtractPublishData(context);
+
+        TestProjectPaths = context.GetFiles("./tests/unit/**/*.csproj");
+        
+        TestProjectPaths.Add(context.GetFiles("./tests/integration/**/*.csproj"));
     }
 }

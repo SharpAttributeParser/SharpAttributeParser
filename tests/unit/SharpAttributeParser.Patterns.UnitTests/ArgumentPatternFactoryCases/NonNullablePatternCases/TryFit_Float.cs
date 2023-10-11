@@ -11,7 +11,7 @@ public sealed class TryFit_Float
 {
     private OneOf<Error, float> Target(object? argument) => Pattern.TryFit(argument);
 
-    private IArgumentPattern<float> Pattern { get; } = ((IArgumentPatternFactory)FactoryContext.Create().Factory).Float();
+    private readonly IArgumentPattern<float> Pattern = ((IArgumentPatternFactory)FactoryContext.Create().Factory).Float();
 
     [Fact]
     public void Float_0_ResultsInMatch() => ResultsInMatch(0, 0f);

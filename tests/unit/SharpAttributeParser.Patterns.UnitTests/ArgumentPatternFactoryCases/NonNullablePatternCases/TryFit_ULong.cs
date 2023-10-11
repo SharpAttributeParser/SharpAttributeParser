@@ -11,7 +11,7 @@ public sealed class TryFit_ULong
 {
     private OneOf<Error, ulong> Target(object? argument) => Pattern.TryFit(argument);
 
-    private IArgumentPattern<ulong> Pattern { get; } = ((IArgumentPatternFactory)FactoryContext.Create().Factory).ULong();
+    private readonly IArgumentPattern<ulong> Pattern = ((IArgumentPatternFactory)FactoryContext.Create().Factory).ULong();
 
     [Fact]
     public void ULong_0_ResultsInMatch() => ResultsInMatch(0, (ulong)0);

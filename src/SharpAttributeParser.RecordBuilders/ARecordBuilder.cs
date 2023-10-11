@@ -6,9 +6,9 @@ using System;
 /// <typeparam name="TRecord">The type of the built data record.</typeparam>
 public abstract class ARecordBuilder<TRecord> : IRecordBuilder<TRecord>
 {
-    private bool HasBeenBuilt { get; set; }
+    private bool HasBeenBuilt;
 
-    private bool ThrowOnMultipleBuilds { get; }
+    private readonly bool ThrowOnMultipleBuilds;
 
     /// <summary>Instantiates a <see cref="ARecordBuilder{TRecord}"/>, reponsible for building data records.</summary>
     /// <param name="throwOnMultipleBuilds">Indicates whether an <see cref="InvalidOperationException"/> should be thrown if build is invoked more than once.</param>

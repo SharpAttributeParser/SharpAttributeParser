@@ -32,7 +32,7 @@ public sealed class DetachedMappedSyntacticNormalConstructorArgumentRecorderFact
 
     private sealed class ArgumentRecorder : IDetachedMappedSyntacticConstructorArgumentRecorder<TRecord>
     {
-        private Func<TRecord, ExpressionSyntax, bool> Recorder { get; }
+        private readonly Func<TRecord, ExpressionSyntax, bool> Recorder;
 
         public ArgumentRecorder(Func<TRecord, ExpressionSyntax, bool> recorder)
         {

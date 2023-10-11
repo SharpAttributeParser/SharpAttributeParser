@@ -12,9 +12,9 @@ using System;
 /// <inheritdoc cref="ISyntacticMapperLogger{TCategoryName}"/>
 public sealed class SyntacticMapperLogger<TCategoryName> : ISyntacticMapperLogger<TCategoryName>
 {
-    private ITypeParameterLogger TypeParameter { get; }
-    private IConstructorParameterLogger ConstructorParameter { get; }
-    private INamedParameterLogger NamedParameter { get; }
+    private readonly ITypeParameterLogger TypeParameter;
+    private readonly IConstructorParameterLogger ConstructorParameter;
+    private readonly INamedParameterLogger NamedParameter;
 
     /// <summary>Instantiates a <see cref="SyntacticMapperLogger{TCategoryName}"/>, handling logging for <see cref="ISyntacticMapper{TRecord}"/>.</summary>
     /// <param name="logger">The logger used to log messages.</param>
@@ -36,7 +36,7 @@ public sealed class SyntacticMapperLogger<TCategoryName> : ISyntacticMapperLogge
 
     private sealed class TypeParameterLogger : ITypeParameterLogger
     {
-        private ILogger Logger { get; }
+        private readonly ILogger Logger;
 
         public TypeParameterLogger(ILogger logger)
         {
@@ -63,7 +63,7 @@ public sealed class SyntacticMapperLogger<TCategoryName> : ISyntacticMapperLogge
 
     private sealed class ConstructorParameterLogger : IConstructorParameterLogger
     {
-        private ILogger Logger { get; }
+        private readonly ILogger Logger;
 
         public ConstructorParameterLogger(ILogger logger)
         {
@@ -90,7 +90,7 @@ public sealed class SyntacticMapperLogger<TCategoryName> : ISyntacticMapperLogge
 
     private sealed class NamedParameterLogger : INamedParameterLogger
     {
-        private ILogger Logger { get; }
+        private readonly ILogger Logger;
 
         public NamedParameterLogger(ILogger logger)
         {

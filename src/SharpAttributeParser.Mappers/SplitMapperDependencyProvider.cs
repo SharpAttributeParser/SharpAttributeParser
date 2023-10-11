@@ -11,16 +11,16 @@ using System;
 /// <inheritdoc cref="ISplitMapperDependencyProvider{TSemanticRecord, TSyntacticRecord}"/>
 public sealed class SplitMapperDependencyProvider<TSemanticRecord, TSyntacticRecord> : ISplitMapperDependencyProvider<TSemanticRecord, TSyntacticRecord>
 {
-    private static Lazy<ISplitMappingRepositoryFactory<TSemanticRecord, TSyntacticRecord>> DefaultRepositoryFactory { get; } = new(DefaultRepositoryFactories.SplitFactory<TSemanticRecord, TSyntacticRecord>);
+    private static readonly Lazy<ISplitMappingRepositoryFactory<TSemanticRecord, TSyntacticRecord>> DefaultRepositoryFactory = new(DefaultRepositoryFactories.SplitFactory<TSemanticRecord, TSyntacticRecord>);
 
-    private IParameterComparer ParameterComparer { get; }
+    private readonly IParameterComparer ParameterComparer;
 
-    private IMappedSemanticArgumentRecorderFactory SemanticRecorderFactory { get; }
-    private IMappedSyntacticArgumentRecorderFactory SyntacticRecorderFactory { get; }
-    private ISplitMappingRepositoryFactory<TSemanticRecord, TSyntacticRecord> RepositoryFactory { get; }
+    private readonly IMappedSemanticArgumentRecorderFactory SemanticRecorderFactory;
+    private readonly IMappedSyntacticArgumentRecorderFactory SyntacticRecorderFactory;
+    private readonly ISplitMappingRepositoryFactory<TSemanticRecord, TSyntacticRecord> RepositoryFactory;
 
-    private ISemanticMapperLogger<ASplitMapper<TSemanticRecord, TSyntacticRecord>> SemanticLogger { get; }
-    private ISyntacticMapperLogger<ASplitMapper<TSemanticRecord, TSyntacticRecord>> SyntacticLogger { get; }
+    private readonly ISemanticMapperLogger<ASplitMapper<TSemanticRecord, TSyntacticRecord>> SemanticLogger;
+    private readonly ISyntacticMapperLogger<ASplitMapper<TSemanticRecord, TSyntacticRecord>> SyntacticLogger;
 
     /// <summary>Instantiates a <see cref="SplitMapperDependencyProvider{TSemanticRecord, TSyntacticRecord}"/>, providing the dependencies of <see cref="ASplitMapper{TSemanticRecord, TSyntacticRecord}"/>.</summary>
     /// <param name="parameterComparer">Determines equality when comparing parameters.</param>

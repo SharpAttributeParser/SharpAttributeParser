@@ -11,8 +11,8 @@ using Xunit;
 
 public sealed class Examples
 {
-    private ISemanticParser Parser { get; }
-    private ISemanticRecorderFactory RecorderFactory { get; }
+    private readonly ISemanticParser Parser;
+    private readonly ISemanticRecorderFactory RecorderFactory;
 
     public Examples(ISemanticParser parser, ISemanticRecorderFactory recorderFactory)
     {

@@ -11,8 +11,8 @@ using System;
 /// <inheritdoc cref="IDetachedMappedAdaptiveNamedArgumentRecorderProviderFactory{TCombinedRecord, TSemanticRecord}"/>
 public sealed class DetachedMappedAdaptiveNamedArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord> : IDetachedMappedAdaptiveNamedArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>
 {
-    private IDetachedMappedCombinedNamedArgumentRecorderFactory<TCombinedRecord> CombinedFactory { get; }
-    private IDetachedMappedSemanticNamedArgumentRecorderFactory<TSemanticRecord> SemanticFactory { get; }
+    private readonly IDetachedMappedCombinedNamedArgumentRecorderFactory<TCombinedRecord> CombinedFactory;
+    private readonly IDetachedMappedSemanticNamedArgumentRecorderFactory<TSemanticRecord> SemanticFactory;
 
     /// <summary>Instantiates a <see cref="DetachedMappedAdaptiveNamedArgumentRecorderProviderFactory{TCombinedRecord, TSemanticRecord}"/>, handling creation of <see cref="IDetachedMappedAdaptiveNamedArgumentRecorderProvider{TCombinedRecord, TSemanticRecord}"/> related to named parameters.</summary>
     /// <param name="combinedFactory">Handles creation of the recorders used when arguments are parsed with syntactic context.</param>
@@ -155,8 +155,8 @@ public sealed class DetachedMappedAdaptiveNamedArgumentRecorderProviderFactory<T
 
     private sealed class Provider : IDetachedMappedAdaptiveNamedArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>
     {
-        private IDetachedMappedCombinedNamedArgumentRecorder<TCombinedRecord> Combined { get; }
-        private IDetachedMappedSemanticNamedArgumentRecorder<TSemanticRecord> Semantic { get; }
+        private readonly IDetachedMappedCombinedNamedArgumentRecorder<TCombinedRecord> Combined;
+        private readonly IDetachedMappedSemanticNamedArgumentRecorder<TSemanticRecord> Semantic;
 
         public Provider(IDetachedMappedCombinedNamedArgumentRecorder<TCombinedRecord> combined, IDetachedMappedSemanticNamedArgumentRecorder<TSemanticRecord> semantic)
         {

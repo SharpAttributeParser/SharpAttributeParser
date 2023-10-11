@@ -10,9 +10,9 @@ using System;
 /// <inheritdoc cref="IDetachedMappedCombinedNamedArgumentRecorderFactory{TRecord}"/>
 public sealed class DetachedMappedCombinedNamedArgumentRecorderFactory<TRecord> : IDetachedMappedCombinedNamedArgumentRecorderFactory<TRecord>
 {
-    private IArgumentPatternFactory ArgumentPatternFactory { get; }
+    private readonly IArgumentPatternFactory ArgumentPatternFactory;
 
-    private IMappedCombinedNamedArgumentRecorderLoggerFactory LoggerFactory { get; }
+    private readonly IMappedCombinedNamedArgumentRecorderLoggerFactory LoggerFactory;
 
     /// <summary>Instantiates a <see cref="DetachedMappedCombinedNamedArgumentRecorderFactory{TRecord}"/>, handling creation of <see cref="IDetachedMappedCombinedNamedArgumentRecorder{TRecord}"/>.</summary>
     /// <param name="argumentPatternFactory">Handles creation of <see cref="IArgumentPattern{T}"/>.</param>
@@ -118,7 +118,7 @@ public sealed class DetachedMappedCombinedNamedArgumentRecorderFactory<TRecord> 
 
     private sealed class UnpatternedArgumentRecorder : IDetachedMappedCombinedNamedArgumentRecorder<TRecord>
     {
-        private Func<TRecord, object?, ExpressionSyntax, bool> Recorder { get; }
+        private readonly Func<TRecord, object?, ExpressionSyntax, bool> Recorder;
 
         public UnpatternedArgumentRecorder(Func<TRecord, object?, ExpressionSyntax, bool> recorder)
         {
@@ -143,10 +143,10 @@ public sealed class DetachedMappedCombinedNamedArgumentRecorderFactory<TRecord> 
 
     private sealed class PatternedArgumentRecorder<TArgument> : IDetachedMappedCombinedNamedArgumentRecorder<TRecord>
     {
-        private IArgumentPattern<TArgument> Pattern { get; }
-        private Func<TRecord, TArgument, ExpressionSyntax, bool> Recorder { get; }
+        private readonly IArgumentPattern<TArgument> Pattern;
+        private readonly Func<TRecord, TArgument, ExpressionSyntax, bool> Recorder;
 
-        private IMappedCombinedNamedArgumentRecorderLogger Logger { get; }
+        private readonly IMappedCombinedNamedArgumentRecorderLogger Logger;
 
         public PatternedArgumentRecorder(IArgumentPattern<TArgument> pattern, Func<TRecord, TArgument, ExpressionSyntax, bool> recorder, IMappedCombinedNamedArgumentRecorderLogger logger)
         {

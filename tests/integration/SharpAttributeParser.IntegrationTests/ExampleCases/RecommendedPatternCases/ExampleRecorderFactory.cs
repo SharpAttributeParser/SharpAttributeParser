@@ -9,8 +9,8 @@ using System.Collections.Generic;
 
 public sealed class ExampleRecorderFactory : IExampleRecorderFactory
 {
-    private ISemanticRecorderFactory Factory { get; }
-    private ISemanticMapper<IExampleRecordBuilder> Mapper { get; }
+    private readonly ISemanticRecorderFactory Factory;
+    private readonly ISemanticMapper<IExampleRecordBuilder> Mapper;
 
     public ExampleRecorderFactory(ISemanticRecorderFactory factory, ISemanticMapper<IExampleRecordBuilder> mapper)
     {
@@ -22,7 +22,7 @@ public sealed class ExampleRecorderFactory : IExampleRecorderFactory
 
     private sealed class ExampleRecordBuilder : ARecordBuilder<IExampleRecord>, IExampleRecordBuilder
     {
-        private ExampleRecord Target { get; } = new();
+        private readonly ExampleRecord Target = new();
 
         protected override IExampleRecord GetRecord() => Target;
         protected override bool CanBuildRecord() => Target.TypeArgument is not null && Target.ParamsArgument is not null;

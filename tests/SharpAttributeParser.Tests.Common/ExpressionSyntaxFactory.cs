@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 public static class ExpressionSyntaxFactory
 {
-    private static ExpressionSyntax Syntax { get; } = SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression);
+    private static readonly ExpressionSyntax Syntax = SyntaxFactory.LiteralExpression(SyntaxKind.NullLiteralExpression);
 
     public static ExpressionSyntax Create() => Syntax;
     public static IReadOnlyList<ExpressionSyntax> CreateCollection() => new[] { Create() };

@@ -63,7 +63,7 @@ internal sealed class MapperContext<TSemanticRecord, TSyntacticRecord>
 
     public sealed class SplitMapper : ASplitMapper<TSemanticRecord, TSyntacticRecord>
     {
-        private Action<IAppendableSplitMappingRepository<TSemanticRecord, TSyntacticRecord>> AddMappingsDelegate { get; }
+        private readonly Action<IAppendableSplitMappingRepository<TSemanticRecord, TSyntacticRecord>> AddMappingsDelegate;
 
         public SplitMapper(ISplitMapperDependencyProvider<TSemanticRecord, TSyntacticRecord> dependencyProvider, Action<IAppendableSplitMappingRepository<TSemanticRecord, TSyntacticRecord>> addMappingsDelegate) : base(dependencyProvider)
         {

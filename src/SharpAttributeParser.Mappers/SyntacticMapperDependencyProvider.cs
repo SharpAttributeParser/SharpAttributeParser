@@ -9,14 +9,14 @@ using System;
 /// <inheritdoc cref="ISyntacticMapperDependencyProvider{TRecord}"/>
 public sealed class SyntacticMapperDependencyProvider<TRecord> : ISyntacticMapperDependencyProvider<TRecord>
 {
-    private static Lazy<ISyntacticMappingRepositoryFactory<TRecord>> DefaultRepositoryFactory { get; } = new(DefaultRepositoryFactories.SyntacticFactory<TRecord>);
+    private static readonly Lazy<ISyntacticMappingRepositoryFactory<TRecord>> DefaultRepositoryFactory = new(DefaultRepositoryFactories.SyntacticFactory<TRecord>);
 
-    private IParameterComparer ParameterComparer { get; }
+    private readonly IParameterComparer ParameterComparer;
 
-    private IMappedSyntacticArgumentRecorderFactory RecorderFactory { get; }
-    private ISyntacticMappingRepositoryFactory<TRecord> RepositoryFactory { get; }
+    private readonly IMappedSyntacticArgumentRecorderFactory RecorderFactory;
+    private readonly ISyntacticMappingRepositoryFactory<TRecord> RepositoryFactory;
 
-    private ISyntacticMapperLogger<ASyntacticMapper<TRecord>> Logger { get; }
+    private readonly ISyntacticMapperLogger<ASyntacticMapper<TRecord>> Logger;
 
     /// <summary>Instantiates a <see cref="SyntacticMapperDependencyProvider{TRecord}"/>, providing the dependencies of <see cref="ASyntacticMapper{TRecord}"/>.</summary>
     /// <param name="parameterComparer">Determines equality when comparing parameters.</param>

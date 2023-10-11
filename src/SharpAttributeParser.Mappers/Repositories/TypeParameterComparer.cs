@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// <inheritdoc cref="ITypeParameterComparer"/>
 public sealed class TypeParameterComparer : ITypeParameterComparer
 {
-    private IEqualityComparer<string> Name { get; }
+    private readonly IEqualityComparer<string> Name;
 
     /// <summary>Instantiates a <see cref="TypeParameterComparer"/>, determining equality when comparing type parameters.</summary>
     /// <param name="name">Determines equality when comparing the names of type parameters.</param>

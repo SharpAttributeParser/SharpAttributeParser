@@ -11,8 +11,8 @@ using System;
 /// <inheritdoc cref="IDetachedMappedAdaptiveNormalConstructorArgumentRecorderProviderFactory{TCombinedRecord, TSemanticRecord}"/>
 public sealed class DetachedMappedAdaptiveNormalConstructorArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord> : IDetachedMappedAdaptiveNormalConstructorArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>
 {
-    private IDetachedMappedCombinedNormalConstructorArgumentRecorderFactory<TCombinedRecord> CombinedFactory { get; }
-    private IDetachedMappedSemanticConstructorArgumentRecorderFactory<TSemanticRecord> SemanticFactory { get; }
+    private readonly IDetachedMappedCombinedNormalConstructorArgumentRecorderFactory<TCombinedRecord> CombinedFactory;
+    private readonly IDetachedMappedSemanticConstructorArgumentRecorderFactory<TSemanticRecord> SemanticFactory;
 
     /// <summary>Instantiates a <see cref="DetachedMappedAdaptiveNormalConstructorArgumentRecorderProviderFactory{TCombinedRecord, TSemanticRecord}"/>, handling creation of <see cref="IDetachedMappedAdaptiveConstructorArgumentRecorderProvider{TCombinedRecord, TSemanticRecord}"/> related to non-optional, non-<see langword="params"/> constructor parameters.</summary>
     /// <param name="combinedFactory">Handles creation of the recorders used when arguments are parsed with syntactic context.</param>

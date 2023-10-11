@@ -15,7 +15,7 @@ public sealed class TryParse_SimpleConstructor
 {
     private bool Target(ISyntacticRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax) => Context.Parser.TryParse(recorder, attributeData, attributeSyntax);
 
-    private ParserContext Context { get; } = ParserContext.Create();
+    private readonly ParserContext Context = ParserContext.Create();
 
     [Fact]
     public async Task ErrorArguments_ReturnsTrueAndRecords()

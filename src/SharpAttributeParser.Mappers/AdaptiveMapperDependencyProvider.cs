@@ -11,16 +11,16 @@ using System;
 /// <inheritdoc cref="IAdaptiveMapperDependencyProvider{TCombinedRecord, TSemanticRecord}"/>
 public sealed class AdaptiveMapperDependencyProvider<TCombinedRecord, TSemanticRecord> : IAdaptiveMapperDependencyProvider<TCombinedRecord, TSemanticRecord>
 {
-    private static Lazy<IAdaptiveMappingRepositoryFactory<TCombinedRecord, TSemanticRecord>> DefaultRepositoryFactory { get; } = new(DefaultRepositoryFactories.AdaptiveFactory<TCombinedRecord, TSemanticRecord>);
+    private static readonly Lazy<IAdaptiveMappingRepositoryFactory<TCombinedRecord, TSemanticRecord>> DefaultRepositoryFactory = new(DefaultRepositoryFactories.AdaptiveFactory<TCombinedRecord, TSemanticRecord>);
 
-    private IParameterComparer ParameterComparer { get; }
+    private readonly IParameterComparer ParameterComparer;
 
-    private IMappedCombinedArgumentRecorderFactory CombinedRecorderFactory { get; }
-    private IMappedSemanticArgumentRecorderFactory SemanticRecorderFactory { get; }
-    private IAdaptiveMappingRepositoryFactory<TCombinedRecord, TSemanticRecord> RepositoryFactory { get; }
+    private readonly IMappedCombinedArgumentRecorderFactory CombinedRecorderFactory;
+    private readonly IMappedSemanticArgumentRecorderFactory SemanticRecorderFactory;
+    private readonly IAdaptiveMappingRepositoryFactory<TCombinedRecord, TSemanticRecord> RepositoryFactory;
 
-    private ICombinedMapperLogger<AAdaptiveMapper<TCombinedRecord, TSemanticRecord>> CombinedLogger { get; }
-    private ISemanticMapperLogger<AAdaptiveMapper<TCombinedRecord, TSemanticRecord>> SemanticLogger { get; }
+    private readonly ICombinedMapperLogger<AAdaptiveMapper<TCombinedRecord, TSemanticRecord>> CombinedLogger;
+    private readonly ISemanticMapperLogger<AAdaptiveMapper<TCombinedRecord, TSemanticRecord>> SemanticLogger;
 
     /// <summary>Instantiates a <see cref="AdaptiveMapperDependencyProvider{TCombinedRecord, TSemanticRecord}"/>, providing the dependencies of <see cref="AAdaptiveMapper{TCombinedRecord, TSemanticRecord}"/>.</summary>
     /// <param name="parameterComparer">Determines equality when comparing parameters.</param>

@@ -14,7 +14,7 @@ public sealed class TryFit_Enum
 {
     private static OneOf<Error, TEnum> Target<TEnum>(IArgumentPattern<TEnum> pattern, object? argument) => pattern.TryFit(argument);
 
-    private FactoryContext Context { get; } = FactoryContext.Create();
+    private readonly FactoryContext Context = FactoryContext.Create();
 
     [Fact]
     public void StringSplitOptions_StringSplitOptions_ResultsInMatch() => ResultsInMatch(StringSplitOptions.TrimEntries, StringSplitOptions.TrimEntries);

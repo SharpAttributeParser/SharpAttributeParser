@@ -7,9 +7,9 @@ using System;
 /// <inheritdoc cref="ISemanticMappingRepositoryFactory{TRecord}"/>
 public sealed class SemanticMappingRepositoryFactory<TRecord> : ISemanticMappingRepositoryFactory<TRecord>
 {
-    private ITypeMappingRepositoryFactory<IDetachedMappedSemanticTypeArgumentRecorder<TRecord>, IDetachedMappedSemanticTypeArgumentRecorderFactory<TRecord>> TypeMappingRepositoryFactory { get; }
-    private IConstructorMappingRepositoryFactory<IDetachedMappedSemanticConstructorArgumentRecorder<TRecord>, IDetachedMappedSemanticConstructorArgumentRecorderFactory<TRecord>> ConstructorMappingRepositoryFactory { get; }
-    private INamedMappingRepositoryFactory<IDetachedMappedSemanticNamedArgumentRecorder<TRecord>, IDetachedMappedSemanticNamedArgumentRecorderFactory<TRecord>> NamedMappingRepositoryFactory { get; }
+    private readonly ITypeMappingRepositoryFactory<IDetachedMappedSemanticTypeArgumentRecorder<TRecord>, IDetachedMappedSemanticTypeArgumentRecorderFactory<TRecord>> TypeMappingRepositoryFactory;
+    private readonly IConstructorMappingRepositoryFactory<IDetachedMappedSemanticConstructorArgumentRecorder<TRecord>, IDetachedMappedSemanticConstructorArgumentRecorderFactory<TRecord>> ConstructorMappingRepositoryFactory;
+    private readonly INamedMappingRepositoryFactory<IDetachedMappedSemanticNamedArgumentRecorder<TRecord>, IDetachedMappedSemanticNamedArgumentRecorderFactory<TRecord>> NamedMappingRepositoryFactory;
 
     /// <summary>Instantiates a <see cref="SemanticMappingRepositoryFactory{TRecord}"/>, handling creation of <see cref="ISemanticMappingRepository{TRecord}"/>.</summary>
     /// <param name="typeMappingRepositoryFactory">Handles creation of repositories for mappings from type parameters to recorders.</param>
@@ -40,9 +40,9 @@ public sealed class SemanticMappingRepositoryFactory<TRecord> : ISemanticMapping
 
     private sealed class Repository : ISemanticMappingRepository<TRecord>
     {
-        private ITypeMappingRepository<IDetachedMappedSemanticTypeArgumentRecorder<TRecord>, IDetachedMappedSemanticTypeArgumentRecorderFactory<TRecord>> TypeParameters { get; }
-        private IConstructorMappingRepository<IDetachedMappedSemanticConstructorArgumentRecorder<TRecord>, IDetachedMappedSemanticConstructorArgumentRecorderFactory<TRecord>> ConstructorParameters { get; }
-        private INamedMappingRepository<IDetachedMappedSemanticNamedArgumentRecorder<TRecord>, IDetachedMappedSemanticNamedArgumentRecorderFactory<TRecord>> NamedParameters { get; }
+        private readonly ITypeMappingRepository<IDetachedMappedSemanticTypeArgumentRecorder<TRecord>, IDetachedMappedSemanticTypeArgumentRecorderFactory<TRecord>> TypeParameters;
+        private readonly IConstructorMappingRepository<IDetachedMappedSemanticConstructorArgumentRecorder<TRecord>, IDetachedMappedSemanticConstructorArgumentRecorderFactory<TRecord>> ConstructorParameters;
+        private readonly INamedMappingRepository<IDetachedMappedSemanticNamedArgumentRecorder<TRecord>, IDetachedMappedSemanticNamedArgumentRecorderFactory<TRecord>> NamedParameters;
 
         public Repository(ITypeMappingRepository<IDetachedMappedSemanticTypeArgumentRecorder<TRecord>, IDetachedMappedSemanticTypeArgumentRecorderFactory<TRecord>> typeParameters,
             IConstructorMappingRepository<IDetachedMappedSemanticConstructorArgumentRecorder<TRecord>, IDetachedMappedSemanticConstructorArgumentRecorderFactory<TRecord>> constructorParameters,
@@ -72,9 +72,9 @@ public sealed class SemanticMappingRepositoryFactory<TRecord> : ISemanticMapping
 
         private sealed class BuiltRepository : IBuiltSemanticMappingRepository<TRecord>
         {
-            private IBuiltTypeMappingRepository<IDetachedMappedSemanticTypeArgumentRecorder<TRecord>> TypeParameters { get; }
-            private IBuiltConstructorMappingRepository<IDetachedMappedSemanticConstructorArgumentRecorder<TRecord>> ConstructorParameters { get; }
-            private IBuiltNamedMappingRepository<IDetachedMappedSemanticNamedArgumentRecorder<TRecord>> NamedParameters { get; }
+            private readonly IBuiltTypeMappingRepository<IDetachedMappedSemanticTypeArgumentRecorder<TRecord>> TypeParameters;
+            private readonly IBuiltConstructorMappingRepository<IDetachedMappedSemanticConstructorArgumentRecorder<TRecord>> ConstructorParameters;
+            private readonly IBuiltNamedMappingRepository<IDetachedMappedSemanticNamedArgumentRecorder<TRecord>> NamedParameters;
 
             public BuiltRepository(IBuiltTypeMappingRepository<IDetachedMappedSemanticTypeArgumentRecorder<TRecord>> typeParameters,
                 IBuiltConstructorMappingRepository<IDetachedMappedSemanticConstructorArgumentRecorder<TRecord>> constructorParameters,

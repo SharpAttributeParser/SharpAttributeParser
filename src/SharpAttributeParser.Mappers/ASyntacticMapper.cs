@@ -11,11 +11,11 @@ using System;
 /// <typeparam name="TRecord">The type to which syntactic information about arguments is recorded.</typeparam>
 public abstract class ASyntacticMapper<TRecord> : ISyntacticMapper<TRecord>
 {
-    private bool IsInitialized { get; set; }
+    private bool IsInitialized;
 
-    private IBuiltSyntacticMappingRepository<TRecord> Mappings { get; set; } = null!;
+    private IBuiltSyntacticMappingRepository<TRecord> Mappings = null!;
 
-    private ISyntacticMapperDependencyProvider<TRecord> DependencyProvider { get; }
+    private readonly ISyntacticMapperDependencyProvider<TRecord> DependencyProvider;
 
     /// <summary>Instantiates a <see cref="ASyntacticMapper{TRecord}"/>, mapping attribute parameters to recorders responsible for recording syntactic information about the arguments of that parameter.</summary>
     /// <param name="dependencyProvider">Provides the dependencies of the mapper. If <see langword="null"/>, a default provider will be used.</param>

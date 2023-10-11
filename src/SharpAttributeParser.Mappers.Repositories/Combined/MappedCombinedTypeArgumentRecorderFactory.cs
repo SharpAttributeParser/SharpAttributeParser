@@ -27,8 +27,8 @@ public sealed class MappedCombinedTypeArgumentRecorderFactory : IMappedCombinedT
 
     private sealed class Recorder<TRecord> : IMappedCombinedTypeArgumentRecorder
     {
-        private TRecord DataRecord { get; }
-        private IDetachedMappedCombinedTypeArgumentRecorder<TRecord> DetachedRecorder { get; }
+        private readonly TRecord DataRecord;
+        private readonly IDetachedMappedCombinedTypeArgumentRecorder<TRecord> DetachedRecorder;
 
         public Recorder(TRecord dataRecord, IDetachedMappedCombinedTypeArgumentRecorder<TRecord> detachedRecorder)
         {

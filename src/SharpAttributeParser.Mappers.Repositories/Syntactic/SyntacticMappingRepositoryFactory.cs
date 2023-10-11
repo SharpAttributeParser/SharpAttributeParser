@@ -7,9 +7,9 @@ using System;
 /// <inheritdoc cref="ISyntacticMappingRepositoryFactory{TRecord}"/>
 public sealed class SyntacticMappingRepositoryFactory<TRecord> : ISyntacticMappingRepositoryFactory<TRecord>
 {
-    private ITypeMappingRepositoryFactory<IDetachedMappedSyntacticTypeArgumentRecorder<TRecord>, IDetachedMappedSyntacticTypeArgumentRecorderFactory<TRecord>> TypeMappingRepositoryFactory { get; }
-    private IConstructorMappingRepositoryFactory<IDetachedMappedSyntacticConstructorArgumentRecorder<TRecord>, IDetachedMappedSyntacticConstructorArgumentRecorderFactory<TRecord>> ConstructorMappingRepositoryFactory { get; }
-    private INamedMappingRepositoryFactory<IDetachedMappedSyntacticNamedArgumentRecorder<TRecord>, IDetachedMappedSyntacticNamedArgumentRecorderFactory<TRecord>> NamedMappingRepositoryFactory { get; }
+    private readonly ITypeMappingRepositoryFactory<IDetachedMappedSyntacticTypeArgumentRecorder<TRecord>, IDetachedMappedSyntacticTypeArgumentRecorderFactory<TRecord>> TypeMappingRepositoryFactory;
+    private readonly IConstructorMappingRepositoryFactory<IDetachedMappedSyntacticConstructorArgumentRecorder<TRecord>, IDetachedMappedSyntacticConstructorArgumentRecorderFactory<TRecord>> ConstructorMappingRepositoryFactory;
+    private readonly INamedMappingRepositoryFactory<IDetachedMappedSyntacticNamedArgumentRecorder<TRecord>, IDetachedMappedSyntacticNamedArgumentRecorderFactory<TRecord>> NamedMappingRepositoryFactory;
 
     /// <summary>Instantiates a <see cref="SyntacticMappingRepositoryFactory{TRecord}"/>, handling construction of <see cref="ISyntacticMappingRepository{TRecord}"/>.</summary>
     /// <param name="typeMappingRepositoryFactory">Handles creation of repositories for mappings from type parameters to recorders.</param>
@@ -40,9 +40,9 @@ public sealed class SyntacticMappingRepositoryFactory<TRecord> : ISyntacticMappi
 
     private sealed class Repository : ISyntacticMappingRepository<TRecord>
     {
-        private ITypeMappingRepository<IDetachedMappedSyntacticTypeArgumentRecorder<TRecord>, IDetachedMappedSyntacticTypeArgumentRecorderFactory<TRecord>> TypeParameters { get; }
-        private IConstructorMappingRepository<IDetachedMappedSyntacticConstructorArgumentRecorder<TRecord>, IDetachedMappedSyntacticConstructorArgumentRecorderFactory<TRecord>> ConstructorParameters { get; }
-        private INamedMappingRepository<IDetachedMappedSyntacticNamedArgumentRecorder<TRecord>, IDetachedMappedSyntacticNamedArgumentRecorderFactory<TRecord>> NamedParameters { get; }
+        private readonly ITypeMappingRepository<IDetachedMappedSyntacticTypeArgumentRecorder<TRecord>, IDetachedMappedSyntacticTypeArgumentRecorderFactory<TRecord>> TypeParameters;
+        private readonly IConstructorMappingRepository<IDetachedMappedSyntacticConstructorArgumentRecorder<TRecord>, IDetachedMappedSyntacticConstructorArgumentRecorderFactory<TRecord>> ConstructorParameters;
+        private readonly INamedMappingRepository<IDetachedMappedSyntacticNamedArgumentRecorder<TRecord>, IDetachedMappedSyntacticNamedArgumentRecorderFactory<TRecord>> NamedParameters;
 
         public Repository(ITypeMappingRepository<IDetachedMappedSyntacticTypeArgumentRecorder<TRecord>, IDetachedMappedSyntacticTypeArgumentRecorderFactory<TRecord>> typeParameters,
             IConstructorMappingRepository<IDetachedMappedSyntacticConstructorArgumentRecorder<TRecord>, IDetachedMappedSyntacticConstructorArgumentRecorderFactory<TRecord>> constructorParameters,
@@ -72,9 +72,9 @@ public sealed class SyntacticMappingRepositoryFactory<TRecord> : ISyntacticMappi
 
         private sealed class BuiltRepository : IBuiltSyntacticMappingRepository<TRecord>
         {
-            private IBuiltTypeMappingRepository<IDetachedMappedSyntacticTypeArgumentRecorder<TRecord>> TypeParameters { get; }
-            private IBuiltConstructorMappingRepository<IDetachedMappedSyntacticConstructorArgumentRecorder<TRecord>> ConstructorParameters { get; }
-            private IBuiltNamedMappingRepository<IDetachedMappedSyntacticNamedArgumentRecorder<TRecord>> NamedParameters { get; }
+            private readonly IBuiltTypeMappingRepository<IDetachedMappedSyntacticTypeArgumentRecorder<TRecord>> TypeParameters;
+            private readonly IBuiltConstructorMappingRepository<IDetachedMappedSyntacticConstructorArgumentRecorder<TRecord>> ConstructorParameters;
+            private readonly IBuiltNamedMappingRepository<IDetachedMappedSyntacticNamedArgumentRecorder<TRecord>> NamedParameters;
 
             public BuiltRepository(IBuiltTypeMappingRepository<IDetachedMappedSyntacticTypeArgumentRecorder<TRecord>> typeParameters,
                 IBuiltConstructorMappingRepository<IDetachedMappedSyntacticConstructorArgumentRecorder<TRecord>> constructorParameters,

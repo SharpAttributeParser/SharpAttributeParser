@@ -13,7 +13,7 @@ public sealed class TryFit
 {
     private static OneOf<Error, TElement[]> Target<TElement>(IArgumentPattern<TElement[]> pattern, object? argument) => pattern.TryFit(argument);
 
-    private FactoryContext Context { get; } = FactoryContext.Create();
+    private readonly FactoryContext Context = FactoryContext.Create();
 
     [Fact]
     public void Empty_ResultsInMatch() => ResultsInMatch(Mock.Of<IArgumentPattern<object>>(), Array.Empty<object>(), Array.Empty<object>());

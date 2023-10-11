@@ -11,8 +11,8 @@ using System;
 /// <inheritdoc cref="IDetachedMappedSplitNormalConstructorArgumentRecorderProviderFactory{TSemanticRecord, TSyntacticRecord}"/>
 public sealed class DetachedMappedSplitNormalConstructorArgumentRecorderProviderFactory<TSemanticRecord, TSyntacticRecord> : IDetachedMappedSplitNormalConstructorArgumentRecorderProviderFactory<TSemanticRecord, TSyntacticRecord>
 {
-    private IDetachedMappedSemanticConstructorArgumentRecorderFactory<TSemanticRecord> SemanticFactory { get; }
-    private IDetachedMappedSyntacticNormalConstructorArgumentRecorderFactory<TSyntacticRecord> SyntacticFactory { get; }
+    private readonly IDetachedMappedSemanticConstructorArgumentRecorderFactory<TSemanticRecord> SemanticFactory;
+    private readonly IDetachedMappedSyntacticNormalConstructorArgumentRecorderFactory<TSyntacticRecord> SyntacticFactory;
 
     /// <summary>Instantiates a <see cref="DetachedMappedSplitNormalConstructorArgumentRecorderProviderFactory{TSemanticRecord, TSyntacticRecord}"/>, handling creation of <see cref="IDetachedMappedSplitConstructorArgumentRecorderProvider{TSemanticRecord, TSyntacticRecord}"/> related to non-optional, non-<see langword="params"/> constructor parameters.</summary>
     /// <param name="semanticFactory">Handles creation of the recorders used when arguments are parsed.</param>

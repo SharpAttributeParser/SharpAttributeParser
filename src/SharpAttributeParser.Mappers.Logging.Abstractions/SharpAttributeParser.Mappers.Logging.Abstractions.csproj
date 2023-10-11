@@ -8,7 +8,7 @@
     <PropertyGroup>
         <Title>SharpAttributeParser.Mappers.Logging.Abstractions</Title>
         <Description>
-            Provides abstractions of 'SharpAttributeParser.Mappers.Logging'.
+            Provides abstractions related to logging for 'SharpAttributeParser.Mappers'.
         </Description>
         <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
     </PropertyGroup>

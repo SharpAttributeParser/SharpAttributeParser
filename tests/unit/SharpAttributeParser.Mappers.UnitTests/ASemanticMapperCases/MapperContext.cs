@@ -55,7 +55,7 @@ internal sealed class MapperContext<TRecord>
 
     public sealed class SemanticMapper : ASemanticMapper<TRecord>
     {
-        private Action<IAppendableSemanticMappingRepository<TRecord>> AddMappingsDelegate { get; }
+        private readonly Action<IAppendableSemanticMappingRepository<TRecord>> AddMappingsDelegate;
 
         public SemanticMapper(ISemanticMapperDependencyProvider<TRecord> dependencyProvider, Action<IAppendableSemanticMappingRepository<TRecord>> addMappingsDelegate) : base(dependencyProvider)
         {

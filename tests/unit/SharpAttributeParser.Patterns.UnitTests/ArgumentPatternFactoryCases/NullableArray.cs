@@ -8,7 +8,7 @@ public sealed class NullableArray
 {
     private IArgumentPattern<TElement[]?> Target<TElement>(IArgumentPattern<TElement> elementPattern) => ((IArgumentPatternFactory)Context.Factory).NullableArray(elementPattern);
 
-    private FactoryContext Context { get; } = FactoryContext.Create();
+    private readonly FactoryContext Context = FactoryContext.Create();
 
     [Fact]
     public void Null_ArgumentNullException()

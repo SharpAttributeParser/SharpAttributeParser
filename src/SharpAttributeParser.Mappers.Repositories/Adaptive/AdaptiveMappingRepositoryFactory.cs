@@ -5,9 +5,9 @@ using System;
 /// <inheritdoc cref="IAdaptiveMappingRepositoryFactory{TSyntacticRecord, TSemanticRecord}"/>
 public sealed class AdaptiveMappingRepositoryFactory<TCombinedRecord, TSemanticRecord> : IAdaptiveMappingRepositoryFactory<TCombinedRecord, TSemanticRecord>
 {
-    private ITypeMappingRepositoryFactory<IDetachedMappedAdaptiveTypeArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>, IDetachedMappedAdaptiveTypeArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>> TypeMappingRepositoryFactory { get; }
-    private IConstructorMappingRepositoryFactory<IDetachedMappedAdaptiveConstructorArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>, IDetachedMappedAdaptiveConstructorArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>> ConstructorMappingRepositoryFactory { get; }
-    private INamedMappingRepositoryFactory<IDetachedMappedAdaptiveNamedArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>, IDetachedMappedAdaptiveNamedArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>> NamedMappingRepositoryFactory { get; }
+    private readonly ITypeMappingRepositoryFactory<IDetachedMappedAdaptiveTypeArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>, IDetachedMappedAdaptiveTypeArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>> TypeMappingRepositoryFactory;
+    private readonly IConstructorMappingRepositoryFactory<IDetachedMappedAdaptiveConstructorArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>, IDetachedMappedAdaptiveConstructorArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>> ConstructorMappingRepositoryFactory;
+    private readonly INamedMappingRepositoryFactory<IDetachedMappedAdaptiveNamedArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>, IDetachedMappedAdaptiveNamedArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>> NamedMappingRepositoryFactory;
 
     /// <summary>Instantiates a <see cref="AdaptiveMappingRepositoryFactory{TSyntacticRecord, TSemanticRecord}"/>, handling creation of <see cref="IAdaptiveMappingRepository{TSyntacticRecord, TSemanticRecord}"/>.</summary>
     /// <param name="typeMappingRepositoryFactory">Handles creation of repositories for mappings from type parameters to recorders.</param>
@@ -38,9 +38,9 @@ public sealed class AdaptiveMappingRepositoryFactory<TCombinedRecord, TSemanticR
 
     private sealed class Repository : IAdaptiveMappingRepository<TCombinedRecord, TSemanticRecord>
     {
-        private ITypeMappingRepository<IDetachedMappedAdaptiveTypeArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>, IDetachedMappedAdaptiveTypeArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>> TypeParameters { get; }
-        private IConstructorMappingRepository<IDetachedMappedAdaptiveConstructorArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>, IDetachedMappedAdaptiveConstructorArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>> ConstructorParameters { get; }
-        private INamedMappingRepository<IDetachedMappedAdaptiveNamedArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>, IDetachedMappedAdaptiveNamedArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>> NamedParameters { get; }
+        private readonly ITypeMappingRepository<IDetachedMappedAdaptiveTypeArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>, IDetachedMappedAdaptiveTypeArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>> TypeParameters;
+        private readonly IConstructorMappingRepository<IDetachedMappedAdaptiveConstructorArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>, IDetachedMappedAdaptiveConstructorArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>> ConstructorParameters;
+        private readonly INamedMappingRepository<IDetachedMappedAdaptiveNamedArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>, IDetachedMappedAdaptiveNamedArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>> NamedParameters;
 
         public Repository(ITypeMappingRepository<IDetachedMappedAdaptiveTypeArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>, IDetachedMappedAdaptiveTypeArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>> typeParameters,
             IConstructorMappingRepository<IDetachedMappedAdaptiveConstructorArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>, IDetachedMappedAdaptiveConstructorArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>> constructorParameters,
@@ -70,9 +70,9 @@ public sealed class AdaptiveMappingRepositoryFactory<TCombinedRecord, TSemanticR
 
         private sealed class BuiltRepository : IBuiltAdaptiveMappingRepository<TCombinedRecord, TSemanticRecord>
         {
-            private IBuiltTypeMappingRepository<IDetachedMappedAdaptiveTypeArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>> TypeParameters { get; }
-            private IBuiltConstructorMappingRepository<IDetachedMappedAdaptiveConstructorArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>> ConstructorParameters { get; }
-            private IBuiltNamedMappingRepository<IDetachedMappedAdaptiveNamedArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>> NamedParameters { get; }
+            private readonly IBuiltTypeMappingRepository<IDetachedMappedAdaptiveTypeArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>> TypeParameters;
+            private readonly IBuiltConstructorMappingRepository<IDetachedMappedAdaptiveConstructorArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>> ConstructorParameters;
+            private readonly IBuiltNamedMappingRepository<IDetachedMappedAdaptiveNamedArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>> NamedParameters;
 
             public BuiltRepository(IBuiltTypeMappingRepository<IDetachedMappedAdaptiveTypeArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>> typeParameters,
                 IBuiltConstructorMappingRepository<IDetachedMappedAdaptiveConstructorArgumentRecorderProvider<TCombinedRecord, TSemanticRecord>> constructorParameters,

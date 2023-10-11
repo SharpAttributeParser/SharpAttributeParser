@@ -55,7 +55,7 @@ internal sealed class MapperContext<TRecord>
 
     public sealed class CombinedMapper : ACombinedMapper<TRecord>
     {
-        private Action<IAppendableCombinedMappingRepository<TRecord>> AddMappingsDelegate { get; }
+        private readonly Action<IAppendableCombinedMappingRepository<TRecord>> AddMappingsDelegate;
 
         public CombinedMapper(ICombinedMapperDependencyProvider<TRecord> dependencyProvider, Action<IAppendableCombinedMappingRepository<TRecord>> addMappingsDelegate) : base(dependencyProvider)
         {

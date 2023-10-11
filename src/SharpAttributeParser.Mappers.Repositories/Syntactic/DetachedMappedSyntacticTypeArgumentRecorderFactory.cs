@@ -31,7 +31,7 @@ public sealed class DetachedMappedSyntacticTypeArgumentRecorderFactory<TRecord> 
 
     private sealed class ArgumentRecorder : IDetachedMappedSyntacticTypeArgumentRecorder<TRecord>
     {
-        private Func<TRecord, ExpressionSyntax, bool> Recorder { get; }
+        private readonly Func<TRecord, ExpressionSyntax, bool> Recorder;
 
         public ArgumentRecorder(Func<TRecord, ExpressionSyntax, bool> recorder)
         {

@@ -13,7 +13,7 @@ public sealed class TryFit_Type
 {
     private OneOf<Error, ITypeSymbol?> Target(object? argument) => Pattern.TryFit(argument);
 
-    private IArgumentPattern<ITypeSymbol?> Pattern { get; } = ((IArgumentPatternFactory)FactoryContext.Create().Factory).NullableType();
+    private readonly IArgumentPattern<ITypeSymbol?> Pattern = ((IArgumentPatternFactory)FactoryContext.Create().Factory).NullableType();
 
     [Fact]
     public void Type_ResultsInMatch()

@@ -5,9 +5,9 @@ using System;
 /// <inheritdoc cref="IMappedSyntacticArgumentRecorderFactory"/>
 public sealed class MappedSyntacticArgumentRecorderFactory : IMappedSyntacticArgumentRecorderFactory
 {
-    private IMappedSyntacticTypeArgumentRecorderFactory TypeParameter { get; }
-    private IMappedSyntacticConstructorArgumentRecorderFactory ConstructorParameter { get; }
-    private IMappedSyntacticNamedArgumentRecorderFactory NamedParameter { get; }
+    private readonly IMappedSyntacticTypeArgumentRecorderFactory TypeParameter;
+    private readonly IMappedSyntacticConstructorArgumentRecorderFactory ConstructorParameter;
+    private readonly IMappedSyntacticNamedArgumentRecorderFactory NamedParameter;
 
     /// <summary>Instantiates a <see cref="MappedSyntacticArgumentRecorderFactory"/>, handling creation of attached recorders.</summary>
     /// <param name="typeParameter">Handles creation of attached recorders related to type parameters.</param>

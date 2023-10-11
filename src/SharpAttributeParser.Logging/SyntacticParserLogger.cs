@@ -12,11 +12,11 @@ using System.Collections.Generic;
 /// <inheritdoc cref="ISyntacticParserLogger{TCategoryName}"/>
 public sealed class SyntacticParserLogger<TCategoryName> : ISyntacticParserLogger<TCategoryName>
 {
-    private ITypeArgumentLogger TypeArgument { get; }
-    private IConstructorArgumentLogger ConstructorArgument { get; }
-    private INamedArgumentLogger NamedArgument { get; }
+    private readonly ITypeArgumentLogger TypeArgument;
+    private readonly IConstructorArgumentLogger ConstructorArgument;
+    private readonly INamedArgumentLogger NamedArgument;
 
-    private ILogger Logger { get; }
+    private readonly ILogger Logger;
 
     /// <summary>Instantiates a <see cref="SyntacticParserLogger{TCategoryName}"/>, handling logging for <see cref="ISyntacticParser"/>.</summary>
     /// <param name="logger">The logger used to log messages.</param>
@@ -61,7 +61,7 @@ public sealed class SyntacticParserLogger<TCategoryName> : ISyntacticParserLogge
 
     private sealed class TypeArgumentLogger : ITypeArgumentLogger
     {
-        private ILogger Logger { get; }
+        private readonly ILogger Logger;
 
         public TypeArgumentLogger(ILogger logger)
         {
@@ -109,7 +109,7 @@ public sealed class SyntacticParserLogger<TCategoryName> : ISyntacticParserLogge
 
     private sealed class ConstructorArgumentLogger : IConstructorArgumentLogger
     {
-        private ILogger Logger { get; }
+        private readonly ILogger Logger;
 
         public ConstructorArgumentLogger(ILogger logger)
         {
@@ -148,7 +148,7 @@ public sealed class SyntacticParserLogger<TCategoryName> : ISyntacticParserLogge
 
     private sealed class NamedArgumentLogger : INamedArgumentLogger
     {
-        private ILogger Logger { get; }
+        private readonly ILogger Logger;
 
         public NamedArgumentLogger(ILogger logger)
         {

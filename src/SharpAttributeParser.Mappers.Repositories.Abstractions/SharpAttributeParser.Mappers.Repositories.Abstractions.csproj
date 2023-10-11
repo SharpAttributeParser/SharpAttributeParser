@@ -8,21 +8,13 @@
     <PropertyGroup>
         <Title>SharpAttributeParser.Mappers.Repositories.Abstractions</Title>
         <Description>
-            Provides abstractions of 'SharpAttributeParser.Mappers.Repositories'.
+            Provides abstractions related to 'SharpAttributeParser.Mappers' repositories, handling collections of mapped argument recorders.
         </Description>
         <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
         <None Include="README.nupkg.md" Pack="true" PackagePath="\" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="OneOf" />
     </ItemGroup>
 
     <ItemGroup>

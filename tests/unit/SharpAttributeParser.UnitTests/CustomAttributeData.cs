@@ -7,8 +7,8 @@ using System.Collections.Immutable;
 
 internal sealed class CustomAttributeData : AttributeData
 {
-    new private INamedTypeSymbol? AttributeClass { get; }
-    new private IMethodSymbol? AttributeConstructor { get; }
+    new private readonly INamedTypeSymbol? AttributeClass;
+    new private readonly IMethodSymbol? AttributeConstructor;
 
     public CustomAttributeData(INamedTypeSymbol? attributeClass, IMethodSymbol? attributeConstructor)
     {

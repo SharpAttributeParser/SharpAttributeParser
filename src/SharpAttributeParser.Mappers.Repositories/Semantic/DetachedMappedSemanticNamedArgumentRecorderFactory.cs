@@ -8,9 +8,9 @@ using System;
 /// <inheritdoc cref="IDetachedMappedSemanticNamedArgumentRecorderFactory{TRecord}"/>
 public sealed class DetachedMappedSemanticNamedArgumentRecorderFactory<TRecord> : IDetachedMappedSemanticNamedArgumentRecorderFactory<TRecord>
 {
-    private IArgumentPatternFactory ArgumentPatternFactory { get; }
+    private readonly IArgumentPatternFactory ArgumentPatternFactory;
 
-    private IMappedSemanticNamedArgumentRecorderLoggerFactory LoggerFactory { get; }
+    private readonly IMappedSemanticNamedArgumentRecorderLoggerFactory LoggerFactory;
 
     /// <summary>Instantiates a <see cref="DetachedMappedSemanticNamedArgumentRecorderFactory{TRecord}"/>, handling creation of <see cref="IDetachedMappedSemanticNamedArgumentRecorder{TRecord}"/>.</summary>
     /// <param name="argumentPatternFactory">Handles creation of <see cref="IArgumentPattern{T}"/>.</param>
@@ -116,7 +116,7 @@ public sealed class DetachedMappedSemanticNamedArgumentRecorderFactory<TRecord> 
 
     private sealed class UnpatternedArgumentRecorder : IDetachedMappedSemanticNamedArgumentRecorder<TRecord>
     {
-        private Func<TRecord, object?, bool> Recorder { get; }
+        private readonly Func<TRecord, object?, bool> Recorder;
 
         public UnpatternedArgumentRecorder(Func<TRecord, object?, bool> recorder)
         {
@@ -136,10 +136,10 @@ public sealed class DetachedMappedSemanticNamedArgumentRecorderFactory<TRecord> 
 
     private sealed class PatternedArgumentRecorder<TArgument> : IDetachedMappedSemanticNamedArgumentRecorder<TRecord>
     {
-        private IArgumentPattern<TArgument> Pattern { get; }
-        private Func<TRecord, TArgument, bool> Recorder { get; }
+        private readonly IArgumentPattern<TArgument> Pattern;
+        private readonly Func<TRecord, TArgument, bool> Recorder;
 
-        private IMappedSemanticNamedArgumentRecorderLogger Logger { get; }
+        private readonly IMappedSemanticNamedArgumentRecorderLogger Logger;
 
         public PatternedArgumentRecorder(IArgumentPattern<TArgument> pattern, Func<TRecord, TArgument, bool> recorder, IMappedSemanticNamedArgumentRecorderLogger logger)
         {

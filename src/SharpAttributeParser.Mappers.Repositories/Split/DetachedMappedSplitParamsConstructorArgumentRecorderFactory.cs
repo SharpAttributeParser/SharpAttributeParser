@@ -14,8 +14,8 @@ using System.Collections.Generic;
 /// <inheritdoc cref="IDetachedMappedSplitParamsConstructorArgumentRecorderProviderFactory{TSemanticRecord, TSyntacticRecord}"/>
 public sealed class DetachedMappedSplitParamsConstructorArgumentRecorderFactory<TSemanticRecord, TSyntacticRecord> : IDetachedMappedSplitParamsConstructorArgumentRecorderProviderFactory<TSemanticRecord, TSyntacticRecord>
 {
-    private IDetachedMappedSemanticConstructorArgumentRecorderFactory<TSemanticRecord> SemanticFactory { get; }
-    private IDetachedMappedSyntacticParamsConstructorArgumentRecorderFactory<TSyntacticRecord> SyntacticFactory { get; }
+    private readonly IDetachedMappedSemanticConstructorArgumentRecorderFactory<TSemanticRecord> SemanticFactory;
+    private readonly IDetachedMappedSyntacticParamsConstructorArgumentRecorderFactory<TSyntacticRecord> SyntacticFactory;
 
     /// <summary>Instantiates a <see cref="DetachedMappedSplitParamsConstructorArgumentRecorderFactory{TSemanticRecord, TSyntacticRecord}"/>, handling creation of <see cref="IDetachedMappedSplitConstructorArgumentRecorderProvider{TSemanticRecord, TSyntacticRecord}"/> related to <see langword="params"/> constructor parameters.</summary>
     /// <param name="semanticFactory">Handles creation of the recorders used when arguments are parsed.</param>

@@ -5,9 +5,9 @@ using System;
 /// <inheritdoc cref="IMappedSemanticArgumentRecorderFactory"/>
 public sealed class MappedSemanticArgumentRecorderFactory : IMappedSemanticArgumentRecorderFactory
 {
-    private IMappedSemanticTypeArgumentRecorderFactory TypeParameter { get; }
-    private IMappedSemanticConstructorArgumentRecorderFactory ConstructorParameter { get; }
-    private IMappedSemanticNamedArgumentRecorderFactory NamedParameter { get; }
+    private readonly IMappedSemanticTypeArgumentRecorderFactory TypeParameter;
+    private readonly IMappedSemanticConstructorArgumentRecorderFactory ConstructorParameter;
+    private readonly IMappedSemanticNamedArgumentRecorderFactory NamedParameter;
 
     /// <summary>Instantiates a <see cref="MappedSemanticArgumentRecorderFactory"/>, handling creation of attached recorders.</summary>
     /// <param name="typeParameter">Handles creation of attached recorders related to type parameters.</param>

@@ -11,11 +11,11 @@ using System;
 /// <typeparam name="TRecord">The type to which arguments are recorded.</typeparam>
 public abstract class ACombinedMapper<TRecord> : ICombinedMapper<TRecord>
 {
-    private bool IsInitialized { get; set; }
+    private bool IsInitialized;
 
-    private IBuiltCombinedMappingRepository<TRecord> Mappings { get; set; } = null!;
+    private IBuiltCombinedMappingRepository<TRecord> Mappings = null!;
 
-    private ICombinedMapperDependencyProvider<TRecord> DependencyProvider { get; }
+    private readonly ICombinedMapperDependencyProvider<TRecord> DependencyProvider;
 
     /// <summary>Instantiates a <see cref="ACombinedMapper{TRecord}"/>, mapping attribute parameters to recorders responsible for recording arguments of that parameter.</summary>
     /// <param name="dependencyProvider">Provides the dependencies of the mapper. If <see langword="null"/>, a default provider will be used.</param>

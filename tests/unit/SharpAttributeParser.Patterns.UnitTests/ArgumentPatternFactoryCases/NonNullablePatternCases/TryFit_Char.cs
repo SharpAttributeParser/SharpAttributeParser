@@ -11,7 +11,7 @@ public sealed class TryFit_Char
 {
     private OneOf<Error, char> Target(object? argument) => Pattern.TryFit(argument);
 
-    private IArgumentPattern<char> Pattern { get; } = ((IArgumentPatternFactory)FactoryContext.Create().Factory).Char();
+    private readonly IArgumentPattern<char> Pattern = ((IArgumentPatternFactory)FactoryContext.Create().Factory).Char();
 
     [Fact]
     public void Char_0_ResultsInMatch() => ResultsInMatch('0', '0');

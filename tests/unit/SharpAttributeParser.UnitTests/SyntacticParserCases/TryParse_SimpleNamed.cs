@@ -14,7 +14,7 @@ public sealed class TryParse_SimpleNamed
 {
     private bool Target(ISyntacticRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax) => Context.Parser.TryParse(recorder, attributeData, attributeSyntax);
 
-    private ParserContext Context { get; } = ParserContext.Create();
+    private readonly ParserContext Context = ParserContext.Create();
 
     [Fact]
     public async Task ErrorArgument_ReturnsTrueAndRecords()
@@ -109,8 +109,8 @@ public sealed class TryParse_SimpleNamed
 
         public int ValueSyntaxSetCount => ValueSyntaxSet ? 1 : 0;
 
-        private bool ValueSyntaxSet { get; init; }
+        private readonly bool ValueSyntaxSet;
 
-        private ExpressionSyntax? RawValueSyntax { get; init; }
+        private readonly ExpressionSyntax? RawValueSyntax;
     }
 }

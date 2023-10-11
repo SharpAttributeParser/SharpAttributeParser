@@ -10,25 +10,25 @@ using System;
 /// <inheritdoc cref="IArgumentPatternFactory"/>
 public sealed class ArgumentPatternFactory : IArgumentPatternFactory
 {
-    private static Lazy<IArgumentPattern<bool>> Bool { get; } = new(() => NonNullablePattern<bool>.PatternSingleton);
-    private static Lazy<IArgumentPattern<byte>> Byte { get; } = new(() => NonNullablePattern<byte>.PatternSingleton);
-    private static Lazy<IArgumentPattern<sbyte>> SByte { get; } = new(() => NonNullablePattern<sbyte>.PatternSingleton);
-    private static Lazy<IArgumentPattern<char>> Char { get; } = new(() => NonNullablePattern<char>.PatternSingleton);
-    private static Lazy<IArgumentPattern<short>> Short { get; } = new(() => NonNullablePattern<short>.PatternSingleton);
-    private static Lazy<IArgumentPattern<ushort>> UShort { get; } = new(() => NonNullablePattern<ushort>.PatternSingleton);
-    private static Lazy<IArgumentPattern<int>> Int { get; } = new(() => NonNullablePattern<int>.PatternSingleton);
-    private static Lazy<IArgumentPattern<uint>> UInt { get; } = new(() => NonNullablePattern<uint>.PatternSingleton);
-    private static Lazy<IArgumentPattern<long>> Long { get; } = new(() => NonNullablePattern<long>.PatternSingleton);
-    private static Lazy<IArgumentPattern<ulong>> ULong { get; } = new(() => NonNullablePattern<ulong>.PatternSingleton);
-    private static Lazy<IArgumentPattern<float>> Float { get; } = new(() => NonNullablePattern<float>.PatternSingleton);
-    private static Lazy<IArgumentPattern<double>> Double { get; } = new(() => NonNullablePattern<double>.PatternSingleton);
+    private static readonly Lazy<IArgumentPattern<bool>> Bool = new(() => NonNullablePattern<bool>.PatternSingleton);
+    private static readonly Lazy<IArgumentPattern<byte>> Byte = new(() => NonNullablePattern<byte>.PatternSingleton);
+    private static readonly Lazy<IArgumentPattern<sbyte>> SByte = new(() => NonNullablePattern<sbyte>.PatternSingleton);
+    private static readonly Lazy<IArgumentPattern<char>> Char = new(() => NonNullablePattern<char>.PatternSingleton);
+    private static readonly Lazy<IArgumentPattern<short>> Short = new(() => NonNullablePattern<short>.PatternSingleton);
+    private static readonly Lazy<IArgumentPattern<ushort>> UShort = new(() => NonNullablePattern<ushort>.PatternSingleton);
+    private static readonly Lazy<IArgumentPattern<int>> Int = new(() => NonNullablePattern<int>.PatternSingleton);
+    private static readonly Lazy<IArgumentPattern<uint>> UInt = new(() => NonNullablePattern<uint>.PatternSingleton);
+    private static readonly Lazy<IArgumentPattern<long>> Long = new(() => NonNullablePattern<long>.PatternSingleton);
+    private static readonly Lazy<IArgumentPattern<ulong>> ULong = new(() => NonNullablePattern<ulong>.PatternSingleton);
+    private static readonly Lazy<IArgumentPattern<float>> Float = new(() => NonNullablePattern<float>.PatternSingleton);
+    private static readonly Lazy<IArgumentPattern<double>> Double = new(() => NonNullablePattern<double>.PatternSingleton);
 
-    private static Lazy<IArgumentPattern<string>> NonNullableString { get; } = new(() => NonNullablePattern<string>.PatternSingleton);
-    private static Lazy<IArgumentPattern<string?>> NullableString { get; } = new(() => NullablePattern<string>.PatternSingleton);
-    private static Lazy<IArgumentPattern<object>> NonNullableObject { get; } = new(() => NonNullablePattern<object>.PatternSingleton);
-    private static Lazy<IArgumentPattern<object?>> NullableObject { get; } = new(() => NullablePattern<object>.PatternSingleton);
-    private static Lazy<IArgumentPattern<ITypeSymbol>> NonNullableType { get; } = new(() => NonNullablePattern<ITypeSymbol>.PatternSingleton);
-    private static Lazy<IArgumentPattern<ITypeSymbol?>> NullableType { get; } = new(() => NullablePattern<ITypeSymbol>.PatternSingleton);
+    private static readonly Lazy<IArgumentPattern<string>> NonNullableString = new(() => NonNullablePattern<string>.PatternSingleton);
+    private static readonly Lazy<IArgumentPattern<string?>> NullableString = new(() => NullablePattern<string>.PatternSingleton);
+    private static readonly Lazy<IArgumentPattern<object>> NonNullableObject = new(() => NonNullablePattern<object>.PatternSingleton);
+    private static readonly Lazy<IArgumentPattern<object?>> NullableObject = new(() => NullablePattern<object>.PatternSingleton);
+    private static readonly Lazy<IArgumentPattern<ITypeSymbol>> NonNullableType = new(() => NonNullablePattern<ITypeSymbol>.PatternSingleton);
+    private static readonly Lazy<IArgumentPattern<ITypeSymbol?>> NullableType = new(() => NullablePattern<ITypeSymbol>.PatternSingleton);
 
     /// <summary>The singleton <see cref="ArgumentPatternFactory"/>.</summary>
     public static ArgumentPatternFactory Singleton { get; } = new();
@@ -118,7 +118,7 @@ public sealed class ArgumentPatternFactory : IArgumentPatternFactory
 
     private sealed class EnumPattern<TEnum> : IArgumentPattern<TEnum>
     {
-        private Func<object?, OneOf<Error, TEnum>> PatternDelegate { get; }
+        private readonly Func<object?, OneOf<Error, TEnum>> PatternDelegate;
 
         public EnumPattern()
         {
@@ -202,7 +202,7 @@ public sealed class ArgumentPatternFactory : IArgumentPatternFactory
 
     private sealed class NonNullableArrayPattern<TElement> : IArgumentPattern<TElement[]>
     {
-        private IArgumentPattern<TElement> ElementPattern { get; }
+        private readonly IArgumentPattern<TElement> ElementPattern;
 
         public NonNullableArrayPattern(IArgumentPattern<TElement> elementPattern)
         {
@@ -260,7 +260,7 @@ public sealed class ArgumentPatternFactory : IArgumentPatternFactory
 
     private sealed class NullableArrayPattern<TElement> : IArgumentPattern<TElement[]?>
     {
-        private IArgumentPattern<TElement[]> NonNullableCollectionPattern { get; }
+        private readonly IArgumentPattern<TElement[]> NonNullableCollectionPattern;
 
         public NullableArrayPattern(IArgumentPattern<TElement[]> nonNullableCollectionPattern)
         {
