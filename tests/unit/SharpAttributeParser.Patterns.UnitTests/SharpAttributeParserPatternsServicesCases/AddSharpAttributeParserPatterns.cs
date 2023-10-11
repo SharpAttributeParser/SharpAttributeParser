@@ -13,7 +13,7 @@ public sealed class AddSharpAttributeParserPatterns
 {
     private static IServiceCollection Target(IServiceCollection services) => SharpAttributeParserPatternsServices.AddSharpAttributeParserPatterns(services);
 
-    private IServiceProvider ServiceProvider { get; }
+    private readonly IServiceProvider ServiceProvider;
 
     public AddSharpAttributeParserPatterns()
     {

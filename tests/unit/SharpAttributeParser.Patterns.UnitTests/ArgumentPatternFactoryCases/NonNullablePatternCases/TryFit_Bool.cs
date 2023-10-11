@@ -11,7 +11,7 @@ public sealed class TryFit_Bool
 {
     private OneOf<Error, bool> Target(object? argument) => Pattern.TryFit(argument);
 
-    private IArgumentPattern<bool> Pattern { get; } = ((IArgumentPatternFactory)FactoryContext.Create().Factory).Bool();
+    private readonly IArgumentPattern<bool> Pattern = ((IArgumentPatternFactory)FactoryContext.Create().Factory).Bool();
 
     [Fact]
     public void Bool_True_ResultsInMatch() => ResultsInMatch(true, true);

@@ -13,9 +13,9 @@ using System.Collections.Generic;
 /// <inheritdoc cref="ICombinedArgumentRecorderLogger{TCategoryName}"/>
 public sealed class CombinedArgumentRecorderLogger<TCategoryName> : ICombinedArgumentRecorderLogger<TCategoryName>
 {
-    private ITypeArgumentLogger TypeArgument { get; }
-    private IConstructorArgumentLogger ConstructorArgument { get; }
-    private INamedArgumentLogger NamedArgument { get; }
+    private readonly ITypeArgumentLogger TypeArgument;
+    private readonly IConstructorArgumentLogger ConstructorArgument;
+    private readonly INamedArgumentLogger NamedArgument;
 
     /// <summary>Instantiates a <see cref="CombinedArgumentRecorderLogger{TCategoryName}"/>, handling logging for <see cref="ICombinedRecorder"/>.</summary>
     /// <param name="logger">The logger used to log messages.</param>
@@ -37,7 +37,7 @@ public sealed class CombinedArgumentRecorderLogger<TCategoryName> : ICombinedArg
 
     private sealed class TypeArgumentLogger : ITypeArgumentLogger
     {
-        private ILogger Logger { get; }
+        private readonly ILogger Logger;
 
         public TypeArgumentLogger(ILogger logger)
         {
@@ -64,7 +64,7 @@ public sealed class CombinedArgumentRecorderLogger<TCategoryName> : ICombinedArg
 
     private sealed class ConstructorArgumentLogger : IConstructorArgumentLogger
     {
-        private ILogger Logger { get; }
+        private readonly ILogger Logger;
 
         public ConstructorArgumentLogger(ILogger logger)
         {
@@ -90,7 +90,7 @@ public sealed class CombinedArgumentRecorderLogger<TCategoryName> : ICombinedArg
 
     private sealed class NamedArgumentLogger : INamedArgumentLogger
     {
-        private ILogger Logger { get; }
+        private readonly ILogger Logger;
 
         public NamedArgumentLogger(ILogger logger)
         {

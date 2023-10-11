@@ -11,7 +11,7 @@ public sealed class TryFit_UShort
 {
     private OneOf<Error, ushort> Target(object? argument) => Pattern.TryFit(argument);
 
-    private IArgumentPattern<ushort> Pattern { get; } = ((IArgumentPatternFactory)FactoryContext.Create().Factory).UShort();
+    private readonly IArgumentPattern<ushort> Pattern = ((IArgumentPatternFactory)FactoryContext.Create().Factory).UShort();
 
     [Fact]
     public void UShort_0_ResultsInMatch() => ResultsInMatch(0, (ushort)0);

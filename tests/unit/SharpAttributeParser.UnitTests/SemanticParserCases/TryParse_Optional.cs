@@ -16,7 +16,7 @@ public sealed class TryParse_Optional
 {
     private bool Target(ISemanticRecorder recorder, AttributeData attributeData) => Context.Parser.TryParse(recorder, attributeData);
 
-    private ParserContext Context { get; } = ParserContext.Create();
+    private readonly ParserContext Context = ParserContext.Create();
 
     [Fact]
     public async Task ErrorArguments_ReturnsFalseAndLogs()

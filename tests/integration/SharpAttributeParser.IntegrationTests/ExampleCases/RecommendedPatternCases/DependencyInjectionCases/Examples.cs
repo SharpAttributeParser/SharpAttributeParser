@@ -9,7 +9,7 @@ using Xunit;
 
 public sealed class Examples
 {
-    private IExampleParser Parser { get; }
+    private readonly IExampleParser Parser;
 
     public Examples(IExampleParser parser)
     {

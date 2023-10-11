@@ -35,7 +35,7 @@ public sealed class DetachedMappedSyntacticOptionalConstructorArgumentRecorderFa
 
     private sealed class ArgumentRecorder : IDetachedMappedSyntacticConstructorArgumentRecorder<TRecord>
     {
-        private Func<TRecord, OneOf<None, ExpressionSyntax>, bool> Recorder { get; }
+        private readonly Func<TRecord, OneOf<None, ExpressionSyntax>, bool> Recorder;
 
         public ArgumentRecorder(Func<TRecord, OneOf<None, ExpressionSyntax>, bool> recorder)
         {

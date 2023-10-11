@@ -12,11 +12,11 @@ using System;
 /// <typeparam name="TSyntacticRecord">The type to which syntactic information about arguments is recorded.</typeparam>
 public abstract class ASplitMapper<TSemanticRecord, TSyntacticRecord> : ISemanticMapper<TSemanticRecord>, ISyntacticMapper<TSyntacticRecord>
 {
-    private bool IsInitialized { get; set; }
+    private bool IsInitialized;
 
-    private IBuiltSplitMappingRepository<TSemanticRecord, TSyntacticRecord> Mappings { get; set; } = null!;
+    private IBuiltSplitMappingRepository<TSemanticRecord, TSyntacticRecord> Mappings = null!;
 
-    private ISplitMapperDependencyProvider<TSemanticRecord, TSyntacticRecord> DependencyProvider { get; }
+    private readonly ISplitMapperDependencyProvider<TSemanticRecord, TSyntacticRecord> DependencyProvider;
 
     /// <summary>Instantiates a <see cref="ASplitMapper{TSyntacticRecord, TSemanticRecord}"/>, mapping attribute parameters to recorders responsible for recording arguments of that parameter.</summary>
     /// <param name="dependencyProvider">Provides the dependencies of the mapper. If <see langword="null"/>, a default provider will be used.</param>

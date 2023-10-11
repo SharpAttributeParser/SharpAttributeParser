@@ -20,7 +20,7 @@ public sealed class AddSharpAttributeParserMapperRepositories
 {
     private static IServiceCollection Target(IServiceCollection services) => SharpAttributeParserMapperRepositoriesServices.AddSharpAttributeParserMapperRepositories(services);
 
-    private IServiceProvider ServiceProvider { get; }
+    private readonly IServiceProvider ServiceProvider;
 
     public AddSharpAttributeParserMapperRepositories()
     {

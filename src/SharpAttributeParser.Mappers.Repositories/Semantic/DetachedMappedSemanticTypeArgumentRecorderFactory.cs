@@ -31,7 +31,7 @@ public sealed class DetachedMappedSemanticTypeArgumentRecorderFactory<TRecord> :
 
     private sealed class ArgumentRecorder : IDetachedMappedSemanticTypeArgumentRecorder<TRecord>
     {
-        private Func<TRecord, ITypeSymbol, bool> Recorder { get; }
+        private readonly Func<TRecord, ITypeSymbol, bool> Recorder;
 
         public ArgumentRecorder(Func<TRecord, ITypeSymbol, bool> recorder)
         {

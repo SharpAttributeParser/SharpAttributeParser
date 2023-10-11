@@ -6,8 +6,8 @@ using SharpAttributeParser.Mappers.Repositories.Syntactic;
 /// <inheritdoc cref="IDetachedMappedSplitConstructorArgumentRecorderProvider{TSemanticRecord, TSyntacticRecord}"/>
 internal sealed class DetachedMappedSplitConstructorArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord> : IDetachedMappedSplitConstructorArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord>
 {
-    private IDetachedMappedSemanticConstructorArgumentRecorder<TSemanticRecord> Semantic { get; }
-    private IDetachedMappedSyntacticConstructorArgumentRecorder<TSyntacticRecord> Syntactic { get; }
+    private readonly IDetachedMappedSemanticConstructorArgumentRecorder<TSemanticRecord> Semantic;
+    private readonly IDetachedMappedSyntacticConstructorArgumentRecorder<TSyntacticRecord> Syntactic;
 
     /// <summary>Instantiates a <see cref="DetachedMappedSplitConstructorArgumentRecorderProvider{TSemanticRecord, TSyntacticRecord}"/>, providing recorders that record the arguments of some constructor parameter.</summary>
     /// <param name="semantic">The recorder used when arguments are parsed.</param>

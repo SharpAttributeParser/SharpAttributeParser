@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// <inheritdoc cref="INamedMappingRepositoryFactory{TRecorder, TRecorderFactory}"/>
 public sealed class NamedMappingRepositoryFactory<TRecorder, TRecorderFactory> : INamedMappingRepositoryFactory<TRecorder, TRecorderFactory>
 {
-    private TRecorderFactory RecorderFactory { get; }
+    private readonly TRecorderFactory RecorderFactory;
 
     /// <summary>Instantiates a <see cref="NamedMappingRepositoryFactory{TRecorder, TRecorderFactory}"/>, handling creation of <see cref="INamedMappingRepository{TRecorder, TRecorderFactory}"/>.</summary>
     /// <param name="recorderFactory">Handles creation of recorders for the created repositories.</param>
@@ -27,12 +27,12 @@ public sealed class NamedMappingRepositoryFactory<TRecorder, TRecorderFactory> :
 
     private sealed class NamedMappingRepository : INamedMappingRepository<TRecorder, TRecorderFactory>
     {
-        private TRecorderFactory RecorderFactory { get; }
+        private readonly TRecorderFactory RecorderFactory;
 
-        private Dictionary<string, TRecorder> NamedMappings { get; }
+        private readonly Dictionary<string, TRecorder> NamedMappings;
 
-        private bool HasBeenBuilt { get; set; }
-        private bool ThrowOnMultipleBuilds { get; }
+        private bool HasBeenBuilt;
+        private readonly bool ThrowOnMultipleBuilds;
 
         public NamedMappingRepository(TRecorderFactory recorderFactory, INamedParameterComparer comparer, bool throwOnMultipleBuilds)
         {
@@ -103,7 +103,7 @@ public sealed class NamedMappingRepositoryFactory<TRecorder, TRecorderFactory> :
 
         private sealed class BuiltNamedMappingRepository : IBuiltNamedMappingRepository<TRecorder>
         {
-            private IReadOnlyDictionary<string, TRecorder> Named { get; }
+            private readonly IReadOnlyDictionary<string, TRecorder> Named;
 
             public BuiltNamedMappingRepository(IReadOnlyDictionary<string, TRecorder> named)
             {

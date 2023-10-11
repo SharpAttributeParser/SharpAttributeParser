@@ -5,9 +5,9 @@ using System;
 /// <inheritdoc cref="IMappedCombinedArgumentRecorderFactory"/>
 public sealed class MappedCombinedArgumentRecorderFactory : IMappedCombinedArgumentRecorderFactory
 {
-    private IMappedCombinedTypeArgumentRecorderFactory TypeParameter { get; }
-    private IMappedCombinedConstructorArgumentRecorderFactory ConstructorParameter { get; }
-    private IMappedCombinedNamedArgumentRecorderFactory NamedParameter { get; }
+    private readonly IMappedCombinedTypeArgumentRecorderFactory TypeParameter;
+    private readonly IMappedCombinedConstructorArgumentRecorderFactory ConstructorParameter;
+    private readonly IMappedCombinedNamedArgumentRecorderFactory NamedParameter;
 
     /// <summary>Instantiates a <see cref="MappedCombinedArgumentRecorderFactory"/>, handling creation of attached recorders.</summary>
     /// <param name="typeParameter">Handles creation of attached recorders related to type parameters.</param>

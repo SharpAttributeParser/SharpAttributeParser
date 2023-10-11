@@ -15,10 +15,10 @@ public sealed class CombinedParser : ICombinedParser
     /// <summary>The singleton <see cref="CombinedParser"/>, with default behaviour.</summary>
     public static CombinedParser Singleton { get; } = new();
 
-    private ISemanticParser SemanticParser { get; }
-    private ISyntacticParser SyntacticParser { get; }
+    private readonly ISemanticParser SemanticParser;
+    private readonly ISyntacticParser SyntacticParser;
 
-    private ICombinedParserLogger Logger { get; }
+    private readonly ICombinedParserLogger Logger;
 
     /// <summary>Instantiates a <see cref="CombinedParser"/>, parsing the arguments of attributes.</summary>
     /// <param name="logger">The logger used to log messages.</param>
@@ -197,9 +197,9 @@ public sealed class CombinedParser : ICombinedParser
         public IReadOnlyDictionary<IParameterSymbol, object?> ConstructorArguments => ConstructorArgument.GetArguments();
         public IReadOnlyDictionary<string, object?> NamedArguments => NamedArgument.GetArguments();
 
-        private TypeArgumentRecorder TypeArgument { get; } = new();
-        private ConstructorArgumentRecorder ConstructorArgument { get; } = new();
-        private NamedArgumentRecorder NamedArgument { get; } = new();
+        private readonly TypeArgumentRecorder TypeArgument = new();
+        private readonly ConstructorArgumentRecorder ConstructorArgument = new();
+        private readonly NamedArgumentRecorder NamedArgument = new();
 
         ISemanticTypeArgumentRecorder ISemanticRecorder.TypeArgument => TypeArgument;
         ISemanticConstructorArgumentRecorder ISemanticRecorder.ConstructorArgument => ConstructorArgument;
@@ -207,7 +207,7 @@ public sealed class CombinedParser : ICombinedParser
 
         private sealed class TypeArgumentRecorder : ISemanticTypeArgumentRecorder
         {
-            private Dictionary<ITypeParameterSymbol, ITypeSymbol> Arguments { get; } = new(SymbolEqualityComparer.Default);
+            private readonly Dictionary<ITypeParameterSymbol, ITypeSymbol> Arguments = new(SymbolEqualityComparer.Default);
 
             bool ISemanticTypeArgumentRecorder.TryRecordArgument(ITypeParameterSymbol parameter, ITypeSymbol argument)
             {
@@ -221,7 +221,7 @@ public sealed class CombinedParser : ICombinedParser
 
         private sealed class ConstructorArgumentRecorder : ISemanticConstructorArgumentRecorder
         {
-            private Dictionary<IParameterSymbol, object?> Arguments { get; } = new(SymbolEqualityComparer.Default);
+            private readonly Dictionary<IParameterSymbol, object?> Arguments = new(SymbolEqualityComparer.Default);
 
             bool ISemanticConstructorArgumentRecorder.TryRecordArgument(IParameterSymbol parameter, object? argument)
             {
@@ -235,7 +235,7 @@ public sealed class CombinedParser : ICombinedParser
 
         private sealed class NamedArgumentRecorder : ISemanticNamedArgumentRecorder
         {
-            private Dictionary<string, object?> Arguments { get; } = new();
+            private readonly Dictionary<string, object?> Arguments = new();
 
             bool ISemanticNamedArgumentRecorder.TryRecordArgument(string parameterName, object? argument)
             {
@@ -256,9 +256,9 @@ public sealed class CombinedParser : ICombinedParser
         public ISet<IParameterSymbol> DefaultConstructorArguments => ConstructorArgument.GetDefaultArguments();
         public IReadOnlyDictionary<string, ExpressionSyntax> NamedArguments => NamedArgument.GetArguments();
 
-        private TypeArgumentRecorder TypeArgument { get; } = new();
-        private ConstructorArgumentRecorder ConstructorArgument { get; } = new();
-        private NamedArgumentRecorder NamedArgument { get; } = new();
+        private readonly TypeArgumentRecorder TypeArgument = new();
+        private readonly ConstructorArgumentRecorder ConstructorArgument = new();
+        private readonly NamedArgumentRecorder NamedArgument = new();
 
         ISyntacticTypeArgumentRecorder ISyntacticRecorder.TypeArgument => TypeArgument;
         ISyntacticConstructorArgumentRecorder ISyntacticRecorder.ConstructorArgument => ConstructorArgument;
@@ -266,7 +266,7 @@ public sealed class CombinedParser : ICombinedParser
 
         private sealed class TypeArgumentRecorder : ISyntacticTypeArgumentRecorder
         {
-            private Dictionary<ITypeParameterSymbol, ExpressionSyntax> Arguments { get; } = new(SymbolEqualityComparer.Default);
+            private readonly Dictionary<ITypeParameterSymbol, ExpressionSyntax> Arguments = new(SymbolEqualityComparer.Default);
 
             bool ISyntacticTypeArgumentRecorder.TryRecordArgument(ITypeParameterSymbol parameter, ExpressionSyntax syntax)
             {
@@ -280,9 +280,9 @@ public sealed class CombinedParser : ICombinedParser
 
         private sealed class ConstructorArgumentRecorder : ISyntacticConstructorArgumentRecorder
         {
-            private Dictionary<IParameterSymbol, ExpressionSyntax> NormalArguments { get; } = new(SymbolEqualityComparer.Default);
-            private Dictionary<IParameterSymbol, IReadOnlyList<ExpressionSyntax>> ParamsArguments { get; } = new(SymbolEqualityComparer.Default);
-            private ISet<IParameterSymbol> DefaultArguments { get; } = new HashSet<IParameterSymbol>(SymbolEqualityComparer.Default);
+            private readonly Dictionary<IParameterSymbol, ExpressionSyntax> NormalArguments = new(SymbolEqualityComparer.Default);
+            private readonly Dictionary<IParameterSymbol, IReadOnlyList<ExpressionSyntax>> ParamsArguments = new(SymbolEqualityComparer.Default);
+            private readonly ISet<IParameterSymbol> DefaultArguments = new HashSet<IParameterSymbol>(SymbolEqualityComparer.Default);
 
             bool ISyntacticConstructorArgumentRecorder.TryRecordArgument(IParameterSymbol parameter, ExpressionSyntax syntax)
             {
@@ -312,7 +312,7 @@ public sealed class CombinedParser : ICombinedParser
 
         private sealed class NamedArgumentRecorder : ISyntacticNamedArgumentRecorder
         {
-            private Dictionary<string, ExpressionSyntax> Arguments { get; } = new();
+            private readonly Dictionary<string, ExpressionSyntax> Arguments = new();
 
             bool ISyntacticNamedArgumentRecorder.TryRecordArgument(string parameterName, ExpressionSyntax syntax)
             {

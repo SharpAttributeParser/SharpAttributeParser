@@ -51,7 +51,7 @@ internal sealed class MapperContext<TRecord>
 
     public sealed class SyntacticMapper : ASyntacticMapper<TRecord>
     {
-        private Action<IAppendableSyntacticMappingRepository<TRecord>> AddMappingsDelegate { get; }
+        private readonly Action<IAppendableSyntacticMappingRepository<TRecord>> AddMappingsDelegate;
 
         public SyntacticMapper(ISyntacticMapperDependencyProvider<TRecord> dependencyProvider, Action<IAppendableSyntacticMappingRepository<TRecord>> addMappingsDelegate) : base(dependencyProvider)
         {

@@ -63,7 +63,7 @@ internal sealed class MapperContext<TCombinedRecord, TSemanticRecord>
 
     public sealed class AdaptiveMapper : AAdaptiveMapper<TCombinedRecord, TSemanticRecord>
     {
-        private Action<IAppendableAdaptiveMappingRepository<TCombinedRecord, TSemanticRecord>> AddMappingsDelegate { get; }
+        private readonly Action<IAppendableAdaptiveMappingRepository<TCombinedRecord, TSemanticRecord>> AddMappingsDelegate;
 
         public AdaptiveMapper(IAdaptiveMapperDependencyProvider<TCombinedRecord, TSemanticRecord> dependencyProvider, Action<IAppendableAdaptiveMappingRepository<TCombinedRecord, TSemanticRecord>> addMappingsDelegate) : base(dependencyProvider)
         {

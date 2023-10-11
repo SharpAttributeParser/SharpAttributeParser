@@ -11,8 +11,8 @@ using System;
 /// <inheritdoc cref="IDetachedMappedSplitNamedArgumentRecorderProviderFactory{TSemanticRecord, TSyntacticRecord}"/>
 public sealed class DetachedMappedSplitNamedArgumentRecorderProviderFactory<TSemanticRecord, TSyntacticRecord> : IDetachedMappedSplitNamedArgumentRecorderProviderFactory<TSemanticRecord, TSyntacticRecord>
 {
-    private IDetachedMappedSemanticNamedArgumentRecorderFactory<TSemanticRecord> SemanticFactory { get; }
-    private IDetachedMappedSyntacticNamedArgumentRecorderFactory<TSyntacticRecord> SyntacticFactory { get; }
+    private readonly IDetachedMappedSemanticNamedArgumentRecorderFactory<TSemanticRecord> SemanticFactory;
+    private readonly IDetachedMappedSyntacticNamedArgumentRecorderFactory<TSyntacticRecord> SyntacticFactory;
 
     /// <summary>Instantiates a <see cref="DetachedMappedSplitNamedArgumentRecorderProviderFactory{TSemanticRecord, TSyntacticRecord}"/>, handling creation of <see cref="IDetachedMappedSplitNamedArgumentRecorderProvider{TSemanticRecord, TSyntacticRecord}"/> related to named parameters.</summary>
     /// <param name="semanticFactory">Handles creation of the recorders used when arguments are parsed.</param>
@@ -155,8 +155,8 @@ public sealed class DetachedMappedSplitNamedArgumentRecorderProviderFactory<TSem
 
     private sealed class Provider : IDetachedMappedSplitNamedArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord>
     {
-        private IDetachedMappedSemanticNamedArgumentRecorder<TSemanticRecord> Semantic { get; }
-        private IDetachedMappedSyntacticNamedArgumentRecorder<TSyntacticRecord> Syntactic { get; }
+        private readonly IDetachedMappedSemanticNamedArgumentRecorder<TSemanticRecord> Semantic;
+        private readonly IDetachedMappedSyntacticNamedArgumentRecorder<TSyntacticRecord> Syntactic;
 
         public Provider(IDetachedMappedSemanticNamedArgumentRecorder<TSemanticRecord> semantic, IDetachedMappedSyntacticNamedArgumentRecorder<TSyntacticRecord> syntactic)
         {

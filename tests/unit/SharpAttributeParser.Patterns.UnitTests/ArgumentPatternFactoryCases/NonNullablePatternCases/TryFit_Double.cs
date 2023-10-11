@@ -11,7 +11,7 @@ public sealed class TryFit_Double
 {
     private OneOf<Error, double> Target(object? argument) => Pattern.TryFit(argument);
 
-    private IArgumentPattern<double> Pattern { get; } = ((IArgumentPatternFactory)FactoryContext.Create().Factory).Double();
+    private readonly IArgumentPattern<double> Pattern = ((IArgumentPatternFactory)FactoryContext.Create().Factory).Double();
 
     [Fact]
     public void Double_0_ResultsInMatch() => ResultsInMatch(0, 0d);

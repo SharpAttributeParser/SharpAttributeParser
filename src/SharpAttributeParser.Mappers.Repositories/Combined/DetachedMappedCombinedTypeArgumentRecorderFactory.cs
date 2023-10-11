@@ -32,7 +32,7 @@ public sealed class DetachedMappedCombinedTypeArgumentRecorderFactory<TRecord> :
 
     private sealed class ArgumentRecorder : IDetachedMappedCombinedTypeArgumentRecorder<TRecord>
     {
-        private Func<TRecord, ITypeSymbol, ExpressionSyntax, bool> Recorder { get; }
+        private readonly Func<TRecord, ITypeSymbol, ExpressionSyntax, bool> Recorder;
 
         public ArgumentRecorder(Func<TRecord, ITypeSymbol, ExpressionSyntax, bool> recorder)
         {

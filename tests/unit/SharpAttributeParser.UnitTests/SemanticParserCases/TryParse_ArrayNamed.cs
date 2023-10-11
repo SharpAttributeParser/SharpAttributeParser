@@ -14,7 +14,7 @@ public sealed class TryParse_ArrayNamed
 {
     private bool Target(ISemanticRecorder recorder, AttributeData attributeData) => Context.Parser.TryParse(recorder, attributeData);
 
-    private ParserContext Context { get; } = ParserContext.Create();
+    private readonly ParserContext Context = ParserContext.Create();
 
     [Fact]
     public async Task ErrorArgument_TrueButNotRecorded()
@@ -137,8 +137,8 @@ public sealed class TryParse_ArrayNamed
 
         public int ValueSetCount => ValueSet ? 1 : 0;
 
-        private bool ValueSet { get; init; }
+        private readonly bool ValueSet;
 
-        private IReadOnlyList<object?>? RawValue { get; init; }
+        private readonly IReadOnlyList<object?>? RawValue;
     }
 }

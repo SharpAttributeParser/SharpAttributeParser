@@ -11,9 +11,9 @@ using System;
 /// <inheritdoc cref="ISemanticArgumentRecorderLogger{TCategoryName}"/>
 public sealed class SemanticArgumentRecorderLogger<TCategoryName> : ISemanticArgumentRecorderLogger<TCategoryName>
 {
-    private ITypeArgumentLogger TypeArgument { get; }
-    private IConstructorArgumentLogger ConstructorArgument { get; }
-    private INamedArgumentLogger NamedArgument { get; }
+    private readonly ITypeArgumentLogger TypeArgument;
+    private readonly IConstructorArgumentLogger ConstructorArgument;
+    private readonly INamedArgumentLogger NamedArgument;
 
     /// <summary>Instantiates a <see cref="SemanticArgumentRecorderLogger{TCategoryName}"/>, handling logging for <see cref="ISemanticRecorder"/>.</summary>
     /// <param name="logger">The logger used to log messages.</param>
@@ -35,7 +35,7 @@ public sealed class SemanticArgumentRecorderLogger<TCategoryName> : ISemanticArg
 
     private sealed class TypeArgumentLogger : ITypeArgumentLogger
     {
-        private ILogger Logger { get; }
+        private readonly ILogger Logger;
 
         public TypeArgumentLogger(ILogger logger)
         {
@@ -62,7 +62,7 @@ public sealed class SemanticArgumentRecorderLogger<TCategoryName> : ISemanticArg
 
     private sealed class ConstructorArgumentLogger : IConstructorArgumentLogger
     {
-        private ILogger Logger { get; }
+        private readonly ILogger Logger;
 
         public ConstructorArgumentLogger(ILogger logger)
         {
@@ -84,7 +84,7 @@ public sealed class SemanticArgumentRecorderLogger<TCategoryName> : ISemanticArg
 
     private sealed class NamedArgumentLogger : INamedArgumentLogger
     {
-        private ILogger Logger { get; }
+        private readonly ILogger Logger;
 
         public NamedArgumentLogger(ILogger logger)
         {

@@ -11,11 +11,11 @@ using System;
 /// <typeparam name="TRecord">The type to which arguments are recorded.</typeparam>
 public abstract class ASemanticMapper<TRecord> : ISemanticMapper<TRecord>
 {
-    private bool IsInitialized { get; set; }
+    private bool IsInitialized;
 
-    private IBuiltSemanticMappingRepository<TRecord> Mappings { get; set; } = null!;
+    private IBuiltSemanticMappingRepository<TRecord> Mappings = null!;
 
-    private ISemanticMapperDependencyProvider<TRecord> DependencyProvider { get; }
+    private readonly ISemanticMapperDependencyProvider<TRecord> DependencyProvider;
 
     /// <summary>Instantiates a <see cref="ASemanticMapper{TRecord}"/>, mapping attribute parameters to recorders responsible for recording arguments of that parameter.</summary>
     /// <param name="dependencyProvider">Provides the dependencies of the mapper. If <see langword="null"/>, a default provider will be used.</param>

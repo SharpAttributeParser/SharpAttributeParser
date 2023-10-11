@@ -14,8 +14,8 @@ using System;
 /// <inheritdoc cref="IDetachedMappedSplitOptionalConstructorArgumentRecorderProviderFactory{TSemanticRecord, TSyntacticRecord}"/>
 public sealed class DetachedMappedSplitOptionalConstructorArgumentRecorderFactory<TSemanticRecord, TSyntacticRecord> : IDetachedMappedSplitOptionalConstructorArgumentRecorderProviderFactory<TSemanticRecord, TSyntacticRecord>
 {
-    private IDetachedMappedSemanticConstructorArgumentRecorderFactory<TSemanticRecord> SemanticFactory { get; }
-    private IDetachedMappedSyntacticOptionalConstructorArgumentRecorderFactory<TSyntacticRecord> SyntacticFactory { get; }
+    private readonly IDetachedMappedSemanticConstructorArgumentRecorderFactory<TSemanticRecord> SemanticFactory;
+    private readonly IDetachedMappedSyntacticOptionalConstructorArgumentRecorderFactory<TSyntacticRecord> SyntacticFactory;
 
     /// <summary>Instantiates a <see cref="DetachedMappedSplitOptionalConstructorArgumentRecorderFactory{TSemanticRecord, TSyntacticRecord}"/>, handling creation of <see cref="IDetachedMappedSplitConstructorArgumentRecorderProvider{TSemanticRecord, TSyntacticRecord}"/> related to optional constructor parameters.</summary>
     /// <param name="semanticFactory">Handles creation of the recorders used when arguments are parsed.</param>

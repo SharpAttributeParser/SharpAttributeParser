@@ -5,9 +5,9 @@ using System;
 /// <inheritdoc cref="IDetachedMappedSyntacticConstructorArgumentRecorderFactory{TRecord}"/>
 public sealed class DetachedMappedSyntacticConstructorArgumentRecorderFactory<TRecord> : IDetachedMappedSyntacticConstructorArgumentRecorderFactory<TRecord>
 {
-    private IDetachedMappedSyntacticNormalConstructorArgumentRecorderFactory<TRecord> Normal { get; }
-    private IDetachedMappedSyntacticParamsConstructorArgumentRecorderFactory<TRecord> Params { get; }
-    private IDetachedMappedSyntacticOptionalConstructorArgumentRecorderFactory<TRecord> Optional { get; }
+    private readonly IDetachedMappedSyntacticNormalConstructorArgumentRecorderFactory<TRecord> Normal;
+    private readonly IDetachedMappedSyntacticParamsConstructorArgumentRecorderFactory<TRecord> Params;
+    private readonly IDetachedMappedSyntacticOptionalConstructorArgumentRecorderFactory<TRecord> Optional;
 
     /// <summary>Instantiates a <see cref="DetachedMappedSyntacticConstructorArgumentRecorderFactory{TRecord}"/>, handling creation of <see cref="IDetachedMappedSyntacticConstructorArgumentRecorder{TRecord}"/>.</summary>
     /// <param name="normalFactory">Handles creation of recorders related to non-optional, non-<see langword="params"/> constructor parameters.</param>

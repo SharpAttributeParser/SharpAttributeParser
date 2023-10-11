@@ -8,7 +8,7 @@
     <PropertyGroup>
         <Title>SharpAttributeParser.Abstractions</Title>
         <Description>
-            Provides abstractions of 'SharpAttributeParser'.
+            Provides abstractions related to parsing C# attributes using the Roslyn API.
         </Description>
         <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
     </PropertyGroup>

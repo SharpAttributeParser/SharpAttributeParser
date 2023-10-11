@@ -18,7 +18,7 @@ public sealed class TryParse_Combined
 {
     private bool Target(ISyntacticRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax) => Context.Parser.TryParse(recorder, attributeData, attributeSyntax);
 
-    private ParserContext Context { get; } = ParserContext.Create();
+    private readonly ParserContext Context = ParserContext.Create();
 
     [Fact]
     public async Task ParamsWithNamed_ReturnsTrueAndRecords()
@@ -251,11 +251,11 @@ public sealed class TryParse_Combined
         public int SimpleNamedValueSyntaxSetCount => SimpleNamedValueSyntaxSet ? 1 : 0;
         public int ArrayNamedValueSyntaxSetCount => ArrayNamedValueSyntaxSet ? 1 : 0;
 
-        private bool SimpleNamedValueSyntaxSet { get; init; }
-        private bool ArrayNamedValueSyntaxSet { get; init; }
+        private readonly bool SimpleNamedValueSyntaxSet;
+        private readonly bool ArrayNamedValueSyntaxSet;
 
-        private ExpressionSyntax? RawSimpleNamedValueSyntax { get; init; }
-        private ExpressionSyntax? RawArrayNamedValueSyntax { get; init; }
+        private readonly ExpressionSyntax? RawSimpleNamedValueSyntax;
+        private readonly ExpressionSyntax? RawArrayNamedValueSyntax;
 
         public ExpectedArguments(ExpressionSyntax t1syntax, ExpressionSyntax t2syntax, ExpressionSyntax simpleValueSyntax, ExpressionSyntax arrayValueSyntax, OneOf<ExpressionSyntax, IReadOnlyList<ExpressionSyntax>> paramsValueSyntax)
         {

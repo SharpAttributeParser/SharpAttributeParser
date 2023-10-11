@@ -13,7 +13,7 @@ public sealed class TryParse_SimpleNamed
 {
     private bool Target(ISemanticRecorder recorder, AttributeData attributeData) => Context.Parser.TryParse(recorder, attributeData);
 
-    private ParserContext Context { get; }
+    private readonly ParserContext Context;
 
     public TryParse_SimpleNamed()
     {
@@ -214,8 +214,8 @@ public sealed class TryParse_SimpleNamed
 
         public int ValueSetCount => ValueSet ? 1 : 0;
 
-        private bool ValueSet { get; init; }
+        private readonly bool ValueSet;
 
-        private object? RawValue { get; init; }
+        private readonly object? RawValue;
     }
 }

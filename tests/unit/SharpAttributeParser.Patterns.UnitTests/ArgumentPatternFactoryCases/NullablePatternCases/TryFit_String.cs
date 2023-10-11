@@ -11,7 +11,7 @@ public sealed class TryFit_String
 {
     private OneOf<Error, string?> Target(object? argument) => Pattern.TryFit(argument);
 
-    private IArgumentPattern<string?> Pattern { get; } = ((IArgumentPatternFactory)FactoryContext.Create().Factory).NullableString();
+    private readonly IArgumentPattern<string?> Pattern = ((IArgumentPatternFactory)FactoryContext.Create().Factory).NullableString();
 
     [Fact]
     public void String_Empty_ResultsInMatch() => ResultsInMatch(string.Empty, string.Empty);

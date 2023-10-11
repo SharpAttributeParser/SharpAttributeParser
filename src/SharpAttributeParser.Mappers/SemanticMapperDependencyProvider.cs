@@ -9,14 +9,14 @@ using System;
 /// <inheritdoc cref="ISemanticMapperDependencyProvider{TRecord}"/>
 public sealed class SemanticMapperDependencyProvider<TRecord> : ISemanticMapperDependencyProvider<TRecord>
 {
-    private static Lazy<ISemanticMappingRepositoryFactory<TRecord>> DefaultRepositoryFactory { get; } = new(DefaultRepositoryFactories.SemanticFactory<TRecord>);
+    private static readonly Lazy<ISemanticMappingRepositoryFactory<TRecord>> DefaultRepositoryFactory = new(DefaultRepositoryFactories.SemanticFactory<TRecord>);
 
-    private IParameterComparer ParameterComparer { get; }
+    private readonly IParameterComparer ParameterComparer;
 
-    private IMappedSemanticArgumentRecorderFactory RecorderFactory { get; }
-    private ISemanticMappingRepositoryFactory<TRecord> RepositoryFactory { get; }
+    private readonly IMappedSemanticArgumentRecorderFactory RecorderFactory;
+    private readonly ISemanticMappingRepositoryFactory<TRecord> RepositoryFactory;
 
-    private ISemanticMapperLogger<ASemanticMapper<TRecord>> Logger { get; }
+    private readonly ISemanticMapperLogger<ASemanticMapper<TRecord>> Logger;
 
     /// <summary>Instantiates a <see cref="SemanticMapperDependencyProvider{TRecord}"/>, providing the dependencies of <see cref="ASemanticMapper{TRecord}"/>.</summary>
     /// <param name="parameterComparer">Determines equality when comparing parameters.</param>

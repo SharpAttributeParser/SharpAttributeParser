@@ -12,7 +12,7 @@ using System.Collections.Generic;
 /// <inheritdoc cref="ISyntacticRecorderFactory"/>
 public sealed class SyntacticRecorderFactory : ISyntacticRecorderFactory
 {
-    private ISyntacticArgumentRecorderLoggerFactory LoggerFactory { get; }
+    private readonly ISyntacticArgumentRecorderLoggerFactory LoggerFactory;
 
     /// <summary>Instantiates a <see cref="SyntacticRecorderFactory"/>, handling creation of <see cref="ISyntacticRecorder"/> using <see cref="ISyntacticMapper{TRecord}"/>.</summary>
     /// <param name="loggerFactory">Handles creation of the loggers used by the created recorders.</param>
@@ -69,7 +69,7 @@ public sealed class SyntacticRecorderFactory : ISyntacticRecorderFactory
 
     private sealed class RecordBuilderMapper<TRecord> : ISyntacticMapper<RecordBuilder<TRecord>>
     {
-        private ISyntacticMapper<TRecord> WrappedMapper { get; }
+        private readonly ISyntacticMapper<TRecord> WrappedMapper;
 
         public RecordBuilderMapper(ISyntacticMapper<TRecord> wrappedMapper)
         {
@@ -94,11 +94,11 @@ public sealed class SyntacticRecorderFactory : ISyntacticRecorderFactory
 
     private sealed class Recorder<TRecord, TRecordBuilder> : ISyntacticRecorder<TRecord> where TRecordBuilder : IRecordBuilder<TRecord>
     {
-        private TRecordBuilder RecordBuilder { get; }
+        private readonly TRecordBuilder RecordBuilder;
 
-        private ISyntacticTypeArgumentRecorder TypeArgument { get; }
-        private ISyntacticConstructorArgumentRecorder ConstructorArgument { get; }
-        private ISyntacticNamedArgumentRecorder NamedArgument { get; }
+        private readonly ISyntacticTypeArgumentRecorder TypeArgument;
+        private readonly ISyntacticConstructorArgumentRecorder ConstructorArgument;
+        private readonly ISyntacticNamedArgumentRecorder NamedArgument;
 
         public Recorder(ISyntacticMapper<TRecordBuilder> argumentRecorderMapper, TRecordBuilder recordBuilder, ISyntacticArgumentRecorderLogger logger)
         {
@@ -117,10 +117,10 @@ public sealed class SyntacticRecorderFactory : ISyntacticRecorderFactory
 
         private sealed class TypeArgumentRecorder : ISyntacticTypeArgumentRecorder
         {
-            private ISyntacticMapper<TRecordBuilder> ArgumentMapper { get; }
-            private TRecordBuilder RecordBuilder { get; }
+            private readonly ISyntacticMapper<TRecordBuilder> ArgumentMapper;
+            private readonly TRecordBuilder RecordBuilder;
 
-            private ISyntacticArgumentRecorderLogger Logger { get; }
+            private readonly ISyntacticArgumentRecorderLogger Logger;
 
             public TypeArgumentRecorder(ISyntacticMapper<TRecordBuilder> argumentMapper, TRecordBuilder recordBuilder, ISyntacticArgumentRecorderLogger logger)
             {
@@ -157,10 +157,10 @@ public sealed class SyntacticRecorderFactory : ISyntacticRecorderFactory
 
         private sealed class ConstructorArgumentRecorder : ISyntacticConstructorArgumentRecorder
         {
-            private ISyntacticMapper<TRecordBuilder> ArgumentMapper { get; }
-            private TRecordBuilder RecordBuilder { get; }
+            private readonly ISyntacticMapper<TRecordBuilder> ArgumentMapper;
+            private readonly TRecordBuilder RecordBuilder;
 
-            private ISyntacticArgumentRecorderLogger Logger { get; }
+            private readonly ISyntacticArgumentRecorderLogger Logger;
 
             public ConstructorArgumentRecorder(ISyntacticMapper<TRecordBuilder> argumentMapper, TRecordBuilder recordBuilder, ISyntacticArgumentRecorderLogger logger)
             {
@@ -246,10 +246,10 @@ public sealed class SyntacticRecorderFactory : ISyntacticRecorderFactory
 
         private sealed class NamedArgumentRecorder : ISyntacticNamedArgumentRecorder
         {
-            private ISyntacticMapper<TRecordBuilder> ArgumentMapper { get; }
-            private TRecordBuilder RecordBuilder { get; }
+            private readonly ISyntacticMapper<TRecordBuilder> ArgumentMapper;
+            private readonly TRecordBuilder RecordBuilder;
 
-            private ISyntacticArgumentRecorderLogger Logger { get; }
+            private readonly ISyntacticArgumentRecorderLogger Logger;
 
             public NamedArgumentRecorder(ISyntacticMapper<TRecordBuilder> argumentMapper, TRecordBuilder recordBuilder, ISyntacticArgumentRecorderLogger logger)
             {

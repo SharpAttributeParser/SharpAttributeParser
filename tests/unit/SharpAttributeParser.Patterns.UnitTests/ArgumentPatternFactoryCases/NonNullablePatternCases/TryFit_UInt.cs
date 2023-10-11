@@ -11,7 +11,7 @@ public sealed class TryFit_UInt
 {
     private OneOf<Error, uint> Target(object? argument) => Pattern.TryFit(argument);
 
-    private IArgumentPattern<uint> Pattern { get; } = ((IArgumentPatternFactory)FactoryContext.Create().Factory).UInt();
+    private readonly IArgumentPattern<uint> Pattern = ((IArgumentPatternFactory)FactoryContext.Create().Factory).UInt();
 
     [Fact]
     public void UInt_0_ResultsInMatch() => ResultsInMatch(0, (uint)0);

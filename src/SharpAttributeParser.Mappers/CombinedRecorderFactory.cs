@@ -12,7 +12,7 @@ using System.Collections.Generic;
 /// <inheritdoc cref="ICombinedRecorderFactory"/>
 public sealed class CombinedRecorderFactory : ICombinedRecorderFactory
 {
-    private ICombinedArgumentRecorderLoggerFactory LoggerFactory { get; }
+    private readonly ICombinedArgumentRecorderLoggerFactory LoggerFactory;
 
     /// <summary>Instantiates a <see cref="CombinedRecorderFactory"/>, handling creation of <see cref="ICombinedRecorder"/> using <see cref="ICombinedMapper{TRecord}"/>.</summary>
     /// <param name="loggerFactory">Handles creation of the loggers used by the created recorders.</param>
@@ -69,7 +69,7 @@ public sealed class CombinedRecorderFactory : ICombinedRecorderFactory
 
     private sealed class RecordBuilderMapper<TRecord> : ICombinedMapper<RecordBuilder<TRecord>>
     {
-        private ICombinedMapper<TRecord> WrappedMapper { get; }
+        private readonly ICombinedMapper<TRecord> WrappedMapper;
 
         public RecordBuilderMapper(ICombinedMapper<TRecord> wrappedMapper)
         {
@@ -94,11 +94,11 @@ public sealed class CombinedRecorderFactory : ICombinedRecorderFactory
 
     private sealed class Recorder<TRecord, TRecordBuilder> : ICombinedRecorder<TRecord> where TRecordBuilder : IRecordBuilder<TRecord>
     {
-        private TRecordBuilder RecordBuilder { get; }
+        private readonly TRecordBuilder RecordBuilder;
 
-        private ICombinedTypeArgumentRecorder TypeArgument { get; }
-        private ICombinedConstructorArgumentRecorder ConstructorArgument { get; }
-        private ICombinedNamedArgumentRecorder NamedArgument { get; }
+        private readonly ICombinedTypeArgumentRecorder TypeArgument;
+        private readonly ICombinedConstructorArgumentRecorder ConstructorArgument;
+        private readonly ICombinedNamedArgumentRecorder NamedArgument;
 
         public Recorder(ICombinedMapper<TRecordBuilder> argumentRecorderMapper, TRecordBuilder recordBuilder, ICombinedArgumentRecorderLogger logger)
         {
@@ -117,10 +117,10 @@ public sealed class CombinedRecorderFactory : ICombinedRecorderFactory
 
         private sealed class TypeArgumentRecorder : ICombinedTypeArgumentRecorder
         {
-            private ICombinedMapper<TRecordBuilder> ArgumentRecorderMapper { get; }
-            private TRecordBuilder RecordBuilder { get; }
+            private readonly ICombinedMapper<TRecordBuilder> ArgumentRecorderMapper;
+            private readonly TRecordBuilder RecordBuilder;
 
-            private ICombinedArgumentRecorderLogger Logger { get; }
+            private readonly ICombinedArgumentRecorderLogger Logger;
 
             public TypeArgumentRecorder(ICombinedMapper<TRecordBuilder> argumentRecorderMapper, TRecordBuilder recordBuilder, ICombinedArgumentRecorderLogger logger)
             {
@@ -162,10 +162,10 @@ public sealed class CombinedRecorderFactory : ICombinedRecorderFactory
 
         private sealed class ConstructorArgumentRecorder : ICombinedConstructorArgumentRecorder
         {
-            private ICombinedMapper<TRecordBuilder> ArgumentRecorderMapper { get; }
-            private TRecordBuilder RecordBuilder { get; }
+            private readonly ICombinedMapper<TRecordBuilder> ArgumentRecorderMapper;
+            private readonly TRecordBuilder RecordBuilder;
 
-            private ICombinedArgumentRecorderLogger Logger { get; }
+            private readonly ICombinedArgumentRecorderLogger Logger;
 
             public ConstructorArgumentRecorder(ICombinedMapper<TRecordBuilder> argumentRecorderMapper, TRecordBuilder recordBuilder, ICombinedArgumentRecorderLogger logger)
             {
@@ -251,10 +251,10 @@ public sealed class CombinedRecorderFactory : ICombinedRecorderFactory
 
         private sealed class NamedArgumentRecorder : ICombinedNamedArgumentRecorder
         {
-            private ICombinedMapper<TRecordBuilder> ArgumentRecorderMapper { get; }
-            private TRecordBuilder RecordBuilder { get; }
+            private readonly ICombinedMapper<TRecordBuilder> ArgumentRecorderMapper;
+            private readonly TRecordBuilder RecordBuilder;
 
-            private ICombinedArgumentRecorderLogger Logger { get; }
+            private readonly ICombinedArgumentRecorderLogger Logger;
 
             public NamedArgumentRecorder(ICombinedMapper<TRecordBuilder> argumentRecorderMapper, TRecordBuilder recordBuilder, ICombinedArgumentRecorderLogger logger)
             {

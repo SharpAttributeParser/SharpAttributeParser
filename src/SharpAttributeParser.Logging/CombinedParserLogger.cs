@@ -12,11 +12,11 @@ using System.Collections.Generic;
 /// <inheritdoc cref="ICombinedParserLogger{TCategoryName}"/>
 public sealed class CombinedParserLogger<TCategoryName> : ICombinedParserLogger<TCategoryName>
 {
-    private ITypeArgumentLogger TypeArgument { get; }
-    private IConstructorArgumentLogger ConstructorArgument { get; }
-    private INamedArgumentLogger NamedArgument { get; }
+    private readonly ITypeArgumentLogger TypeArgument;
+    private readonly IConstructorArgumentLogger ConstructorArgument;
+    private readonly INamedArgumentLogger NamedArgument;
 
-    private ILogger Logger { get; }
+    private readonly ILogger Logger;
 
     /// <summary>Instantiates a <see cref="CombinedParserLogger{TCategoryName}"/>, handling logging for <see cref="ICombinedParser"/>.</summary>
     /// <param name="logger">The logger used to log messages.</param>
@@ -48,7 +48,7 @@ public sealed class CombinedParserLogger<TCategoryName> : ICombinedParserLogger<
 
     private sealed class TypeArgumentLogger : ITypeArgumentLogger
     {
-        private ILogger Logger { get; }
+        private readonly ILogger Logger;
 
         public TypeArgumentLogger(ILogger logger)
         {
@@ -93,7 +93,7 @@ public sealed class CombinedParserLogger<TCategoryName> : ICombinedParserLogger<
 
     private sealed class ConstructorArgumentLogger : IConstructorArgumentLogger
     {
-        private ILogger Logger { get; }
+        private readonly ILogger Logger;
 
         public ConstructorArgumentLogger(ILogger logger)
         {
@@ -147,7 +147,7 @@ public sealed class CombinedParserLogger<TCategoryName> : ICombinedParserLogger<
 
     private sealed class NamedArgumentLogger : INamedArgumentLogger
     {
-        private ILogger Logger { get; }
+        private readonly ILogger Logger;
 
         public NamedArgumentLogger(ILogger logger)
         {

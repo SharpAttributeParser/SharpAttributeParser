@@ -16,7 +16,7 @@ public sealed class SyntacticParser : ISyntacticParser
     /// <summary>The singleton <see cref="SyntacticParser"/>, with default behaviour.</summary>
     public static SyntacticParser Singleton { get; } = new();
 
-    private ISyntacticParserLogger Logger { get; }
+    private readonly ISyntacticParserLogger Logger;
 
     /// <summary>Instantiates a <see cref="SyntacticParser"/>, extracting syntactic information about the arguments of attributes.</summary>
     /// <param name="logger">The logger used to log messages.</param>
@@ -91,11 +91,11 @@ public sealed class SyntacticParser : ISyntacticParser
             return parser.TryParse();
         }
 
-        private ISyntacticRecorder Recorder { get; }
-        private IReadOnlyList<ITypeParameterSymbol> Parameters { get; }
-        private NameSyntax AttributeNameSyntax { get; }
+        private readonly ISyntacticRecorder Recorder;
+        private readonly IReadOnlyList<ITypeParameterSymbol> Parameters;
+        private readonly NameSyntax AttributeNameSyntax;
 
-        private ISyntacticParserLogger Logger { get; }
+        private readonly ISyntacticParserLogger Logger;
 
         private TypeArgumentsParser(ISyntacticRecorder recorder, INamedTypeSymbol attributeClass, AttributeSyntax attributeSyntax, ISyntacticParserLogger logger)
         {
@@ -176,13 +176,13 @@ public sealed class SyntacticParser : ISyntacticParser
             return parser.TryParse();
         }
 
-        private ISyntacticRecorder Recorder { get; }
-        private IReadOnlyList<IParameterSymbol> Parameters { get; }
-        private AttributeData AttributeData { get; }
+        private readonly ISyntacticRecorder Recorder;
+        private readonly IReadOnlyList<IParameterSymbol> Parameters;
+        private readonly AttributeData AttributeData;
 
-        private ParsingData Data { get; }
+        private readonly ParsingData Data;
 
-        private ISyntacticParserLogger Logger { get; }
+        private readonly ISyntacticParserLogger Logger;
 
         private ConstructorArgumentsParser(ISyntacticRecorder recorder, IMethodSymbol targetConstructor, AttributeData attributeData, AttributeSyntax attributeSyntax, ISyntacticParserLogger logger)
         {
@@ -197,7 +197,7 @@ public sealed class SyntacticParser : ISyntacticParser
 
         private bool TryParse()
         {
-            if (Data.OutOfOrderLabelledArgumentsFollowedByUnlabelled)
+            if (Data.OutOfOrderLabelledArgumentFollowedByUnlabelled)
             {
                 Logger.ConstructorArgument.OutOfOrderLabelledConstructorArgumentsFollowedByUnlabelled();
 
@@ -268,7 +268,7 @@ public sealed class SyntacticParser : ISyntacticParser
                 {
                     data.ParseArgument(i, attributeSyntax.ArgumentList.Arguments);
 
-                    if (data.OutOfOrderLabelledArgumentsFollowedByUnlabelled)
+                    if (data.OutOfOrderLabelledArgumentFollowedByUnlabelled)
                     {
                         break;
                     }
@@ -279,18 +279,18 @@ public sealed class SyntacticParser : ISyntacticParser
                 return data;
             }
 
-            private AttributeData AttributeData { get; }
-            private IReadOnlyList<IParameterSymbol> Parameters { get; }
+            private readonly AttributeData AttributeData;
+            private readonly IReadOnlyList<IParameterSymbol> Parameters;
 
-            private bool HasEncounteredOutOfOrderLabelledArgument { get; set; }
+            private bool HasEncounteredOutOfOrderLabelledArgument;
 
             public bool MissingRequiredArgument { get; private set; }
-            public bool OutOfOrderLabelledArgumentsFollowedByUnlabelled { get; private set; }
+            public bool OutOfOrderLabelledArgumentFollowedByUnlabelled { get; private set; }
 
-            private IDictionary<string, IParameterSymbol> UnparsedParameters { get; }
+            private readonly IDictionary<string, IParameterSymbol> UnparsedParameters;
 
-            private IDictionary<IParameterSymbol, ExpressionSyntax> NormalArguments { get; } = new Dictionary<IParameterSymbol, ExpressionSyntax>(SymbolEqualityComparer.Default);
-            private IReadOnlyList<ExpressionSyntax>? ParamsArgument { get; set; }
+            private readonly IDictionary<IParameterSymbol, ExpressionSyntax> NormalArguments = new Dictionary<IParameterSymbol, ExpressionSyntax>(SymbolEqualityComparer.Default);
+            private IReadOnlyList<ExpressionSyntax>? ParamsArgument;
 
             public ParsingData(AttributeData attributeData, IReadOnlyList<IParameterSymbol> parameters)
             {
@@ -330,7 +330,7 @@ public sealed class SyntacticParser : ISyntacticParser
 
                 if (HasEncounteredOutOfOrderLabelledArgument)
                 {
-                    OutOfOrderLabelledArgumentsFollowedByUnlabelled = true;
+                    OutOfOrderLabelledArgumentFollowedByUnlabelled = true;
 
                     return;
                 }
@@ -501,11 +501,11 @@ public sealed class SyntacticParser : ISyntacticParser
             return parser.TryParse();
         }
 
-        private ISyntacticRecorder Recorder { get; }
+        private readonly ISyntacticRecorder Recorder;
 
-        private IReadOnlyDictionary<string, ExpressionSyntax> ParameterSyntaxPairs { get; }
+        private readonly IReadOnlyDictionary<string, ExpressionSyntax> ParameterSyntaxPairs;
 
-        private ISyntacticParserLogger Logger { get; }
+        private readonly ISyntacticParserLogger Logger;
 
         public NamedArgumentsParser(ISyntacticRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax, ISyntacticParserLogger logger)
         {

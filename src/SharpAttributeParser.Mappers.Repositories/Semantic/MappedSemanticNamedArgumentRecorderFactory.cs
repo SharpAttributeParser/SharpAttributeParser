@@ -24,8 +24,8 @@ public sealed class MappedSemanticNamedArgumentRecorderFactory : IMappedSemantic
 
     private sealed class Recorder<TRecord> : IMappedSemanticNamedArgumentRecorder
     {
-        private TRecord DataRecord { get; }
-        private IDetachedMappedSemanticNamedArgumentRecorder<TRecord> DetachedRecorder { get; }
+        private readonly TRecord DataRecord;
+        private readonly IDetachedMappedSemanticNamedArgumentRecorder<TRecord> DetachedRecorder;
 
         public Recorder(TRecord dataRecord, IDetachedMappedSemanticNamedArgumentRecorder<TRecord> detachedRecorder)
         {

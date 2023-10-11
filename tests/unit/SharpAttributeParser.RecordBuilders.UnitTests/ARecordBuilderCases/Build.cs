@@ -58,8 +58,8 @@ public sealed class Build
 
     private sealed class RecordBuilder : ARecordBuilder<object>
     {
-        private object? BuildTarget { get; }
-        private bool CheckFullyConstructedReturnValue { get; }
+        private readonly object? BuildTarget;
+        private readonly bool CheckFullyConstructedReturnValue;
 
         public RecordBuilder(object? buildTarget, bool throwOnMultipleBuilds, bool checkFullyConstructedReturnValue) : base(throwOnMultipleBuilds)
         {

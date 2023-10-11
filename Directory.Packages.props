@@ -1,19 +1,19 @@
 ﻿<Project>
-    
+
     <PropertyGroup>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     </PropertyGroup>
 
-	<ItemGroup>
-		<PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.7.0" />
+    <ItemGroup>
+        <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.7.0" />
         <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.7.0" />
-		<PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-		<PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
-		<PackageVersion Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+        <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+        <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+        <PackageVersion Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
         <PackageVersion Include="Microsoft.Extensions.Logging" Version="7.0.0" />
         <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
-		<PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.1" />
-	</ItemGroup>
+        <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.1" />
+    </ItemGroup>
 
     <ItemGroup>
         <PackageVersion Include="Moq" Version="4.20.69" />
@@ -27,10 +27,10 @@
         <PackageVersion Include="SonarAnalyzer.CSharp" Version="9.8.0.76515" />
     </ItemGroup>
 
-	<ItemGroup>
-		<PackageVersion Include="xunit" Version="2.5.0" />
+    <ItemGroup>
+        <PackageVersion Include="xunit" Version="2.5.0" />
         <PackageVersion Include="Xunit.DependencyInjection" Version="8.8.2" />
-		<PackageVersion Include="xunit.runner.visualstudio" Version="2.5.0" />
-	</ItemGroup>
-    
+        <PackageVersion Include="xunit.runner.visualstudio" Version="2.5.0" />
+    </ItemGroup>
+
 </Project>

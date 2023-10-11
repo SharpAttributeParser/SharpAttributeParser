@@ -5,9 +5,9 @@ using System;
 /// <inheritdoc cref="IParameterComparer"/>
 public sealed class ParameterComparer : IParameterComparer
 {
-    private ITypeParameterComparer TypeParameter { get; }
-    private IConstructorParameterComparer ConstructorParameter { get; }
-    private INamedParameterComparer NamedParameter { get; }
+    private readonly ITypeParameterComparer TypeParameter;
+    private readonly IConstructorParameterComparer ConstructorParameter;
+    private readonly INamedParameterComparer NamedParameter;
 
     /// <summary>Instantiates a <see cref="ParameterComparer"/>, determining equality when comparing parameters.</summary>
     /// <param name="typeParameter">Determines equality when comparing type parameters.</param>

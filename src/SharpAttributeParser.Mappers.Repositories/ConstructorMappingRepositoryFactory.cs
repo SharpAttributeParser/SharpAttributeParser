@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// <inheritdoc cref="IConstructorMappingRepositoryFactory{TRecorder, TRecorderFactory}"/>
 public sealed class ConstructorMappingRepositoryFactory<TRecorder, TRecorderFactory> : IConstructorMappingRepositoryFactory<TRecorder, TRecorderFactory>
 {
-    private TRecorderFactory RecorderFactory { get; }
+    private readonly TRecorderFactory RecorderFactory;
 
     /// <summary>Instantiates a <see cref="ConstructorMappingRepositoryFactory{TRecorder, TRecorderFactory}"/>, handling creation of <see cref="IConstructorMappingRepository{TRecorder, TRecorderFactory}"/>.</summary>
     /// <param name="recorderFactory">Handles creation of recorders for the created repositories.</param>
@@ -27,12 +27,12 @@ public sealed class ConstructorMappingRepositoryFactory<TRecorder, TRecorderFact
 
     private sealed class ConstructorMappingRepository : IConstructorMappingRepository<TRecorder, TRecorderFactory>
     {
-        private TRecorderFactory RecorderFactory { get; }
+        private readonly TRecorderFactory RecorderFactory;
 
-        private Dictionary<string, TRecorder> NamedMappings { get; }
+        private readonly Dictionary<string, TRecorder> NamedMappings;
 
-        private bool HasBeenBuilt { get; set; }
-        private bool ThrowOnMultipleBuilds { get; }
+        private bool HasBeenBuilt;
+        private readonly bool ThrowOnMultipleBuilds;
 
         public ConstructorMappingRepository(TRecorderFactory recorderFactory, IConstructorParameterComparer comparer, bool throwOnMultipleBuilds)
         {
@@ -103,7 +103,7 @@ public sealed class ConstructorMappingRepositoryFactory<TRecorder, TRecorderFact
 
         private sealed class BuiltConstructorMappingRepository : IBuiltConstructorMappingRepository<TRecorder>
         {
-            private IReadOnlyDictionary<string, TRecorder> Named { get; }
+            private readonly IReadOnlyDictionary<string, TRecorder> Named;
 
             public BuiltConstructorMappingRepository(IReadOnlyDictionary<string, TRecorder> named)
             {

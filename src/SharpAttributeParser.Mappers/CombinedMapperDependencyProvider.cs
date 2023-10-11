@@ -9,14 +9,14 @@ using System;
 /// <inheritdoc cref="ICombinedMapperDependencyProvider{TRecord}"/>
 public sealed class CombinedMapperDependencyProvider<TRecord> : ICombinedMapperDependencyProvider<TRecord>
 {
-    private static Lazy<ICombinedMappingRepositoryFactory<TRecord>> DefaultRepositoryFactory { get; } = new(DefaultRepositoryFactories.CombinedFactory<TRecord>);
+    private static readonly Lazy<ICombinedMappingRepositoryFactory<TRecord>> DefaultRepositoryFactory = new(DefaultRepositoryFactories.CombinedFactory<TRecord>);
 
-    private IParameterComparer ParameterComparer { get; }
+    private readonly IParameterComparer ParameterComparer;
 
-    private IMappedCombinedArgumentRecorderFactory RecorderFactory { get; }
-    private ICombinedMappingRepositoryFactory<TRecord> RepositoryFactory { get; }
+    private readonly IMappedCombinedArgumentRecorderFactory RecorderFactory;
+    private readonly ICombinedMappingRepositoryFactory<TRecord> RepositoryFactory;
 
-    private ICombinedMapperLogger<ACombinedMapper<TRecord>> Logger { get; }
+    private readonly ICombinedMapperLogger<ACombinedMapper<TRecord>> Logger;
 
     /// <summary>Instantiates a <see cref="CombinedMapperDependencyProvider{TRecord}"/>, providing the dependencies of <see cref="ACombinedMapper{TRecord}"/>.</summary>
     /// <param name="parameterComparer">Determines equality when comparing parameters.</param>

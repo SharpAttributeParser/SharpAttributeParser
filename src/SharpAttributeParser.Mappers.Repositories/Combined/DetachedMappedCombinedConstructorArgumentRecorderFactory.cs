@@ -5,9 +5,9 @@ using System;
 /// <inheritdoc cref="IDetachedMappedCombinedConstructorArgumentRecorderFactory{TRecord}"/>
 public sealed class DetachedMappedCombinedConstructorArgumentRecorderFactory<TRecord> : IDetachedMappedCombinedConstructorArgumentRecorderFactory<TRecord>
 {
-    private IDetachedMappedCombinedNormalConstructorArgumentRecorderFactory<TRecord> Normal { get; }
-    private IDetachedMappedCombinedParamsConstructorArgumentRecorderFactory<TRecord> Params { get; }
-    private IDetachedMappedCombinedOptionalConstructorArgumentRecorderFactory<TRecord> Optional { get; }
+    private readonly IDetachedMappedCombinedNormalConstructorArgumentRecorderFactory<TRecord> Normal;
+    private readonly IDetachedMappedCombinedParamsConstructorArgumentRecorderFactory<TRecord> Params;
+    private readonly IDetachedMappedCombinedOptionalConstructorArgumentRecorderFactory<TRecord> Optional;
 
     /// <summary>Instantiates a <see cref="DetachedMappedCombinedConstructorArgumentRecorderFactory{TRecord}"/>, handling creation of <see cref="IDetachedMappedCombinedConstructorArgumentRecorder{TRecord}"/>.</summary>
     /// <param name="normalFactory">Handles creation of recorders related to non-optional, non-<see langword="params"/> constructor parameters.</param>

@@ -5,9 +5,9 @@ using System;
 /// <inheritdoc cref="ICombinedMappingRepositoryFactory{TRecord}"/>
 public sealed class CombinedMappingRepositoryFactory<TRecord> : ICombinedMappingRepositoryFactory<TRecord>
 {
-    private ITypeMappingRepositoryFactory<IDetachedMappedCombinedTypeArgumentRecorder<TRecord>, IDetachedMappedCombinedTypeArgumentRecorderFactory<TRecord>> TypeMappingRepositoryFactory { get; }
-    private IConstructorMappingRepositoryFactory<IDetachedMappedCombinedConstructorArgumentRecorder<TRecord>, IDetachedMappedCombinedConstructorArgumentRecorderFactory<TRecord>> ConstructorMappingRepositoryFactory { get; }
-    private INamedMappingRepositoryFactory<IDetachedMappedCombinedNamedArgumentRecorder<TRecord>, IDetachedMappedCombinedNamedArgumentRecorderFactory<TRecord>> NamedMappingRepositoryFactory { get; }
+    private readonly ITypeMappingRepositoryFactory<IDetachedMappedCombinedTypeArgumentRecorder<TRecord>, IDetachedMappedCombinedTypeArgumentRecorderFactory<TRecord>> TypeMappingRepositoryFactory;
+    private readonly IConstructorMappingRepositoryFactory<IDetachedMappedCombinedConstructorArgumentRecorder<TRecord>, IDetachedMappedCombinedConstructorArgumentRecorderFactory<TRecord>> ConstructorMappingRepositoryFactory;
+    private readonly INamedMappingRepositoryFactory<IDetachedMappedCombinedNamedArgumentRecorder<TRecord>, IDetachedMappedCombinedNamedArgumentRecorderFactory<TRecord>> NamedMappingRepositoryFactory;
 
     /// <summary>Instantiates a <see cref="CombinedMappingRepositoryFactory{TRecord}"/>, handling creation of <see cref="ICombinedMappingRepository{TRecord}"/>.</summary>
     /// <param name="typeMappingRepositoryFactory">Handles creation of repositories for mappings from type parameters to recorders.</param>
@@ -38,9 +38,9 @@ public sealed class CombinedMappingRepositoryFactory<TRecord> : ICombinedMapping
 
     private sealed class Repository : ICombinedMappingRepository<TRecord>
     {
-        private ITypeMappingRepository<IDetachedMappedCombinedTypeArgumentRecorder<TRecord>, IDetachedMappedCombinedTypeArgumentRecorderFactory<TRecord>> TypeParameters { get; }
-        private IConstructorMappingRepository<IDetachedMappedCombinedConstructorArgumentRecorder<TRecord>, IDetachedMappedCombinedConstructorArgumentRecorderFactory<TRecord>> ConstructorParameters { get; }
-        private INamedMappingRepository<IDetachedMappedCombinedNamedArgumentRecorder<TRecord>, IDetachedMappedCombinedNamedArgumentRecorderFactory<TRecord>> NamedParameters { get; }
+        private readonly ITypeMappingRepository<IDetachedMappedCombinedTypeArgumentRecorder<TRecord>, IDetachedMappedCombinedTypeArgumentRecorderFactory<TRecord>> TypeParameters;
+        private readonly IConstructorMappingRepository<IDetachedMappedCombinedConstructorArgumentRecorder<TRecord>, IDetachedMappedCombinedConstructorArgumentRecorderFactory<TRecord>> ConstructorParameters;
+        private readonly INamedMappingRepository<IDetachedMappedCombinedNamedArgumentRecorder<TRecord>, IDetachedMappedCombinedNamedArgumentRecorderFactory<TRecord>> NamedParameters;
 
         public Repository(ITypeMappingRepository<IDetachedMappedCombinedTypeArgumentRecorder<TRecord>, IDetachedMappedCombinedTypeArgumentRecorderFactory<TRecord>> typeParameters,
             IConstructorMappingRepository<IDetachedMappedCombinedConstructorArgumentRecorder<TRecord>, IDetachedMappedCombinedConstructorArgumentRecorderFactory<TRecord>> constructorParameters,
@@ -70,9 +70,9 @@ public sealed class CombinedMappingRepositoryFactory<TRecord> : ICombinedMapping
 
         private sealed class BuiltRepository : IBuiltCombinedMappingRepository<TRecord>
         {
-            private IBuiltTypeMappingRepository<IDetachedMappedCombinedTypeArgumentRecorder<TRecord>> TypeParameters { get; }
-            private IBuiltConstructorMappingRepository<IDetachedMappedCombinedConstructorArgumentRecorder<TRecord>> ConstructorParameters { get; }
-            private IBuiltNamedMappingRepository<IDetachedMappedCombinedNamedArgumentRecorder<TRecord>> NamedParameters { get; }
+            private readonly IBuiltTypeMappingRepository<IDetachedMappedCombinedTypeArgumentRecorder<TRecord>> TypeParameters;
+            private readonly IBuiltConstructorMappingRepository<IDetachedMappedCombinedConstructorArgumentRecorder<TRecord>> ConstructorParameters;
+            private readonly IBuiltNamedMappingRepository<IDetachedMappedCombinedNamedArgumentRecorder<TRecord>> NamedParameters;
 
             public BuiltRepository(IBuiltTypeMappingRepository<IDetachedMappedCombinedTypeArgumentRecorder<TRecord>> typeParameters,
                 IBuiltConstructorMappingRepository<IDetachedMappedCombinedConstructorArgumentRecorder<TRecord>> constructorParameters,

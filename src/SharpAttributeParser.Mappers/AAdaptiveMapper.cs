@@ -12,11 +12,11 @@ using System;
 /// <typeparam name="TSemanticRecord">The type to which arguments are recorded when parsed without syntactic context.</typeparam>
 public abstract class AAdaptiveMapper<TCombinedRecord, TSemanticRecord> : ICombinedMapper<TCombinedRecord>, ISemanticMapper<TSemanticRecord>
 {
-    private bool IsInitialized { get; set; }
+    private bool IsInitialized;
 
-    private IBuiltAdaptiveMappingRepository<TCombinedRecord, TSemanticRecord> Mappings { get; set; } = null!;
+    private IBuiltAdaptiveMappingRepository<TCombinedRecord, TSemanticRecord> Mappings = null!;
 
-    private IAdaptiveMapperDependencyProvider<TCombinedRecord, TSemanticRecord> DependencyProvider { get; }
+    private readonly IAdaptiveMapperDependencyProvider<TCombinedRecord, TSemanticRecord> DependencyProvider;
 
     /// <summary>Instantiates a <see cref="AAdaptiveMapper{TCombinedRecord, TSemanticRecord}"/>, mapping attribute parameters to recorders responsible for recording arguments of that parameter.</summary>
     /// <param name="dependencyProvider">Provides the dependencies of the mapper. If <see langword="null"/>, a default provider will be used.</param>

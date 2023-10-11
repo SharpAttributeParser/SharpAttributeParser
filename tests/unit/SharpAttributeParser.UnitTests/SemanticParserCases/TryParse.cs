@@ -16,7 +16,7 @@ public sealed class TryParse
 {
     private bool Target(ISemanticRecorder recorder, AttributeData attributeData) => Context.Parser.TryParse(recorder, attributeData);
 
-    private ParserContext Context { get; } = ParserContext.Create();
+    private readonly ParserContext Context = ParserContext.Create();
 
     [Fact]
     public void NullRecorder_ArgumentNullException()

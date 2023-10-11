@@ -14,7 +14,7 @@ public sealed class SemanticParser : ISemanticParser
     /// <summary>The singleton <see cref="SemanticParser"/>, with default behaviour.</summary>
     public static SemanticParser Singleton { get; } = new();
 
-    private ISemanticParserLogger Logger { get; }
+    private readonly ISemanticParserLogger Logger;
 
     /// <summary>Instantiates a <see cref="SyntacticParser"/>, parsing the arguments of attributes.</summary>
     /// <param name="logger">The logger used to log messages.</param>
@@ -82,11 +82,11 @@ public sealed class SemanticParser : ISemanticParser
             return parser.TryParse();
         }
 
-        private ISemanticRecorder Recorder { get; }
-        private IReadOnlyList<ITypeParameterSymbol> Parameters { get; }
-        private IReadOnlyList<ITypeSymbol> Arguments { get; }
+        private readonly ISemanticRecorder Recorder;
+        private readonly IReadOnlyList<ITypeParameterSymbol> Parameters;
+        private readonly IReadOnlyList<ITypeSymbol> Arguments;
 
-        private ISemanticParserLogger Logger { get; }
+        private readonly ISemanticParserLogger Logger;
 
         private TypeArgumentsParser(ISemanticRecorder recorder, INamedTypeSymbol attributeClass, ISemanticParserLogger logger)
         {
@@ -140,11 +140,11 @@ public sealed class SemanticParser : ISemanticParser
             return parser.TryParse();
         }
 
-        private ISemanticRecorder Recorder { get; }
-        private IReadOnlyList<IParameterSymbol> Parameters { get; }
-        private IReadOnlyList<TypedConstant> Arguments { get; }
+        private readonly ISemanticRecorder Recorder;
+        private readonly IReadOnlyList<IParameterSymbol> Parameters;
+        private readonly IReadOnlyList<TypedConstant> Arguments;
 
-        private ISemanticParserLogger Logger { get; }
+        private readonly ISemanticParserLogger Logger;
 
         private ConstructorArgumentsParser(ISemanticRecorder recorder, IMethodSymbol targetConstructor, AttributeData attributeData, ISemanticParserLogger logger)
         {
@@ -203,10 +203,10 @@ public sealed class SemanticParser : ISemanticParser
             return parser.TryParse();
         }
 
-        private ISemanticRecorder Recorder { get; }
-        private IReadOnlyList<KeyValuePair<string, TypedConstant>> Arguments { get; }
+        private readonly ISemanticRecorder Recorder;
+        private readonly IReadOnlyList<KeyValuePair<string, TypedConstant>> Arguments;
 
-        private ISemanticParserLogger Logger { get; }
+        private readonly ISemanticParserLogger Logger;
 
         private NamedArgumentsParser(ISemanticRecorder recorder, AttributeData attributeData, ISemanticParserLogger logger)
         {

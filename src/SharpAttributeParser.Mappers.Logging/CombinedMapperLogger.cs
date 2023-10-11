@@ -12,9 +12,9 @@ using System;
 /// <inheritdoc cref="ICombinedMapperLogger{TCategoryName}"/>
 public sealed class CombinedMapperLogger<TCategoryName> : ICombinedMapperLogger<TCategoryName>
 {
-    private ITypeParameterLogger TypeParameter { get; }
-    private IConstructorParameterLogger ConstructorParameter { get; }
-    private INamedParameterLogger NamedParameter { get; }
+    private readonly ITypeParameterLogger TypeParameter;
+    private readonly IConstructorParameterLogger ConstructorParameter;
+    private readonly INamedParameterLogger NamedParameter;
 
     /// <summary>Instantiates a <see cref="CombinedMapperLogger{TCategoryName}"/>, handling logging for <see cref="ICombinedMapper{TRecord}"/>.</summary>
     /// <param name="logger">The logger used to log messages.</param>
@@ -36,7 +36,7 @@ public sealed class CombinedMapperLogger<TCategoryName> : ICombinedMapperLogger<
 
     private sealed class TypeParameterLogger : ITypeParameterLogger
     {
-        private ILogger Logger { get; }
+        private readonly ILogger Logger;
 
         public TypeParameterLogger(ILogger logger)
         {
@@ -63,7 +63,7 @@ public sealed class CombinedMapperLogger<TCategoryName> : ICombinedMapperLogger<
 
     private sealed class ConstructorParameterLogger : IConstructorParameterLogger
     {
-        private ILogger Logger { get; }
+        private readonly ILogger Logger;
 
         public ConstructorParameterLogger(ILogger logger)
         {
@@ -90,7 +90,7 @@ public sealed class CombinedMapperLogger<TCategoryName> : ICombinedMapperLogger<
 
     private sealed class NamedParameterLogger : INamedParameterLogger
     {
-        private ILogger Logger { get; }
+        private readonly ILogger Logger;
 
         public NamedParameterLogger(ILogger logger)
         {

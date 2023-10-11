@@ -14,8 +14,8 @@ using System.Collections.Generic;
 /// <inheritdoc cref="IDetachedMappedAdaptiveParamsConstructorArgumentRecorderProviderFactory{TCombinedRecord, TSemanticRecord}"/>
 public sealed class DetachedMappedAdaptiveParamsConstructorArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord> : IDetachedMappedAdaptiveParamsConstructorArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord>
 {
-    private IDetachedMappedCombinedParamsConstructorArgumentRecorderFactory<TCombinedRecord> CombinedFactory { get; }
-    private IDetachedMappedSemanticConstructorArgumentRecorderFactory<TSemanticRecord> SemanticFactory { get; }
+    private readonly IDetachedMappedCombinedParamsConstructorArgumentRecorderFactory<TCombinedRecord> CombinedFactory;
+    private readonly IDetachedMappedSemanticConstructorArgumentRecorderFactory<TSemanticRecord> SemanticFactory;
 
     /// <summary>Instantiates a <see cref="DetachedMappedAdaptiveParamsConstructorArgumentRecorderProviderFactory{TCombinedRecord, TSemanticRecord}"/>, handling creation of <see cref="IDetachedMappedAdaptiveConstructorArgumentRecorderProvider{TCombinedRecord, TSemanticRecord}"/> related to <see langword="params"/> constructor parameters.</summary>
     /// <param name="combinedFactory">Handles creation of the recorders used when arguments are parsed with syntactic context.</param>

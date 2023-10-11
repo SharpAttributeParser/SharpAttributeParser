@@ -10,7 +10,7 @@ using System;
 /// <inheritdoc cref="ISemanticRecorderFactory"/>
 public sealed class SemanticRecorderFactory : ISemanticRecorderFactory
 {
-    private ISemanticArgumentRecorderLoggerFactory LoggerFactory { get; }
+    private readonly ISemanticArgumentRecorderLoggerFactory LoggerFactory;
 
     /// <summary>Instantiates a <see cref="SemanticRecorderFactory"/>, handling creation of <see cref="ISemanticRecorder"/> using <see cref="ISemanticMapper{TRecord}"/>.</summary>
     /// <param name="loggerFactory">Handles creation of the loggers used by the created recorders.</param>
@@ -67,7 +67,7 @@ public sealed class SemanticRecorderFactory : ISemanticRecorderFactory
 
     private sealed class RecordBuilderMapper<TRecord> : ISemanticMapper<RecordBuilder<TRecord>>
     {
-        private ISemanticMapper<TRecord> WrappedMapper { get; }
+        private readonly ISemanticMapper<TRecord> WrappedMapper;
 
         public RecordBuilderMapper(ISemanticMapper<TRecord> wrappedMapper)
         {
@@ -81,11 +81,11 @@ public sealed class SemanticRecorderFactory : ISemanticRecorderFactory
 
     private sealed class Recorder<TRecord, TRecordBuilder> : ISemanticRecorder<TRecord> where TRecordBuilder : IRecordBuilder<TRecord>
     {
-        private TRecordBuilder RecordBuilder { get; }
+        private readonly TRecordBuilder RecordBuilder;
 
-        private ISemanticTypeArgumentRecorder TypeArgument { get; }
-        private ISemanticConstructorArgumentRecorder ConstructorArgument { get; }
-        private ISemanticNamedArgumentRecorder NamedArgument { get; }
+        private readonly ISemanticTypeArgumentRecorder TypeArgument;
+        private readonly ISemanticConstructorArgumentRecorder ConstructorArgument;
+        private readonly ISemanticNamedArgumentRecorder NamedArgument;
 
         public Recorder(ISemanticMapper<TRecordBuilder> argumentRecorderMapper, TRecordBuilder recordBuilder, ISemanticArgumentRecorderLogger logger)
         {
@@ -104,10 +104,10 @@ public sealed class SemanticRecorderFactory : ISemanticRecorderFactory
 
         private sealed class TypeArgumentRecorder : ISemanticTypeArgumentRecorder
         {
-            private ISemanticMapper<TRecordBuilder> ArgumentRecorderMapper { get; }
-            private TRecordBuilder RecordBuilder { get; }
+            private readonly ISemanticMapper<TRecordBuilder> ArgumentRecorderMapper;
+            private readonly TRecordBuilder RecordBuilder;
 
-            private ISemanticArgumentRecorderLogger Logger { get; }
+            private readonly ISemanticArgumentRecorderLogger Logger;
 
             public TypeArgumentRecorder(ISemanticMapper<TRecordBuilder> argumentRecorderMapper, TRecordBuilder recordBuilder, ISemanticArgumentRecorderLogger logger)
             {
@@ -144,10 +144,10 @@ public sealed class SemanticRecorderFactory : ISemanticRecorderFactory
 
         private sealed class ConstructorArgumentRecorder : ISemanticConstructorArgumentRecorder
         {
-            private ISemanticMapper<TRecordBuilder> ArgumentRecorderMapper { get; }
-            private TRecordBuilder RecordBuilder { get; }
+            private readonly ISemanticMapper<TRecordBuilder> ArgumentRecorderMapper;
+            private readonly TRecordBuilder RecordBuilder;
 
-            private ISemanticArgumentRecorderLogger Logger { get; }
+            private readonly ISemanticArgumentRecorderLogger Logger;
 
             public ConstructorArgumentRecorder(ISemanticMapper<TRecordBuilder> argumentRecorderMapper, TRecordBuilder recordBuilder, ISemanticArgumentRecorderLogger logger)
             {
@@ -179,10 +179,10 @@ public sealed class SemanticRecorderFactory : ISemanticRecorderFactory
 
         private sealed class NamedArgumentRecorder : ISemanticNamedArgumentRecorder
         {
-            private ISemanticMapper<TRecordBuilder> ArgumentRecorderMapper { get; }
-            private TRecordBuilder RecordBuilder { get; }
+            private readonly ISemanticMapper<TRecordBuilder> ArgumentRecorderMapper;
+            private readonly TRecordBuilder RecordBuilder;
 
-            private ISemanticArgumentRecorderLogger Logger { get; }
+            private readonly ISemanticArgumentRecorderLogger Logger;
 
             public NamedArgumentRecorder(ISemanticMapper<TRecordBuilder> argumentRecorderMapper, TRecordBuilder recordBuilder, ISemanticArgumentRecorderLogger logger)
             {

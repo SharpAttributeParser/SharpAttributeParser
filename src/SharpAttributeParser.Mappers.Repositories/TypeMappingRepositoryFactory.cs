@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// <inheritdoc cref="ITypeMappingRepositoryFactory{TRecorder, TRecorderFactory}"/>
 public sealed class TypeMappingRepositoryFactory<TRecorder, TRecorderFactory> : ITypeMappingRepositoryFactory<TRecorder, TRecorderFactory>
 {
-    private TRecorderFactory RecorderFactory { get; }
+    private readonly TRecorderFactory RecorderFactory;
 
     /// <summary>Instantiates a <see cref="TypeMappingRepositoryFactory{TRecorder, TRecorderFactory}"/>, handling creation of <see cref="ITypeMappingRepository{TRecorder, TRecorderFactory}"/>.</summary>
     /// <param name="recorderFactory">Handles creation of recorders for the created repositories.</param>
@@ -27,13 +27,13 @@ public sealed class TypeMappingRepositoryFactory<TRecorder, TRecorderFactory> : 
 
     private sealed class TypeMappingRepository : ITypeMappingRepository<TRecorder, TRecorderFactory>
     {
-        private TRecorderFactory RecorderFactory { get; }
+        private readonly TRecorderFactory RecorderFactory;
 
-        private Dictionary<int, TRecorder> IndexedMappings { get; } = new();
-        private Dictionary<string, TRecorder> NamedMappings { get; }
+        private readonly Dictionary<int, TRecorder> IndexedMappings = new();
+        private readonly Dictionary<string, TRecorder> NamedMappings;
 
-        private bool HasBeenBuilt { get; set; }
-        private bool ThrowOnMultipleBuilds { get; }
+        private bool HasBeenBuilt;
+        private readonly bool ThrowOnMultipleBuilds;
 
         public TypeMappingRepository(TRecorderFactory recorderFactory, ITypeParameterComparer comparer, bool throwOnMultipleBuilds)
         {
@@ -153,8 +153,8 @@ public sealed class TypeMappingRepositoryFactory<TRecorder, TRecorderFactory> : 
 
         private sealed class BuiltTypeMappingRepository : IBuiltTypeMappingRepository<TRecorder>
         {
-            private IReadOnlyDictionary<int, TRecorder> Indexed { get; }
-            private IReadOnlyDictionary<string, TRecorder> Named { get; }
+            private readonly IReadOnlyDictionary<int, TRecorder> Indexed;
+            private readonly IReadOnlyDictionary<string, TRecorder> Named;
 
             public BuiltTypeMappingRepository(IReadOnlyDictionary<int, TRecorder> indexed, IReadOnlyDictionary<string, TRecorder> named)
             {

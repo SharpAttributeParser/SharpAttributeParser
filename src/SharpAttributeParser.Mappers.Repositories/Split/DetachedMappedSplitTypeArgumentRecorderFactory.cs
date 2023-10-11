@@ -11,8 +11,8 @@ using System;
 /// <inheritdoc cref="IDetachedMappedSplitTypeArgumentRecorderProviderFactory{TSemanticRecord, TSyntacticRecord}"/>
 public sealed class DetachedMappedSplitTypeArgumentRecorderFactory<TSemanticRecord, TSyntacticRecord> : IDetachedMappedSplitTypeArgumentRecorderProviderFactory<TSemanticRecord, TSyntacticRecord>
 {
-    private IDetachedMappedSemanticTypeArgumentRecorderFactory<TSemanticRecord> SemanticFactory { get; }
-    private IDetachedMappedSyntacticTypeArgumentRecorderFactory<TSyntacticRecord> SyntacticFactory { get; }
+    private readonly IDetachedMappedSemanticTypeArgumentRecorderFactory<TSemanticRecord> SemanticFactory;
+    private readonly IDetachedMappedSyntacticTypeArgumentRecorderFactory<TSyntacticRecord> SyntacticFactory;
 
     /// <summary>Instantiates a <see cref="DetachedMappedSplitTypeArgumentRecorderFactory{TSemanticRecord, TSyntacticRecord}"/>, handling creation of <see cref="IDetachedMappedSplitTypeArgumentRecorderProvider{TSemanticRecord, TSyntacticRecord}"/> related to type parameters.</summary>
     /// <param name="semanticFactory">Handles creation of the recorders used when arguments are parsed.</param>
@@ -63,8 +63,8 @@ public sealed class DetachedMappedSplitTypeArgumentRecorderFactory<TSemanticReco
 
     private sealed class Provider : IDetachedMappedSplitTypeArgumentRecorderProvider<TSemanticRecord, TSyntacticRecord>
     {
-        private IDetachedMappedSemanticTypeArgumentRecorder<TSemanticRecord> Semantic { get; }
-        private IDetachedMappedSyntacticTypeArgumentRecorder<TSyntacticRecord> Syntactic { get; }
+        private readonly IDetachedMappedSemanticTypeArgumentRecorder<TSemanticRecord> Semantic;
+        private readonly IDetachedMappedSyntacticTypeArgumentRecorder<TSyntacticRecord> Syntactic;
 
         public Provider(IDetachedMappedSemanticTypeArgumentRecorder<TSemanticRecord> semantic, IDetachedMappedSyntacticTypeArgumentRecorder<TSyntacticRecord> syntactic)
         {

@@ -4,8 +4,8 @@ using Microsoft.CodeAnalysis;
 
 public sealed class ExampleParser : IExampleParser
 {
-    private ISemanticParser Parser { get; }
-    private IExampleRecorderFactory RecorderFactory { get; }
+    private readonly ISemanticParser Parser;
+    private readonly IExampleRecorderFactory RecorderFactory;
 
     public ExampleParser(ISemanticParser parser, IExampleRecorderFactory recorderFactory)
     {

@@ -7,7 +7,7 @@ using System;
 /// <inheritdoc cref="ISyntacticArgumentRecorderLoggerFactory"/>
 public sealed class SyntacticArgumentRecorderLoggerFactory : ISyntacticArgumentRecorderLoggerFactory
 {
-    private ILoggerFactory LoggerFactory { get; }
+    private readonly ILoggerFactory LoggerFactory;
 
     /// <summary>Instantiates a <see cref="SyntacticArgumentRecorderLoggerFactory"/>, handling creation of <see cref="ISyntacticArgumentRecorderLogger"/>.</summary>
     /// <param name="loggerFactory">Handles creation of loggers.</param>

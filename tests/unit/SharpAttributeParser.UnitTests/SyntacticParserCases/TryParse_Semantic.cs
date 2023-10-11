@@ -16,7 +16,7 @@ public sealed class TryParse_Semantic
 {
     private bool Target(ISyntacticRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax) => Context.Parser.TryParse(recorder, attributeData, attributeSyntax);
 
-    private ParserContext Context { get; } = ParserContext.Create();
+    private readonly ParserContext Context = ParserContext.Create();
 
     [Fact]
     public void NullAttributeClass_ReturnsFalseAndLogs()

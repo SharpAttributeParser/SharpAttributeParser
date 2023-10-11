@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// <inheritdoc cref="IConstructorParameterComparer"/>
 public sealed class ConstructorParameterComparer : IConstructorParameterComparer
 {
-    private IEqualityComparer<string> Name { get; }
+    private readonly IEqualityComparer<string> Name;
 
     /// <summary>Instantiates a <see cref="ConstructorParameterComparer"/>, determining equality when comparing constructor parameters.</summary>
     /// <param name="name">Determines equality when comparing the names of constructor parameters.</param>

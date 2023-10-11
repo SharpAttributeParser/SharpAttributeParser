@@ -26,8 +26,8 @@ public sealed class MappedSyntacticNamedArgumentRecorderFactory : IMappedSyntact
 
     private sealed class Recorder<TRecord> : IMappedSyntacticNamedArgumentRecorder
     {
-        private TRecord DataRecord { get; }
-        private IDetachedMappedSyntacticNamedArgumentRecorder<TRecord> DetachedRecorder { get; }
+        private readonly TRecord DataRecord;
+        private readonly IDetachedMappedSyntacticNamedArgumentRecorder<TRecord> DetachedRecorder;
 
         public Recorder(TRecord dataRecord, IDetachedMappedSyntacticNamedArgumentRecorder<TRecord> detachedRecorder)
         {
