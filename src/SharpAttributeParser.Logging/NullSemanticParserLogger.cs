@@ -18,8 +18,7 @@ public sealed class NullSemanticParserLogger<TCategoryName> : ISemanticParserLog
     IConstructorArgumentLogger ISemanticParserLogger.ConstructorArgument { get; } = new NullConstructorArgumentLogger();
     INamedArgumentLogger ISemanticParserLogger.NamedArgument { get; } = new NullNamedArgumentLogger();
 
-    /// <summary>Instantiates a <see cref="NullSemanticParserLogger{TCategoryName}"/>, a <see cref="ISemanticParserLogger"/> with no behaviour.</summary>
-    public NullSemanticParserLogger() { }
+    private NullSemanticParserLogger() { }
 
     IDisposable? ISemanticParserLogger.BeginScopeParsingAttribute(Type recorderType, AttributeData attributeData) => null;
     IDisposable? ISemanticParserLogger.BeginScopeDeterminedAttributeClass(INamedTypeSymbol attributeClass) => null;

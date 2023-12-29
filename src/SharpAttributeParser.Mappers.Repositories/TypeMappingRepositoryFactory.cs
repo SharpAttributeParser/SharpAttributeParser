@@ -29,7 +29,7 @@ public sealed class TypeMappingRepositoryFactory<TRecorder, TRecorderFactory> : 
     {
         private readonly TRecorderFactory RecorderFactory;
 
-        private readonly Dictionary<int, TRecorder> IndexedMappings = new();
+        private readonly Dictionary<int, TRecorder> IndexedMappings = [];
         private readonly Dictionary<string, TRecorder> NamedMappings;
 
         private bool HasBeenBuilt;

@@ -53,13 +53,13 @@ public static class CompilationStore
     public static IEnumerable<Assembly> ListAssemblies()
     {
         Queue<Assembly> unresolvedAssemblies = new();
-        List<Assembly> resolvedAssemblies = new();
+        List<Assembly> resolvedAssemblies = [];
 
-        HashSet<string> resolvedAssemblyNames = new();
+        HashSet<string> resolvedAssemblyNames = [];
 
         unresolvedAssemblies.Enqueue(Assembly.GetExecutingAssembly());
 
-        while (unresolvedAssemblies.Any())
+        while (unresolvedAssemblies.Count != 0)
         {
             var targetAssembly = unresolvedAssemblies.Dequeue();
 

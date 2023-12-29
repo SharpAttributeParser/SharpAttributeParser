@@ -4,15 +4,12 @@ using SharpAttributeParser.Mappers.Repositories.Combined;
 using SharpAttributeParser.Mappers.Repositories.Semantic;
 using SharpAttributeParser.Mappers.Repositories.Syntactic;
 
-/// <summary>Provides common functionality related to creating default recorders.</summary>
 internal static class DefaultRecorderFactories
 {
     private static IMappedSemanticArgumentRecorderFactory? CachedSemanticFactory;
     private static IMappedSyntacticArgumentRecorderFactory? CachedSyntacticFactory;
     private static IMappedCombinedArgumentRecorderFactory? CachedCombinedFactory;
 
-    /// <summary>Creates the default <see cref="IMappedSemanticArgumentRecorderFactory"/>.</summary>
-    /// <returns>The default <see cref="IMappedSemanticArgumentRecorderFactory"/>.</returns>
     public static IMappedSemanticArgumentRecorderFactory SemanticFactory()
     {
         if (CachedSemanticFactory is not null)
@@ -27,8 +24,6 @@ internal static class DefaultRecorderFactories
         return CachedSemanticFactory = new MappedSemanticArgumentRecorderFactory(typeParameter, constructorParameter, namedParameter);
     }
 
-    /// <summary>Creates the default <see cref="IMappedSyntacticArgumentRecorderFactory"/>.</summary>
-    /// <returns>The default <see cref="IMappedSyntacticArgumentRecorderFactory"/>.</returns>
     public static IMappedSyntacticArgumentRecorderFactory SyntacticFactory()
     {
         if (CachedSyntacticFactory is not null)
@@ -43,8 +38,6 @@ internal static class DefaultRecorderFactories
         return CachedSyntacticFactory = new MappedSyntacticArgumentRecorderFactory(typeParameter, constructorParameter, namedParameter);
     }
 
-    /// <summary>Creates the default <see cref="IMappedCombinedArgumentRecorderFactory"/>.</summary>
-    /// <returns>The default <see cref="IMappedCombinedArgumentRecorderFactory"/>.</returns>
     public static IMappedCombinedArgumentRecorderFactory CombinedFactory()
     {
         if (CachedCombinedFactory is not null)

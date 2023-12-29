@@ -13,9 +13,6 @@ using System.Linq;
 /// <inheritdoc cref="ISyntacticParser"/>
 public sealed class SyntacticParser : ISyntacticParser
 {
-    /// <summary>The singleton <see cref="SyntacticParser"/>, with default behaviour.</summary>
-    public static SyntacticParser Singleton { get; } = new();
-
     private readonly ISyntacticParserLogger Logger;
 
     /// <summary>Instantiates a <see cref="SyntacticParser"/>, extracting syntactic information about the arguments of attributes.</summary>

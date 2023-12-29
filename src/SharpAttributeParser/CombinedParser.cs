@@ -12,9 +12,6 @@ using System.Linq;
 /// <inheritdoc cref="ICombinedParser"/>
 public sealed class CombinedParser : ICombinedParser
 {
-    /// <summary>The singleton <see cref="CombinedParser"/>, with default behaviour.</summary>
-    public static CombinedParser Singleton { get; } = new();
-
     private readonly ISemanticParser SemanticParser;
     private readonly ISyntacticParser SyntacticParser;
 
@@ -235,7 +232,7 @@ public sealed class CombinedParser : ICombinedParser
 
         private sealed class NamedArgumentRecorder : ISemanticNamedArgumentRecorder
         {
-            private readonly Dictionary<string, object?> Arguments = new();
+            private readonly Dictionary<string, object?> Arguments = [];
 
             bool ISemanticNamedArgumentRecorder.TryRecordArgument(string parameterName, object? argument)
             {
@@ -312,7 +309,7 @@ public sealed class CombinedParser : ICombinedParser
 
         private sealed class NamedArgumentRecorder : ISyntacticNamedArgumentRecorder
         {
-            private readonly Dictionary<string, ExpressionSyntax> Arguments = new();
+            private readonly Dictionary<string, ExpressionSyntax> Arguments = [];
 
             bool ISyntacticNamedArgumentRecorder.TryRecordArgument(string parameterName, ExpressionSyntax syntax)
             {

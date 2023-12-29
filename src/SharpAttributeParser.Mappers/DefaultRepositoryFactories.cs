@@ -6,42 +6,31 @@ using SharpAttributeParser.Mappers.Repositories.Combined;
 using SharpAttributeParser.Mappers.Repositories.Semantic;
 using SharpAttributeParser.Mappers.Repositories.Split;
 using SharpAttributeParser.Mappers.Repositories.Syntactic;
-using SharpAttributeParser.Patterns;
 
-/// <summary>Provides common functionality related to creating default repositories.</summary>
 internal static class DefaultRepositoryFactories
 {
-    /// <summary>Creates the default <see cref="ICombinedMappingRepositoryFactory{TRecord}"/>.</summary>
-    /// <typeparam name="TRecord">The type to which arguments are recorded by the recorders of the repositories.</typeparam>
-    /// <returns>The default <see cref="ICombinedMappingRepositoryFactory{TRecord}"/>.</returns>
     public static ICombinedMappingRepositoryFactory<TRecord> CombinedFactory<TRecord>()
     {
-        DetachedMappedCombinedNormalConstructorArgumentRecorderFactory<TRecord> normalConstructorArgumentRecorderFactory = new(ArgumentPatternFactory.Singleton);
-        DetachedMappedCombinedParamsConstructorArgumentRecorderFactory<TRecord> paramsConstructorArgumentRecorderFactory = new(ArgumentPatternFactory.Singleton);
-        DetachedMappedCombinedOptionalConstructorArgumentRecorderFactory<TRecord> optionalConstructorArgumentRecorderFactory = new(ArgumentPatternFactory.Singleton);
+        DetachedMappedCombinedNormalConstructorArgumentRecorderFactory<TRecord> normalConstructorArgumentRecorderFactory = new(ArgumentPatternFactorySingleton.Singleton);
+        DetachedMappedCombinedParamsConstructorArgumentRecorderFactory<TRecord> paramsConstructorArgumentRecorderFactory = new(ArgumentPatternFactorySingleton.Singleton);
+        DetachedMappedCombinedOptionalConstructorArgumentRecorderFactory<TRecord> optionalConstructorArgumentRecorderFactory = new(ArgumentPatternFactorySingleton.Singleton);
 
         TypeMappingRepositoryFactory<IDetachedMappedCombinedTypeArgumentRecorder<TRecord>, IDetachedMappedCombinedTypeArgumentRecorderFactory<TRecord>> typeMappingRepositoryFactory = new(new DetachedMappedCombinedTypeArgumentRecorderFactory<TRecord>());
         ConstructorMappingRepositoryFactory<IDetachedMappedCombinedConstructorArgumentRecorder<TRecord>, IDetachedMappedCombinedConstructorArgumentRecorderFactory<TRecord>> constructorMappingRepositoryFactory = new(new DetachedMappedCombinedConstructorArgumentRecorderFactory<TRecord>(normalConstructorArgumentRecorderFactory, paramsConstructorArgumentRecorderFactory, optionalConstructorArgumentRecorderFactory));
-        NamedMappingRepositoryFactory<IDetachedMappedCombinedNamedArgumentRecorder<TRecord>, IDetachedMappedCombinedNamedArgumentRecorderFactory<TRecord>> namedMappingRepositoryFactory = new(new DetachedMappedCombinedNamedArgumentRecorderFactory<TRecord>(ArgumentPatternFactory.Singleton));
+        NamedMappingRepositoryFactory<IDetachedMappedCombinedNamedArgumentRecorder<TRecord>, IDetachedMappedCombinedNamedArgumentRecorderFactory<TRecord>> namedMappingRepositoryFactory = new(new DetachedMappedCombinedNamedArgumentRecorderFactory<TRecord>(ArgumentPatternFactorySingleton.Singleton));
 
         return new CombinedMappingRepositoryFactory<TRecord>(typeMappingRepositoryFactory, constructorMappingRepositoryFactory, namedMappingRepositoryFactory);
     }
 
-    /// <summary>Creates the default <see cref="ISemanticMappingRepositoryFactory{TRecord}"/>.</summary>
-    /// <typeparam name="TRecord">The type to which arguments are recorded by the recorders of the repositories.</typeparam>
-    /// <returns>The default <see cref="ISemanticMappingRepositoryFactory{TRecord}"/>.</returns>
     public static ISemanticMappingRepositoryFactory<TRecord> SemanticFactory<TRecord>()
     {
         TypeMappingRepositoryFactory<IDetachedMappedSemanticTypeArgumentRecorder<TRecord>, IDetachedMappedSemanticTypeArgumentRecorderFactory<TRecord>> typeMappingRepositoryFactory = new(new DetachedMappedSemanticTypeArgumentRecorderFactory<TRecord>());
-        ConstructorMappingRepositoryFactory<IDetachedMappedSemanticConstructorArgumentRecorder<TRecord>, IDetachedMappedSemanticConstructorArgumentRecorderFactory<TRecord>> constructorMappingRepositoryFactory = new(new DetachedMappedSemanticConstructorArgumentRecorderFactory<TRecord>(ArgumentPatternFactory.Singleton));
-        NamedMappingRepositoryFactory<IDetachedMappedSemanticNamedArgumentRecorder<TRecord>, IDetachedMappedSemanticNamedArgumentRecorderFactory<TRecord>> namedMappingRepositoryFactory = new(new DetachedMappedSemanticNamedArgumentRecorderFactory<TRecord>(ArgumentPatternFactory.Singleton));
+        ConstructorMappingRepositoryFactory<IDetachedMappedSemanticConstructorArgumentRecorder<TRecord>, IDetachedMappedSemanticConstructorArgumentRecorderFactory<TRecord>> constructorMappingRepositoryFactory = new(new DetachedMappedSemanticConstructorArgumentRecorderFactory<TRecord>(ArgumentPatternFactorySingleton.Singleton));
+        NamedMappingRepositoryFactory<IDetachedMappedSemanticNamedArgumentRecorder<TRecord>, IDetachedMappedSemanticNamedArgumentRecorderFactory<TRecord>> namedMappingRepositoryFactory = new(new DetachedMappedSemanticNamedArgumentRecorderFactory<TRecord>(ArgumentPatternFactorySingleton.Singleton));
 
         return new SemanticMappingRepositoryFactory<TRecord>(typeMappingRepositoryFactory, constructorMappingRepositoryFactory, namedMappingRepositoryFactory);
     }
 
-    /// <summary>Creates the default <see cref="ISyntacticMappingRepositoryFactory{TRecord}"/>.</summary>
-    /// <typeparam name="TRecord">The type to which syntactic information is recorded by the recorders of the repositories.</typeparam>
-    /// <returns>The default <see cref="ISyntacticMappingRepositoryFactory{TRecord}"/>.</returns>
     public static ISyntacticMappingRepositoryFactory<TRecord> SyntacticFactory<TRecord>()
     {
         DetachedMappedSyntacticNormalConstructorArgumentRecorderFactory<TRecord> normalConstructorArgumentRecorderFactory = new();
@@ -55,23 +44,19 @@ internal static class DefaultRepositoryFactories
         return new SyntacticMappingRepositoryFactory<TRecord>(typeMappingRepositoryFactory, constructorMappingRepositoryFactory, namedMappingRepositoryFactory);
     }
 
-    /// <summary>Creates the default <see cref="IAdaptiveMappingRepositoryFactory{TCombinedRecord, TSemanticRecord}"/>.</summary>
-    /// <typeparam name="TCombinedRecord">The type to which arguments are recorded by the recorders of the repositories, when attributes are parsed with syntactic context.</typeparam>
-    /// <typeparam name="TSemanticRecord">The type to which arguments are recorded by the recorders of the repositories, when attributes are parsed without syntactic context.</typeparam>
-    /// <returns>The default <see cref="IAdaptiveMappingRepositoryFactory{TCombinedRecord, TSemanticRecord}"/>.</returns>
     public static IAdaptiveMappingRepositoryFactory<TCombinedRecord, TSemanticRecord> AdaptiveFactory<TCombinedRecord, TSemanticRecord>()
     {
         DetachedMappedCombinedTypeArgumentRecorderFactory<TCombinedRecord> combinedTypeArgumentRecorderFactory = new();
         DetachedMappedSemanticTypeArgumentRecorderFactory<TSemanticRecord> semanticTypeArgumentRecorderFactory = new();
 
-        DetachedMappedCombinedNormalConstructorArgumentRecorderFactory<TCombinedRecord> combinedNormalConstructorArgumentRecorderFactory = new(ArgumentPatternFactory.Singleton);
-        DetachedMappedCombinedParamsConstructorArgumentRecorderFactory<TCombinedRecord> combinedParamsConstructorArgumentRecorderFactory = new(ArgumentPatternFactory.Singleton);
-        DetachedMappedCombinedOptionalConstructorArgumentRecorderFactory<TCombinedRecord> combinedOptionalConstructorArgumentRecorderFactory = new(ArgumentPatternFactory.Singleton);
+        DetachedMappedCombinedNormalConstructorArgumentRecorderFactory<TCombinedRecord> combinedNormalConstructorArgumentRecorderFactory = new(ArgumentPatternFactorySingleton.Singleton);
+        DetachedMappedCombinedParamsConstructorArgumentRecorderFactory<TCombinedRecord> combinedParamsConstructorArgumentRecorderFactory = new(ArgumentPatternFactorySingleton.Singleton);
+        DetachedMappedCombinedOptionalConstructorArgumentRecorderFactory<TCombinedRecord> combinedOptionalConstructorArgumentRecorderFactory = new(ArgumentPatternFactorySingleton.Singleton);
 
-        DetachedMappedSemanticConstructorArgumentRecorderFactory<TSemanticRecord> semanticConstructorArgumentRecorderFactory = new(ArgumentPatternFactory.Singleton);
+        DetachedMappedSemanticConstructorArgumentRecorderFactory<TSemanticRecord> semanticConstructorArgumentRecorderFactory = new(ArgumentPatternFactorySingleton.Singleton);
 
-        DetachedMappedCombinedNamedArgumentRecorderFactory<TCombinedRecord> combinedNamedArgumentRecorderFactory = new(ArgumentPatternFactory.Singleton);
-        DetachedMappedSemanticNamedArgumentRecorderFactory<TSemanticRecord> semanticNamedArgumentRecorderFactory = new(ArgumentPatternFactory.Singleton);
+        DetachedMappedCombinedNamedArgumentRecorderFactory<TCombinedRecord> combinedNamedArgumentRecorderFactory = new(ArgumentPatternFactorySingleton.Singleton);
+        DetachedMappedSemanticNamedArgumentRecorderFactory<TSemanticRecord> semanticNamedArgumentRecorderFactory = new(ArgumentPatternFactorySingleton.Singleton);
 
         DetachedMappedAdaptiveNormalConstructorArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord> normalConstructorArgumentRecorderFactory = new(combinedNormalConstructorArgumentRecorderFactory, semanticConstructorArgumentRecorderFactory);
         DetachedMappedAdaptiveParamsConstructorArgumentRecorderProviderFactory<TCombinedRecord, TSemanticRecord> paramsConstructorArgumentRecorderFactory = new(combinedParamsConstructorArgumentRecorderFactory, semanticConstructorArgumentRecorderFactory);
@@ -84,22 +69,18 @@ internal static class DefaultRepositoryFactories
         return new AdaptiveMappingRepositoryFactory<TCombinedRecord, TSemanticRecord>(typeMappingRepositoryFactory, constructorMappingRepositoryFactory, namedMappingRepositoryFactory);
     }
 
-    /// <summary>Creates the default <see cref="ISplitMappingRepositoryFactory{TSemanticRecord, TSyntacticRecord}"/>.</summary>
-    /// <typeparam name="TSemanticRecord">The type to which arguments are recorded by the recorders of the repositories.</typeparam>
-    /// <typeparam name="TSyntacticRecord">The type to which syntactic information about arguments is recorded by the recorders of the repositories.</typeparam>
-    /// <returns>The default <see cref="ISplitMappingRepositoryFactory{TSemanticRecord, TSyntacticRecord}"/>.</returns>
     public static ISplitMappingRepositoryFactory<TSemanticRecord, TSyntacticRecord> SplitFactory<TSemanticRecord, TSyntacticRecord>()
     {
         DetachedMappedSemanticTypeArgumentRecorderFactory<TSemanticRecord> semanticTypeArgumentRecorderFactory = new();
         DetachedMappedSyntacticTypeArgumentRecorderFactory<TSyntacticRecord> syntacticTypeArgumentRecorderFactory = new();
 
-        DetachedMappedSemanticConstructorArgumentRecorderFactory<TSemanticRecord> semanticConstructorArgumentRecorderFactory = new(ArgumentPatternFactory.Singleton);
+        DetachedMappedSemanticConstructorArgumentRecorderFactory<TSemanticRecord> semanticConstructorArgumentRecorderFactory = new(ArgumentPatternFactorySingleton.Singleton);
 
         DetachedMappedSyntacticNormalConstructorArgumentRecorderFactory<TSyntacticRecord> syntacticNormalConstructorArgumentRecorderFactory = new();
         DetachedMappedSyntacticParamsConstructorArgumentRecorderFactory<TSyntacticRecord> syntacticParamsConstructorArgumentRecorderFactory = new();
         DetachedMappedSyntacticOptionalConstructorArgumentRecorderFactory<TSyntacticRecord> syntacticOptionalConstructorArgumentRecorderFactory = new();
 
-        DetachedMappedSemanticNamedArgumentRecorderFactory<TSemanticRecord> semanticNamedArgumentRecorderFactory = new(ArgumentPatternFactory.Singleton);
+        DetachedMappedSemanticNamedArgumentRecorderFactory<TSemanticRecord> semanticNamedArgumentRecorderFactory = new(ArgumentPatternFactorySingleton.Singleton);
         DetachedMappedSyntacticNamedArgumentRecorderFactory<TSyntacticRecord> syntacticNamedArgumentRecorderFactory = new();
 
         DetachedMappedSplitNormalConstructorArgumentRecorderProviderFactory<TSemanticRecord, TSyntacticRecord> normalConstructorArgumentRecorderFactory = new(semanticConstructorArgumentRecorderFactory, syntacticNormalConstructorArgumentRecorderFactory);

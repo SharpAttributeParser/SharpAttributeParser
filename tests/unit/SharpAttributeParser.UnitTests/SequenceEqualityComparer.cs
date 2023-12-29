@@ -9,7 +9,7 @@ internal sealed class SequenceEqualityComparer : IEqualityComparer<object?>
 
     private SequenceEqualityComparer() { }
 
-    private bool SequenceEquals(IEnumerable x, IEnumerable y)
+    private static bool SequenceEquals(IEnumerable x, IEnumerable y)
     {
         if (x is null)
         {

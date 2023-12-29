@@ -2,7 +2,7 @@
 
 internal sealed class FactoryContext
 {
-    public static FactoryContext Create() => new(ArgumentPatternFactory.Singleton);
+    public static FactoryContext Create() => new(new ArgumentPatternFactory());
 
     public ArgumentPatternFactory Factory { get; }
 
