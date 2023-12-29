@@ -17,4 +17,7 @@ public sealed class SequentialEventID
             return NextField;
         }
     }
+
+    /// <summary>Instantiates a <see cref="SequentialEventID"/>, used to retrieve sequential <see cref="int"/> for creating <see cref="EventId"/>.</summary>
+    public SequentialEventID() { }
 }

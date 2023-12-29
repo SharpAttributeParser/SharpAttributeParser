@@ -19,8 +19,7 @@ public sealed class NullSyntacticParserLogger<TCategoryName> : ISyntacticParserL
     IConstructorArgumentLogger ISyntacticParserLogger.ConstructorArgument { get; } = new NullConstructorArgumentLogger();
     INamedArgumentLogger ISyntacticParserLogger.NamedArgument { get; } = new NullNamedArgumentLogger();
 
-    /// <summary>Instantiates a <see cref="NullSyntacticParserLogger{TCategoryName}"/>, a <see cref="ISyntacticParserLogger"/> with no behaviour.</summary>
-    public NullSyntacticParserLogger() { }
+    private NullSyntacticParserLogger() { }
 
     IDisposable? ISyntacticParserLogger.BeginScopeParsingAttribute(Type recorderType, AttributeData attributeData, AttributeSyntax attributeSyntax) => null;
     IDisposable? ISyntacticParserLogger.BeginScopeDeterminedAttributeClass(INamedTypeSymbol attributeClass) => null;

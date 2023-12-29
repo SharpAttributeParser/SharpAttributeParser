@@ -24,8 +24,7 @@ public sealed class NullCombinedParserLogger<TCategoryName> : ICombinedParserLog
     void ICombinedParserLogger.SemanticParserFailedToParseAttribute() { }
     void ICombinedParserLogger.SyntacticParserFailedToParseAttribute() { }
 
-    /// <summary>Instantiates a <see cref="NullCombinedParserLogger{TCategoryName}"/>, a <see cref="ICombinedParserLogger"/> with no behaviour.</summary>
-    public NullCombinedParserLogger() { }
+    private NullCombinedParserLogger() { }
 
     private sealed class NullTypeArgumentLogger : ITypeArgumentLogger
     {

@@ -11,9 +11,6 @@ using System.Linq;
 /// <inheritdoc cref="ISemanticParser"/>
 public sealed class SemanticParser : ISemanticParser
 {
-    /// <summary>The singleton <see cref="SemanticParser"/>, with default behaviour.</summary>
-    public static SemanticParser Singleton { get; } = new();
-
     private readonly ISemanticParserLogger Logger;
 
     /// <summary>Instantiates a <see cref="SyntacticParser"/>, parsing the arguments of attributes.</summary>
@@ -257,7 +254,7 @@ public sealed class SemanticParser : ISemanticParser
 
         if (value.Values.IsEmpty)
         {
-            return Array.Empty<object?>();
+            return [];
         }
 
         var arrayConstants = value.Values;
