@@ -5,11 +5,6 @@
         <RootNamespace>SharpAttributeParser.Patterns</RootNamespace>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <GenerateDocumentationFile>false</GenerateDocumentationFile>
-        <IsPackable>false</IsPackable>
-    </PropertyGroup>
-
     <ItemGroup>
         <PackageReference Include="Microsoft.Extensions.Hosting" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
