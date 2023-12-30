@@ -14,21 +14,11 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <Owners>ErikWe</Owners>
-        <Authors>ErikWe</Authors>
-        <PackageProjectUrl>https://github.com/ErikWe/sharp-attribute-parser</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/ErikWe/sharp-attribute-parser</RepositoryUrl>
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <PropertyGroup>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-        <NeutralLanguage>en</NeutralLanguage>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <IsPackable>true</IsPackable>
+        <GenerateDocumentationFile>false</GenerateDocumentationFile>
     </PropertyGroup>
     
     <ItemGroup>
