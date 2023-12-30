@@ -8,6 +8,7 @@
         <Authors>ErikWe</Authors>
         <PackageProjectUrl>https://github.com/ErikWe/sharp-attribute-parser</PackageProjectUrl>
         <RepositoryUrl>https://github.com/ErikWe/sharp-attribute-parser</RepositoryUrl>
+        <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <NeutralLanguage>en</NeutralLanguage>
@@ -16,5 +17,9 @@
     <PropertyGroup>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
+    
+    <ItemGroup>
+        <None Include="README.nupkg.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
 
 </Project>

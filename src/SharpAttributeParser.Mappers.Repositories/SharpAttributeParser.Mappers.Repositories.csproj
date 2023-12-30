@@ -10,12 +10,7 @@
         <Description>
             Adds repositories to 'SharpAttributeParser.Mappers', handling collections of mapped argument recorders.
         </Description>
-        <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
     </PropertyGroup>
-
-    <ItemGroup>
-        <None Include="README.nupkg.md" Pack="true" PackagePath="\" />
-    </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\SharpAttributeParser.Mappers.Abstractions\SharpAttributeParser.Mappers.Abstractions.csproj" />

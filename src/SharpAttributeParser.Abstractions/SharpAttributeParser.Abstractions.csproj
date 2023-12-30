@@ -10,12 +10,7 @@
         <Description>
             Provides abstractions related to parsing C# attributes using the Roslyn API.
         </Description>
-        <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
     </PropertyGroup>
-
-    <ItemGroup>
-        <None Include="README.nupkg.md" Pack="true" PackagePath="\" />
-    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" />
