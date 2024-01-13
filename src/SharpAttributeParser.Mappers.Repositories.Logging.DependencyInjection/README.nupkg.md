@@ -8,4 +8,4 @@ using SharpAttributeParser.Mappers.Repositories.Logging;
 services.AddSharpAttributeParserMapperRepositoriesLogging();
 ```
 
-See [GitHub](https://github.com/ErikWe/sharp-attribute-parser) for more information.
+See [GitHub](https://github.com/SharpAttributeParser/SharpAttributeParser) for more information.

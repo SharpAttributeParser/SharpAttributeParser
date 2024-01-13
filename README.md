@@ -1,4 +1,4 @@
-# SharpAttributeParser [![NuGet version](https://img.shields.io/nuget/v/SharpAttributeParser.svg?style=plastic)](https://www.nuget.org/packages/SharpAttributeParser/) ![License](https://img.shields.io/github/license/ErikWe/sharp-attribute-parser?style=plastic)
+# SharpAttributeParser [![NuGet version](https://img.shields.io/nuget/v/SharpAttributeParser.svg?style=plastic)](https://www.nuget.org/packages/SharpAttributeParser/) ![License](https://img.shields.io/github/license/SharpAttributeParser/SharpAttributeParser?style=plastic)
 
 Parses C\# attributes using the Roslyn API, primarily intended for Analyzers and Source Generators - simplifying the process of interpreting `AttributeData` and extracting strongly-typed descriptions of attributes.
 

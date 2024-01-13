@@ -4,10 +4,10 @@
 
     <PropertyGroup>
         <IsPackable>true</IsPackable>
-        <Owners>ErikWe</Owners>
+        <Owners>SharpAttributeParser</Owners>
         <Authors>ErikWe</Authors>
-        <PackageProjectUrl>https://github.com/ErikWe/sharp-attribute-parser</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/ErikWe/sharp-attribute-parser</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/SharpAttributeParser/sharp-attribute-parser</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/SharpAttributeParser/sharp-attribute-parser</RepositoryUrl>
         <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>

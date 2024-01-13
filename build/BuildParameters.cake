@@ -4,8 +4,8 @@
 
 public class BuildParameters
 {
-    public string Owner { get; } = "ErikWe";
-    public string Repository { get; } = "sharp-attribute-parser";
+    public string Owner { get; } = "SharpAttributeParser";
+    public string Repository { get; } = "SharpAttributeParser";
 
     public bool IsRunningOnGitHubActions { get; }
 

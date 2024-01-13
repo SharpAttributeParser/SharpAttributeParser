@@ -1,7 +1,7 @@
 public class PublishData
 {
     public string NuGetSource { get; } = "https://api.nuget.org/v3/index.json";
-    public string GitHubPackagesSource { get; } = "https://nuget.pkg.github.com/ErikWe/index.json";
+    public string GitHubPackagesSource { get; } = "https://nuget.pkg.github.com/SharpAttributeParser/index.json";
 
     public string NuGetKey { get; }
     public string GitHubKey { get; }
