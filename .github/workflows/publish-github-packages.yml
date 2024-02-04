@@ -1,0 +1,22 @@
+name: Publish to GitHub Packages
+
+on:
+  release:
+    types:
+      - released
+
+jobs:
+  publish-github-packages:
+    name: Publish to GitHub Packages
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+
+      - name: Publish Packages
+        uses: SharpAttributeParser/actions/dotnet/nuget/release-to-github-packages@v0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}

@@ -159,15 +159,15 @@ public sealed class TryParse_Combined
 
         Assert.True(outcome);
 
-        Context.RecorderMock.Verify((recorder) => recorder.TypeArgument.TryRecordArgument(typeParameters[0], typeArguments[0]), Times.Once);
-        Context.RecorderMock.Verify((recorder) => recorder.TypeArgument.TryRecordArgument(typeParameters[1], typeArguments[1]), Times.Once);
+        Context.RecorderMock.Verify((recorder) => recorder.Type.TryRecordArgument(typeParameters[0], typeArguments[0]), Times.Once);
+        Context.RecorderMock.Verify((recorder) => recorder.Type.TryRecordArgument(typeParameters[1], typeArguments[1]), Times.Once);
 
-        Context.RecorderMock.Verify((recorder) => recorder.ConstructorArgument.TryRecordArgument(constructorParameters[0], It.Is(expectedArguments.SimpleValue, SequenceEqualityComparer.Instance)), Times.Once);
-        Context.RecorderMock.Verify((recorder) => recorder.ConstructorArgument.TryRecordArgument(constructorParameters[1], It.Is(expectedArguments.ArrayValue, SequenceEqualityComparer.Instance)), Times.Once);
-        Context.RecorderMock.Verify((recorder) => recorder.ConstructorArgument.TryRecordArgument(constructorParameters[2], It.Is(expectedArguments.ParamsValue, SequenceEqualityComparer.Instance)), Times.Once);
+        Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordArgument(constructorParameters[0], It.Is(expectedArguments.SimpleValue, SequenceEqualityComparer.Instance)), Times.Once);
+        Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordArgument(constructorParameters[1], It.Is(expectedArguments.ArrayValue, SequenceEqualityComparer.Instance)), Times.Once);
+        Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordArgument(constructorParameters[2], It.Is(expectedArguments.ParamsValue, SequenceEqualityComparer.Instance)), Times.Once);
 
-        Context.RecorderMock.Verify((recorder) => recorder.NamedArgument.TryRecordArgument(nameof(CombinedAttribute<object, object>.SimpleNamedValue), It.Is(expectedArguments.SimpleNamedValue, SequenceEqualityComparer.Instance)), Times.Exactly(expectedArguments.SimpleNamedValueSetCount));
-        Context.RecorderMock.Verify((recorder) => recorder.NamedArgument.TryRecordArgument(nameof(CombinedAttribute<object, object>.ArrayNamedValue), It.Is(expectedArguments.ArrayNamedValue, SequenceEqualityComparer.Instance)), Times.Exactly(expectedArguments.ArrayNamedValueSetCount));
+        Context.RecorderMock.Verify((recorder) => recorder.Named.TryRecordArgument(nameof(CombinedAttribute<object, object>.SimpleNamedValue), It.Is(expectedArguments.SimpleNamedValue, SequenceEqualityComparer.Instance)), Times.Exactly(expectedArguments.SimpleNamedValueSetCount));
+        Context.RecorderMock.Verify((recorder) => recorder.Named.TryRecordArgument(nameof(CombinedAttribute<object, object>.ArrayNamedValue), It.Is(expectedArguments.ArrayNamedValue, SequenceEqualityComparer.Instance)), Times.Exactly(expectedArguments.ArrayNamedValueSetCount));
     }
 
     private sealed class ExpectedArguments

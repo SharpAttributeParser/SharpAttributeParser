@@ -17,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SharpAttributeParser.Logging.Abstractions\SharpAttributeParser.Logging.Abstractions.csproj" />
+        <ProjectReference Include="..\SharpAttributeParser.Logging.Core\SharpAttributeParser.Logging.Core.csproj" />
         <ProjectReference Include="..\SharpAttributeParser.Logging\SharpAttributeParser.Logging.csproj" />
     </ItemGroup>
 

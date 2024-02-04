@@ -3,7 +3,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-using SharpAttributeParser.Logging.SyntacticParserComponents;
+using SharpAttributeParser.Logging.SyntacticParserLoggerComponents;
 
 using System;
 using System.Collections.Generic;
@@ -12,14 +12,12 @@ using System.Collections.Generic;
 /// <typeparam name="TCategoryName">The name of the logging category.</typeparam>
 public sealed class NullSyntacticParserLogger<TCategoryName> : ISyntacticParserLogger<TCategoryName>
 {
-    /// <summary>The singleton <see cref="NullSyntacticParserLogger{TCategoryName}"/>.</summary>
-    public static NullSyntacticParserLogger<TCategoryName> Singleton { get; } = new();
+    ITypeArgumentLogger ISyntacticParserLogger.Type { get; } = new NullTypeArgumentLogger();
+    IConstructorArgumentLogger ISyntacticParserLogger.Constructor { get; } = new NullConstructorArgumentLogger();
+    INamedArgumentLogger ISyntacticParserLogger.Named { get; } = new NullNamedArgumentLogger();
 
-    ITypeArgumentLogger ISyntacticParserLogger.TypeArgument { get; } = new NullTypeArgumentLogger();
-    IConstructorArgumentLogger ISyntacticParserLogger.ConstructorArgument { get; } = new NullConstructorArgumentLogger();
-    INamedArgumentLogger ISyntacticParserLogger.NamedArgument { get; } = new NullNamedArgumentLogger();
-
-    private NullSyntacticParserLogger() { }
+    /// <summary>Instantiates a <see cref="NullSyntacticParserLogger{TCategoryName}"/>, a <see cref="ISyntacticParserLogger"/> with no behaviour.</summary>
+    public NullSyntacticParserLogger() { }
 
     IDisposable? ISyntacticParserLogger.BeginScopeParsingAttribute(Type recorderType, AttributeData attributeData, AttributeSyntax attributeSyntax) => null;
     IDisposable? ISyntacticParserLogger.BeginScopeDeterminedAttributeClass(INamedTypeSymbol attributeClass) => null;

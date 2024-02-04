@@ -3,7 +3,7 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 
-using SharpAttributeParser.Logging.SemanticParserComponents;
+using SharpAttributeParser.Logging.SemanticParserLoggerComponents;
 
 using System;
 using System.Collections.Generic;
@@ -28,9 +28,9 @@ public sealed class SemanticParserLogger<TCategoryName> : ISemanticParserLogger<
         NamedArgument = new NamedArgumentLogger(Logger);
     }
 
-    ITypeArgumentLogger ISemanticParserLogger.TypeArgument => TypeArgument;
-    IConstructorArgumentLogger ISemanticParserLogger.ConstructorArgument => ConstructorArgument;
-    INamedArgumentLogger ISemanticParserLogger.NamedArgument => NamedArgument;
+    ITypeArgumentLogger ISemanticParserLogger.Type => TypeArgument;
+    IConstructorArgumentLogger ISemanticParserLogger.Constructor => ConstructorArgument;
+    INamedArgumentLogger ISemanticParserLogger.Named => NamedArgument;
 
     IDisposable? ISemanticParserLogger.BeginScopeParsingAttribute(Type recorderType, AttributeData attributeData)
     {

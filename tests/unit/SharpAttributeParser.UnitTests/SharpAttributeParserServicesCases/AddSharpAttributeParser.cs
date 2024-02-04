@@ -43,7 +43,7 @@ public sealed class AddSharpAttributeParser
     }
 
     [Fact]
-    public void ICombinedParser_ServiceCanBeResolved() => ServiceCanBeResolved<ICombinedParser>();
+    public void IParser_ServiceCanBeResolved() => ServiceCanBeResolved<IParser>();
 
     [Fact]
     public void ISemanticParser_ServiceCanBeResolved() => ServiceCanBeResolved<ISemanticParser>();

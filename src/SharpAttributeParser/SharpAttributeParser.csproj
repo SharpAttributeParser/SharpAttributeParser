@@ -13,8 +13,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SharpAttributeParser.Abstractions\SharpAttributeParser.Abstractions.csproj" />
-        <ProjectReference Include="..\SharpAttributeParser.Logging.Abstractions\SharpAttributeParser.Logging.Abstractions.csproj" />
+        <ProjectReference Include="..\SharpAttributeParser.Core\SharpAttributeParser.Core.csproj" />
+        <ProjectReference Include="..\SharpAttributeParser.Logging.Core\SharpAttributeParser.Logging.Core.csproj" />
         <ProjectReference Include="..\SharpAttributeParser.Logging\SharpAttributeParser.Logging.csproj" />
     </ItemGroup>
 

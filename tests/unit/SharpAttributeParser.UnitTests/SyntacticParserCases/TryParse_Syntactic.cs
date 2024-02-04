@@ -33,7 +33,7 @@ public sealed class TryParse_Syntactic
             public class Foo { }
             """;
 
-        await Generic_ReturnsFalseAndLogs(semanticSource, syntacticSource, static (logger) => logger.TypeArgument.SyntaxNotRecognizedAsGenericExpression());
+        await Generic_ReturnsFalseAndLogs(semanticSource, syntacticSource, static (logger) => logger.Type.SyntaxNotRecognizedAsGenericExpression());
     }
 
     [Fact]
@@ -49,7 +49,7 @@ public sealed class TryParse_Syntactic
             public class Foo { }
             """;
 
-        await Generic_ReturnsFalseAndLogs(semanticSource, syntacticSource, static (logger) => logger.TypeArgument.UnexpectedNumberOfSyntacticTypeArguments());
+        await Generic_ReturnsFalseAndLogs(semanticSource, syntacticSource, static (logger) => logger.Type.UnexpectedNumberOfSyntacticTypeArguments());
     }
 
     [Fact]
@@ -65,7 +65,7 @@ public sealed class TryParse_Syntactic
             public class Foo { }
             """;
 
-        await Generic_ReturnsFalseAndLogs(semanticSource, syntacticSource, static (logger) => logger.TypeArgument.UnexpectedNumberOfSyntacticTypeArguments());
+        await Generic_ReturnsFalseAndLogs(semanticSource, syntacticSource, static (logger) => logger.Type.UnexpectedNumberOfSyntacticTypeArguments());
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public sealed class TryParse_Syntactic
             public class Foo { }
             """;
 
-        await Generic_ReturnsFalseAndLogs(semanticSource, syntacticSource, static (logger) => logger.ConstructorArgument.MissingOneOrMoreRequiredConstructorArgument());
+        await Generic_ReturnsFalseAndLogs(semanticSource, syntacticSource, static (logger) => logger.Constructor.MissingOneOrMoreRequiredConstructorArgument());
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public sealed class TryParse_Syntactic
             public class Foo { }
             """;
 
-        await Generic_ReturnsFalseAndLogs(semanticSource, syntacticSource, static (logger) => logger.ConstructorArgument.OutOfOrderLabelledConstructorArgumentsFollowedByUnlabelled());
+        await Generic_ReturnsFalseAndLogs(semanticSource, syntacticSource, static (logger) => logger.Constructor.OutOfOrderLabelledConstructorArgumentsFollowedByUnlabelled());
     }
 
     [Fact]
@@ -113,7 +113,7 @@ public sealed class TryParse_Syntactic
             public class Foo { }
             """;
 
-        await Generic_ReturnsFalseAndLogs(semanticSource, syntacticSource, static (logger) => logger.ConstructorArgument.MissingOneOrMoreRequiredConstructorArgument());
+        await Generic_ReturnsFalseAndLogs(semanticSource, syntacticSource, static (logger) => logger.Constructor.MissingOneOrMoreRequiredConstructorArgument());
     }
 
     [Fact]
@@ -129,7 +129,7 @@ public sealed class TryParse_Syntactic
             public class Foo { }
             """;
 
-        await Generic_ReturnsFalseAndLogs(semanticSource, syntacticSource, static (logger) => logger.ConstructorArgument.MissingOneOrMoreRequiredConstructorArgument());
+        await Generic_ReturnsFalseAndLogs(semanticSource, syntacticSource, static (logger) => logger.Constructor.MissingOneOrMoreRequiredConstructorArgument());
     }
 
     [Fact]
@@ -145,7 +145,7 @@ public sealed class TryParse_Syntactic
             public class Foo { }
             """;
 
-        await Generic_ReturnsFalseAndLogs(semanticSource, syntacticSource, static (logger) => logger.ConstructorArgument.MissingOneOrMoreRequiredConstructorArgument());
+        await Generic_ReturnsFalseAndLogs(semanticSource, syntacticSource, static (logger) => logger.Constructor.MissingOneOrMoreRequiredConstructorArgument());
     }
 
     [Fact]
@@ -233,8 +233,8 @@ public sealed class TryParse_Syntactic
 
         Assert.True(outcome);
 
-        Context.RecorderMock.Verify((recorder) => recorder.ConstructorArgument.TryRecordArgument(constructorParameters[0], expectedArguments.ValueASyntax), Times.Once);
-        Context.RecorderMock.Verify((recorder) => recorder.ConstructorArgument.TryRecordArgument(constructorParameters[1], expectedArguments.ValueBSyntax), Times.Once);
+        Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordArgument(constructorParameters[0], expectedArguments.ValueASyntax), Times.Once);
+        Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordArgument(constructorParameters[1], expectedArguments.ValueBSyntax), Times.Once);
     }
 
     [AssertionMethod]
@@ -249,7 +249,7 @@ public sealed class TryParse_Syntactic
 
         Assert.True(outcome);
 
-        Context.RecorderMock.Verify((recorder) => recorder.NamedArgument.TryRecordArgument(nameof(NamedAttribute.SimpleValue), expectedArguments.SimpleValueSyntax!), Times.Exactly(expectedArguments.SimpleValueSyntaxSetCount));
+        Context.RecorderMock.Verify((recorder) => recorder.Named.TryRecordArgument(nameof(NamedAttribute.SimpleValue), expectedArguments.SimpleValueSyntax!), Times.Exactly(expectedArguments.SimpleValueSyntaxSetCount));
     }
 
     private sealed class ExpectedSimpleConstructorArguments

@@ -2,7 +2,7 @@
 
 using Microsoft.CodeAnalysis;
 
-using SharpAttributeParser.Logging.SemanticParserComponents;
+using SharpAttributeParser.Logging.SemanticParserLoggerComponents;
 
 using System;
 using System.Collections.Generic;
@@ -11,14 +11,12 @@ using System.Collections.Generic;
 /// <typeparam name="TCategoryName">The name of the logging category.</typeparam>
 public sealed class NullSemanticParserLogger<TCategoryName> : ISemanticParserLogger<TCategoryName>
 {
-    /// <summary>The singleton <see cref="NullSemanticParserLogger{TCategoryName}"/>.</summary>
-    public static NullSemanticParserLogger<TCategoryName> Singleton { get; } = new();
+    ITypeArgumentLogger ISemanticParserLogger.Type { get; } = new NullTypeArgumentLogger();
+    IConstructorArgumentLogger ISemanticParserLogger.Constructor { get; } = new NullConstructorArgumentLogger();
+    INamedArgumentLogger ISemanticParserLogger.Named { get; } = new NullNamedArgumentLogger();
 
-    ITypeArgumentLogger ISemanticParserLogger.TypeArgument { get; } = new NullTypeArgumentLogger();
-    IConstructorArgumentLogger ISemanticParserLogger.ConstructorArgument { get; } = new NullConstructorArgumentLogger();
-    INamedArgumentLogger ISemanticParserLogger.NamedArgument { get; } = new NullNamedArgumentLogger();
-
-    private NullSemanticParserLogger() { }
+    /// <summary>Instantiates a <see cref="NullSemanticParserLogger{TCategoryName}"/>, a <see cref="ISemanticParserLogger"/> with no behaviour.</summary>
+    public NullSemanticParserLogger() { }
 
     IDisposable? ISemanticParserLogger.BeginScopeParsingAttribute(Type recorderType, AttributeData attributeData) => null;
     IDisposable? ISemanticParserLogger.BeginScopeDeterminedAttributeClass(INamedTypeSymbol attributeClass) => null;
