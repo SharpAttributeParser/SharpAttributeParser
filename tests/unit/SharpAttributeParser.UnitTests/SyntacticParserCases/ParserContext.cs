@@ -17,11 +17,11 @@ internal sealed class ParserContext
 
         Mock<ISyntacticParserLogger<SyntacticParser>> loggerMock = new() { DefaultValue = DefaultValue.Mock };
 
-        recorderMock.Setup(static (recorder) => recorder.TypeArgument.TryRecordArgument(It.IsAny<ITypeParameterSymbol>(), It.IsAny<ExpressionSyntax>())).Returns(true);
-        recorderMock.Setup(static (recorder) => recorder.ConstructorArgument.TryRecordArgument(It.IsAny<IParameterSymbol>(), It.IsAny<ExpressionSyntax>())).Returns(true);
-        recorderMock.Setup(static (recorder) => recorder.ConstructorArgument.TryRecordParamsArgument(It.IsAny<IParameterSymbol>(), It.IsAny<IReadOnlyList<ExpressionSyntax>>())).Returns(true);
-        recorderMock.Setup(static (recorder) => recorder.ConstructorArgument.TryRecordDefaultArgument(It.IsAny<IParameterSymbol>())).Returns(true);
-        recorderMock.Setup(static (recorder) => recorder.NamedArgument.TryRecordArgument(It.IsAny<string>(), It.IsAny<ExpressionSyntax>())).Returns(true);
+        recorderMock.Setup(static (recorder) => recorder.Type.TryRecordArgument(It.IsAny<ITypeParameterSymbol>(), It.IsAny<ExpressionSyntax>())).Returns(true);
+        recorderMock.Setup(static (recorder) => recorder.Constructor.TryRecordArgument(It.IsAny<IParameterSymbol>(), It.IsAny<ExpressionSyntax>())).Returns(true);
+        recorderMock.Setup(static (recorder) => recorder.Constructor.TryRecordParamsArgument(It.IsAny<IParameterSymbol>(), It.IsAny<IReadOnlyList<ExpressionSyntax>>())).Returns(true);
+        recorderMock.Setup(static (recorder) => recorder.Constructor.TryRecordDefaultArgument(It.IsAny<IParameterSymbol>())).Returns(true);
+        recorderMock.Setup(static (recorder) => recorder.Named.TryRecordArgument(It.IsAny<string>(), It.IsAny<ExpressionSyntax>())).Returns(true);
 
         SyntacticParser parser = new(loggerMock.Object);
 

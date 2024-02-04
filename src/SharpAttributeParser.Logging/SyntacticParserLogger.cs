@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.Extensions.Logging;
 
-using SharpAttributeParser.Logging.SyntacticParserComponents;
+using SharpAttributeParser.Logging.SyntacticParserLoggerComponents;
 
 using System;
 using System.Collections.Generic;
@@ -29,9 +29,9 @@ public sealed class SyntacticParserLogger<TCategoryName> : ISyntacticParserLogge
         NamedArgument = new NamedArgumentLogger(Logger);
     }
 
-    ITypeArgumentLogger ISyntacticParserLogger.TypeArgument => TypeArgument;
-    IConstructorArgumentLogger ISyntacticParserLogger.ConstructorArgument => ConstructorArgument;
-    INamedArgumentLogger ISyntacticParserLogger.NamedArgument => NamedArgument;
+    ITypeArgumentLogger ISyntacticParserLogger.Type => TypeArgument;
+    IConstructorArgumentLogger ISyntacticParserLogger.Constructor => ConstructorArgument;
+    INamedArgumentLogger ISyntacticParserLogger.Named => NamedArgument;
 
     IDisposable? ISyntacticParserLogger.BeginScopeParsingAttribute(Type recorderType, AttributeData attributeData, AttributeSyntax attributeSyntax)
     {

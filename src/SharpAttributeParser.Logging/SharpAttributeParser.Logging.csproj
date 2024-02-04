@@ -13,9 +13,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SharpAttributeParser.Abstractions\SharpAttributeParser.Abstractions.csproj" />
-        <ProjectReference Include="..\SharpAttributeParser.Logging.Abstractions\SharpAttributeParser.Logging.Abstractions.csproj" />
-        <ProjectReference Include="..\SharpAttributeParser.Logging.Common\SharpAttributeParser.Logging.Common.csproj" PrivateAssets="compile" />
+        <PackageReference Include="SharpAttributeParser.Common.Logging" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SharpAttributeParser.Core\SharpAttributeParser.Core.csproj" />
+        <ProjectReference Include="..\SharpAttributeParser.Logging.Core\SharpAttributeParser.Logging.Core.csproj" />
     </ItemGroup>
 
 </Project>

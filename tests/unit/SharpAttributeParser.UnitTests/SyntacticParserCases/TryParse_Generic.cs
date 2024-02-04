@@ -101,8 +101,8 @@ public sealed class TryParse_Generic
 
         Assert.True(outcome);
 
-        Context.RecorderMock.Verify((recorder) => recorder.TypeArgument.TryRecordArgument(typeParameters[0], expectedArguments.T1Syntax), Times.Once);
-        Context.RecorderMock.Verify((recorder) => recorder.TypeArgument.TryRecordArgument(typeParameters[1], expectedArguments.T2Syntax), Times.Once);
+        Context.RecorderMock.Verify((recorder) => recorder.Type.TryRecordArgument(typeParameters[0], expectedArguments.T1Syntax), Times.Once);
+        Context.RecorderMock.Verify((recorder) => recorder.Type.TryRecordArgument(typeParameters[1], expectedArguments.T2Syntax), Times.Once);
     }
 
     private sealed class ExpectedResult

@@ -27,7 +27,7 @@ public sealed class TryParse_Params_InterpretedAsParams
             public class Foo { }
             """;
 
-        await ReturnsFalseAndLogs(source, static (logger) => logger.ConstructorArgument.InvalidConstructorArgument());
+        await ReturnsFalseAndLogs(source, static (logger) => logger.Constructor.InvalidConstructorArgument());
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public sealed class TryParse_Params_InterpretedAsParams
 
         Assert.True(outcome);
 
-        Context.RecorderMock.Verify((recorder) => recorder.ConstructorArgument.TryRecordArgument(constructorParameters[0], It.Is(expectedArguments.Value, SequenceEqualityComparer.Instance)), Times.Once);
+        Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordArgument(constructorParameters[0], It.Is(expectedArguments.Value, SequenceEqualityComparer.Instance)), Times.Once);
     }
 
     [AssertionMethod]

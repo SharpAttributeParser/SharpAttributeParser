@@ -64,8 +64,8 @@ public sealed class TryParse_Named
 
         Assert.True(outcome);
 
-        Context.RecorderMock.Verify((recorder) => recorder.NamedArgument.TryRecordArgument(nameof(NamedAttribute.SimpleValue), expectedArguments.SimpleValueSyntax!), Times.Exactly(expectedArguments.SimpleValueSyntaxSetCount));
-        Context.RecorderMock.Verify((recorder) => recorder.NamedArgument.TryRecordArgument(nameof(NamedAttribute.ArrayValue), expectedArguments.ArrayValueSyntax!), Times.Exactly(expectedArguments.ArrayValueSyntaxSetCount));
+        Context.RecorderMock.Verify((recorder) => recorder.Named.TryRecordArgument(nameof(NamedAttribute.SimpleValue), expectedArguments.SimpleValueSyntax!), Times.Exactly(expectedArguments.SimpleValueSyntaxSetCount));
+        Context.RecorderMock.Verify((recorder) => recorder.Named.TryRecordArgument(nameof(NamedAttribute.ArrayValue), expectedArguments.ArrayValueSyntax!), Times.Exactly(expectedArguments.ArrayValueSyntaxSetCount));
     }
 
     private sealed class ExpectedResult

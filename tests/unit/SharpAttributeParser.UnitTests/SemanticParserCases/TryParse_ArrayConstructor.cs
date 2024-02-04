@@ -27,7 +27,7 @@ public sealed class TryParse_ArrayConstructor
             public class Foo { }
             """;
 
-        await ReturnsFalseAndLogs(source, static (logger) => logger.ConstructorArgument.InvalidConstructorArgument());
+        await ReturnsFalseAndLogs(source, static (logger) => logger.Constructor.InvalidConstructorArgument());
     }
 
     [Fact]
@@ -144,8 +144,8 @@ public sealed class TryParse_ArrayConstructor
 
         Assert.True(outcome);
 
-        Context.RecorderMock.Verify((recorder) => recorder.ConstructorArgument.TryRecordArgument(constructorParameters[0], It.Is(expectedArguments.ValueA, SequenceEqualityComparer.Instance)), Times.Once);
-        Context.RecorderMock.Verify((recorder) => recorder.ConstructorArgument.TryRecordArgument(constructorParameters[1], It.Is(expectedArguments.ValueB, SequenceEqualityComparer.Instance)), Times.Once);
+        Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordArgument(constructorParameters[0], It.Is(expectedArguments.ValueA, SequenceEqualityComparer.Instance)), Times.Once);
+        Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordArgument(constructorParameters[1], It.Is(expectedArguments.ValueB, SequenceEqualityComparer.Instance)), Times.Once);
     }
 
     [AssertionMethod]

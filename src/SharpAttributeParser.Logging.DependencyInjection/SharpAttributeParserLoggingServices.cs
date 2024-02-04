@@ -19,7 +19,7 @@ public static class SharpAttributeParserLoggingServices
 
         services.AddLogging();
 
-        services.AddSingleton(typeof(ICombinedParserLogger<>), typeof(CombinedParserLogger<>));
+        services.AddSingleton(typeof(IParserLogger<>), typeof(ParserLogger<>));
         services.AddSingleton(typeof(ISyntacticParserLogger<>), typeof(SyntacticParserLogger<>));
         services.AddSingleton(typeof(ISemanticParserLogger<>), typeof(SemanticParserLogger<>));
 

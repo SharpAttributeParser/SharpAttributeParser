@@ -109,9 +109,9 @@ public sealed class TryParse
     {
         Mock<ISemanticRecorder> falseReturningRecorderMock = new();
 
-        falseReturningRecorderMock.Setup(static (recorder) => recorder.TypeArgument.TryRecordArgument(It.IsAny<ITypeParameterSymbol>(), It.IsAny<ITypeSymbol>())).Returns(false);
-        falseReturningRecorderMock.Setup(static (recorder) => recorder.ConstructorArgument.TryRecordArgument(It.IsAny<IParameterSymbol>(), It.IsAny<object?>())).Returns(false);
-        falseReturningRecorderMock.Setup(static (recorder) => recorder.NamedArgument.TryRecordArgument(It.IsAny<string>(), It.IsAny<object?>())).Returns(false);
+        falseReturningRecorderMock.Setup(static (recorder) => recorder.Type.TryRecordArgument(It.IsAny<ITypeParameterSymbol>(), It.IsAny<ITypeSymbol>())).Returns(false);
+        falseReturningRecorderMock.Setup(static (recorder) => recorder.Constructor.TryRecordArgument(It.IsAny<IParameterSymbol>(), It.IsAny<object?>())).Returns(false);
+        falseReturningRecorderMock.Setup(static (recorder) => recorder.Named.TryRecordArgument(It.IsAny<string>(), It.IsAny<object?>())).Returns(false);
 
         var (_, attributeData, _) = await CompilationStore.GetComponents(source, "Foo");
 
