@@ -213,7 +213,7 @@ public sealed class ParserLogger<TCategoryName> : IParserLogger<TCategoryName>
             PropagateParsedConstructorArgumentOfKind = LoggerMessage.DefineScope<string>("ConstructorArgumentKind: {ConstructorArgumentKind}");
 
             PropagateParsedNamedArguments = LoggerMessage.DefineScope<int, int>("[SemanticallyParsedNamedArgumentCount: {SemanticallyParsedNamedArgumentCount}, SyntacticallyParsedNamedArgumentCount: {SyntacticallyParsedNamedArgumentCount}]");
-            PropagateParsedNamedArgument = LoggerMessage.DefineScope<string>("[NamedParameterName: {NamedParameterName}]");
+            PropagateParsedNamedArgument = LoggerMessage.DefineScope<string>("NamedParameterName: {NamedParameterName}");
         }
     }
 
