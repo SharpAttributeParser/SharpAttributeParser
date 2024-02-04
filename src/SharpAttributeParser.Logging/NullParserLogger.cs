@@ -12,6 +12,9 @@ using System.Collections.Generic;
 /// <typeparam name="TCategoryName">The name of the logging category.</typeparam>
 public sealed class NullParserLogger<TCategoryName> : IParserLogger<TCategoryName>
 {
+    /// <summary>A <see cref="IParserLogger"/> with no behaviour.</summary>
+    public static IParserLogger<TCategoryName> Instance { get; } = new NullParserLogger<TCategoryName>();
+
     ITypeArgumentLogger IParserLogger.Type { get; } = new NullTypeArgumentLogger();
     IConstructorArgumentLogger IParserLogger.Constructor { get; } = new NullConstructorArgumentLogger();
     INamedArgumentLogger IParserLogger.Named { get; } = new NullNamedArgumentLogger();
@@ -21,8 +24,7 @@ public sealed class NullParserLogger<TCategoryName> : IParserLogger<TCategoryNam
     void IParserLogger.SemanticParserFailedToParseAttribute() { }
     void IParserLogger.SyntacticParserFailedToParseAttribute() { }
 
-    /// <summary>Instantiates a <see cref="NullParserLogger{TCategoryName}"/>, a <see cref="IParserLogger"/> with no behaviour.</summary>
-    public NullParserLogger() { }
+    private NullParserLogger() { }
 
     private sealed class NullTypeArgumentLogger : ITypeArgumentLogger
     {

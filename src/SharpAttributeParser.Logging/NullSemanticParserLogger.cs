@@ -11,12 +11,14 @@ using System.Collections.Generic;
 /// <typeparam name="TCategoryName">The name of the logging category.</typeparam>
 public sealed class NullSemanticParserLogger<TCategoryName> : ISemanticParserLogger<TCategoryName>
 {
+    /// <summary>A <see cref="ISemanticParserLogger"/> with no behaviour.</summary>
+    public static ISemanticParserLogger<TCategoryName> Instance { get; } = new NullSemanticParserLogger<TCategoryName>();
+
     ITypeArgumentLogger ISemanticParserLogger.Type { get; } = new NullTypeArgumentLogger();
     IConstructorArgumentLogger ISemanticParserLogger.Constructor { get; } = new NullConstructorArgumentLogger();
     INamedArgumentLogger ISemanticParserLogger.Named { get; } = new NullNamedArgumentLogger();
 
-    /// <summary>Instantiates a <see cref="NullSemanticParserLogger{TCategoryName}"/>, a <see cref="ISemanticParserLogger"/> with no behaviour.</summary>
-    public NullSemanticParserLogger() { }
+    private NullSemanticParserLogger() { }
 
     IDisposable? ISemanticParserLogger.BeginScopeParsingAttribute(Type recorderType, AttributeData attributeData) => null;
     IDisposable? ISemanticParserLogger.BeginScopeDeterminedAttributeClass(INamedTypeSymbol attributeClass) => null;

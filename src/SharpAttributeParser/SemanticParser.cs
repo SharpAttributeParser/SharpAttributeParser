@@ -17,7 +17,7 @@ public sealed class SemanticParser : ISemanticParser
     /// <param name="logger">The logger used to log messages.</param>
     public SemanticParser(ISemanticParserLogger<SemanticParser>? logger = null)
     {
-        Logger = logger ?? new NullSemanticParserLogger<SemanticParser>();
+        Logger = logger ?? NullSemanticParserLogger<SemanticParser>.Instance;
     }
 
     /// <inheritdoc/>
