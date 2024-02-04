@@ -185,7 +185,7 @@ public sealed class TryParse_SimpleNamed
 
         Assert.True(outcome);
 
-        Context.RecorderMock.Verify((recorder) => recorder.NamedArgument.TryRecordArgument(nameof(NamedAttribute.SimpleValue), It.Is(expectedArguments.Value, SequenceEqualityComparer.Instance)), Times.Exactly(expectedArguments.ValueSetCount));
+        Context.RecorderMock.Verify((recorder) => recorder.Named.TryRecordArgument(nameof(NamedAttribute.SimpleValue), It.Is(expectedArguments.Value, SequenceEqualityComparer.Instance)), Times.Exactly(expectedArguments.ValueSetCount));
     }
 
     [AssertionMethod]
@@ -197,7 +197,7 @@ public sealed class TryParse_SimpleNamed
 
         Assert.True(outcome);
 
-        Context.RecorderMock.Verify(static (recorder) => recorder.NamedArgument.TryRecordArgument(It.IsAny<string>(), It.IsAny<object?>()), Times.Never);
+        Context.RecorderMock.Verify(static (recorder) => recorder.Named.TryRecordArgument(It.IsAny<string>(), It.IsAny<object?>()), Times.Never);
     }
 
     private sealed class ExpectedArguments

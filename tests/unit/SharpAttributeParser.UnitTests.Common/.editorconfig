@@ -1,4 +1,0 @@
-[*.cs]
-
-# Validate arguments of public methods
-dotnet_diagnostic.CA1062.severity = none

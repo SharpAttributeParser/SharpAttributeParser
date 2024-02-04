@@ -19,7 +19,7 @@ public sealed class SyntacticParser : ISyntacticParser
     /// <param name="logger">The logger used to log messages.</param>
     public SyntacticParser(ISyntacticParserLogger<SyntacticParser>? logger = null)
     {
-        Logger = logger ?? NullSyntacticParserLogger<SyntacticParser>.Singleton;
+        Logger = logger ?? new NullSyntacticParserLogger<SyntacticParser>();
     }
 
     /// <inheritdoc/>
@@ -81,7 +81,7 @@ public sealed class SyntacticParser : ISyntacticParser
     {
         public static bool TryParse(ISyntacticRecorder recorder, INamedTypeSymbol attributeClass, AttributeSyntax attributeSyntax, ISyntacticParserLogger logger)
         {
-            using var _ = logger.TypeArgument.BeginScopeParsingTypeArguments(attributeClass.TypeParameters, attributeSyntax.Name);
+            using var _ = logger.Type.BeginScopeParsingTypeArguments(attributeClass.TypeParameters, attributeSyntax.Name);
 
             TypeArgumentsParser parser = new(recorder, attributeClass, attributeSyntax, logger);
 
@@ -112,16 +112,16 @@ public sealed class SyntacticParser : ISyntacticParser
 
             if (GetGenericNameSyntax() is not GenericNameSyntax genericNameSyntax)
             {
-                Logger.TypeArgument.SyntaxNotRecognizedAsGenericExpression();
+                Logger.Type.SyntaxNotRecognizedAsGenericExpression();
 
                 return false;
             }
 
-            using var __ = Logger.TypeArgument.BeginScopeRecognizedGenericExpression(genericNameSyntax);
+            using var __ = Logger.Type.BeginScopeRecognizedGenericExpression(genericNameSyntax);
 
             if (Parameters.Count != genericNameSyntax.TypeArgumentList.Arguments.Count)
             {
-                Logger.TypeArgument.UnexpectedNumberOfSyntacticTypeArguments();
+                Logger.Type.UnexpectedNumberOfSyntacticTypeArguments();
 
                 return false;
             }
@@ -136,9 +136,9 @@ public sealed class SyntacticParser : ISyntacticParser
 
         private bool TryParseArgument(ITypeParameterSymbol parameter, TypeSyntax syntax)
         {
-            using var _ = Logger.TypeArgument.BeginScopeParsingTypeArgument(parameter, syntax);
+            using var _ = Logger.Type.BeginScopeParsingTypeArgument(parameter, syntax);
 
-            return Recorder.TypeArgument.TryRecordArgument(parameter, syntax);
+            return Recorder.Type.TryRecordArgument(parameter, syntax);
         }
 
         private GenericNameSyntax? GetGenericNameSyntax()
@@ -166,7 +166,7 @@ public sealed class SyntacticParser : ISyntacticParser
     {
         public static bool TryParse(ISyntacticRecorder recorder, IMethodSymbol targetConstructor, AttributeData attributeData, AttributeSyntax attributeSyntax, ISyntacticParserLogger logger)
         {
-            using var _ = logger.ConstructorArgument.BeginScopeParsingConstructorArguments(attributeData, attributeSyntax);
+            using var _ = logger.Constructor.BeginScopeParsingConstructorArguments(attributeData, attributeSyntax);
 
             ConstructorArgumentsParser parser = new(recorder, targetConstructor, attributeData, attributeSyntax, logger);
 
@@ -196,14 +196,14 @@ public sealed class SyntacticParser : ISyntacticParser
         {
             if (Data.OutOfOrderLabelledArgumentFollowedByUnlabelled)
             {
-                Logger.ConstructorArgument.OutOfOrderLabelledConstructorArgumentsFollowedByUnlabelled();
+                Logger.Constructor.OutOfOrderLabelledConstructorArgumentsFollowedByUnlabelled();
 
                 return false;
             }
 
             if (Data.MissingRequiredArgument)
             {
-                Logger.ConstructorArgument.MissingOneOrMoreRequiredConstructorArgument();
+                Logger.Constructor.MissingOneOrMoreRequiredConstructorArgument();
 
                 return false;
             }
@@ -215,7 +215,7 @@ public sealed class SyntacticParser : ISyntacticParser
 
             if (Parameters.Count != AttributeData.ConstructorArguments.Length)
             {
-                Logger.ConstructorArgument.UnexpectedNumberOfSemanticConstructorArguments();
+                Logger.Constructor.UnexpectedNumberOfSemanticConstructorArguments();
 
                 return false;
             }
@@ -225,27 +225,27 @@ public sealed class SyntacticParser : ISyntacticParser
 
         private bool TryParseArgument(IParameterSymbol parameter)
         {
-            using var _ = Logger.ConstructorArgument.BeginScopeParsingConstructorArgument(parameter);
+            using var _ = Logger.Constructor.BeginScopeParsingConstructorArgument(parameter);
 
             if (Data.GetNormalArgumentExpression(parameter) is ExpressionSyntax syntax)
             {
-                using var __ = Logger.ConstructorArgument.BeginScopeParsingNormalConstructorArgument(syntax);
+                using var __ = Logger.Constructor.BeginScopeParsingNormalConstructorArgument(syntax);
 
-                return Recorder.ConstructorArgument.TryRecordArgument(parameter, syntax);
+                return Recorder.Constructor.TryRecordArgument(parameter, syntax);
             }
 
             if (parameter.IsParams)
             {
                 var elementSyntax = Data.GetParamsArgumentExpressions();
 
-                using var __ = Logger.ConstructorArgument.BeginScopeParsingParamsConstructorArgument(elementSyntax);
+                using var __ = Logger.Constructor.BeginScopeParsingParamsConstructorArgument(elementSyntax);
 
-                return Recorder.ConstructorArgument.TryRecordParamsArgument(parameter, elementSyntax);
+                return Recorder.Constructor.TryRecordParamsArgument(parameter, elementSyntax);
             }
 
-            using var ___ = Logger.ConstructorArgument.BeginScopeParsingDefaultConstructorArgument();
+            using var ___ = Logger.Constructor.BeginScopeParsingDefaultConstructorArgument();
 
-            return Recorder.ConstructorArgument.TryRecordDefaultArgument(parameter);
+            return Recorder.Constructor.TryRecordDefaultArgument(parameter);
         }
 
         private sealed class ParsingData
@@ -491,7 +491,7 @@ public sealed class SyntacticParser : ISyntacticParser
     {
         public static bool TryParse(ISyntacticRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax, ISyntacticParserLogger logger)
         {
-            using var _ = logger.NamedArgument.BeginScopeParsingNamedArguments(attributeData, attributeSyntax);
+            using var _ = logger.Named.BeginScopeParsingNamedArguments(attributeData, attributeSyntax);
 
             NamedArgumentsParser parser = new(recorder, attributeData, attributeSyntax, logger);
 
@@ -525,9 +525,9 @@ public sealed class SyntacticParser : ISyntacticParser
 
         private bool TryParseArgument(string parameterName, ExpressionSyntax syntax)
         {
-            using var _ = Logger.NamedArgument.BeginScopeParsingNamedArgument(parameterName, syntax);
+            using var _ = Logger.Named.BeginScopeParsingNamedArgument(parameterName, syntax);
 
-            return Recorder.NamedArgument.TryRecordArgument(parameterName, syntax);
+            return Recorder.Named.TryRecordArgument(parameterName, syntax);
         }
 
         private static IReadOnlyDictionary<string, ExpressionSyntax> CreateParameterSyntaxPairDictionary(AttributeData attributeData, AttributeSyntax attributeSyntax)

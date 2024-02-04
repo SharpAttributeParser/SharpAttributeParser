@@ -4,22 +4,24 @@
 
     <PropertyGroup>
         <IsPackable>true</IsPackable>
-        <Owners>ErikWe</Owners>
+        <Owners>SharpAttributeParser</Owners>
         <Authors>ErikWe</Authors>
-        <PackageProjectUrl>https://github.com/ErikWe/sharp-attribute-parser</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/ErikWe/sharp-attribute-parser</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/SharpAttributeParser/SharpAttributeParser</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/SharpAttributeParser/SharpAttributeParser</RepositoryUrl>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <PackageReadmeFile>README.nupkg.md</PackageReadmeFile>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
         <NeutralLanguage>en</NeutralLanguage>
     </PropertyGroup>
 
-    <PropertyGroup>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    </PropertyGroup>
-    
     <ItemGroup>
         <None Include="README.nupkg.md" Pack="true" PackagePath="\" />
+        <None Include="$(PkgSharpAttributeParser_Logo)\Logo.png" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="SharpAttributeParser.Logo" PrivateAssets="all" GeneratePathProperty="true" />
     </ItemGroup>
 
 </Project>

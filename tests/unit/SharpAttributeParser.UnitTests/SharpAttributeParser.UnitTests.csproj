@@ -15,15 +15,23 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="OneOf" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="SharpAttributeParser.Common.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="xunit" />
         <PackageReference Include="xunit.runner.visualstudio" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\src\SharpAttributeParser.Abstractions\SharpAttributeParser.Abstractions.csproj" />
+        <ProjectReference Include="..\..\..\src\SharpAttributeParser.Core\SharpAttributeParser.Core.csproj" />
         <ProjectReference Include="..\..\..\src\SharpAttributeParser.DependencyInjection\SharpAttributeParser.DependencyInjection.csproj" />
-        <ProjectReference Include="..\..\..\src\SharpAttributeParser.Logging.Abstractions\SharpAttributeParser.Logging.Abstractions.csproj" />
+        <ProjectReference Include="..\..\..\src\SharpAttributeParser.Logging.Core\SharpAttributeParser.Logging.Core.csproj" />
         <ProjectReference Include="..\..\..\src\SharpAttributeParser\SharpAttributeParser.csproj" />
-        <ProjectReference Include="..\..\SharpAttributeParser.Tests.Common\SharpAttributeParser.Tests.Common.csproj" />
     </ItemGroup>
 
 </Project>

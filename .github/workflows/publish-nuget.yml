@@ -1,0 +1,22 @@
+name: Publish to NuGet
+
+on:
+  release:
+    types:
+      - released
+
+jobs:
+  publish-nuget:
+    name: Publish to NuGet
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+
+      - name: Publish Packages
+        uses: SharpAttributeParser/actions/dotnet/nuget/release-to-nuget@v0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          nuget-token: ${{ secrets.NUGET_API_KEY }}

@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>SharpAttributeParser.Logging</RootNamespace>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Title>SharpAttributeParser.Logging.Core</Title>
+        <Description>
+            Provides the core components handling logging for 'SharpAttributeParser'.
+        </Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\SharpAttributeParser.Core\SharpAttributeParser.Core.csproj" />
+    </ItemGroup>
+
+</Project>

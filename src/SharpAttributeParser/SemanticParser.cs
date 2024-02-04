@@ -17,7 +17,7 @@ public sealed class SemanticParser : ISemanticParser
     /// <param name="logger">The logger used to log messages.</param>
     public SemanticParser(ISemanticParserLogger<SemanticParser>? logger = null)
     {
-        Logger = logger ?? NullSemanticParserLogger<SemanticParser>.Singleton;
+        Logger = logger ?? new NullSemanticParserLogger<SemanticParser>();
     }
 
     /// <inheritdoc/>
@@ -96,7 +96,7 @@ public sealed class SemanticParser : ISemanticParser
 
         private bool TryParse()
         {
-            using var _ = Logger.TypeArgument.BeginScopeParsingTypeArguments(Parameters, Arguments);
+            using var _ = Logger.Type.BeginScopeParsingTypeArguments(Parameters, Arguments);
 
             if (Parameters.Count is 0)
             {
@@ -105,7 +105,7 @@ public sealed class SemanticParser : ISemanticParser
 
             if (Parameters.Count != Arguments.Count)
             {
-                Logger.TypeArgument.UnexpectedNumberOfTypeArguments();
+                Logger.Type.UnexpectedNumberOfTypeArguments();
 
                 return false;
             }
@@ -115,16 +115,16 @@ public sealed class SemanticParser : ISemanticParser
 
         private bool TryParseArgument(ITypeParameterSymbol parameter, ITypeSymbol argument)
         {
-            using var _ = Logger.TypeArgument.BeginScopeParsingTypeArgument(parameter, argument);
+            using var _ = Logger.Type.BeginScopeParsingTypeArgument(parameter, argument);
 
             if (argument.Kind is SymbolKind.ErrorType)
             {
-                Logger.TypeArgument.InvalidTypeArgument();
+                Logger.Type.InvalidTypeArgument();
 
                 return false;
             }
 
-            return Recorder.TypeArgument.TryRecordArgument(parameter, argument);
+            return Recorder.Type.TryRecordArgument(parameter, argument);
         }
     }
 
@@ -154,7 +154,7 @@ public sealed class SemanticParser : ISemanticParser
 
         private bool TryParse()
         {
-            using var _ = Logger.ConstructorArgument.BeginScopeParsingConstructorArguments(Parameters, Arguments);
+            using var _ = Logger.Constructor.BeginScopeParsingConstructorArguments(Parameters, Arguments);
 
             if (Arguments.Count is 0)
             {
@@ -163,7 +163,7 @@ public sealed class SemanticParser : ISemanticParser
 
             if (Arguments.Count != Parameters.Count())
             {
-                Logger.ConstructorArgument.UnexpectedNumberOfConstructorArguments();
+                Logger.Constructor.UnexpectedNumberOfConstructorArguments();
 
                 return false;
             }
@@ -173,21 +173,21 @@ public sealed class SemanticParser : ISemanticParser
 
         private bool TryParseArgument(IParameterSymbol parameter, TypedConstant argument)
         {
-            using var _ = Logger.ConstructorArgument.BeginScopeParsingConstructorArgument(parameter, argument);
+            using var _ = Logger.Constructor.BeginScopeParsingConstructorArgument(parameter, argument);
 
             if (argument.Kind is TypedConstantKind.Error)
             {
-                Logger.ConstructorArgument.InvalidConstructorArgument();
+                Logger.Constructor.InvalidConstructorArgument();
 
                 return false;
             }
 
             if (argument.Kind is TypedConstantKind.Array)
             {
-                return Recorder.ConstructorArgument.TryRecordArgument(parameter, ParseArrayArguments(argument));
+                return Recorder.Constructor.TryRecordArgument(parameter, ParseArrayArguments(argument));
             }
 
-            return Recorder.ConstructorArgument.TryRecordArgument(parameter, argument.Value);
+            return Recorder.Constructor.TryRecordArgument(parameter, argument.Value);
         }
     }
 
@@ -215,7 +215,7 @@ public sealed class SemanticParser : ISemanticParser
 
         private bool TryParse()
         {
-            Logger.NamedArgument.BeginScopeParsingNamedArguments(Arguments);
+            Logger.Named.BeginScopeParsingNamedArguments(Arguments);
 
             if (Arguments.Count is 0)
             {
@@ -227,21 +227,21 @@ public sealed class SemanticParser : ISemanticParser
 
         private bool TryParseArgument(string parameterName, TypedConstant argument)
         {
-            Logger.NamedArgument.BeginScopeParsingNamedArgument(parameterName, argument);
+            Logger.Named.BeginScopeParsingNamedArgument(parameterName, argument);
 
             if (argument.Kind is TypedConstantKind.Error)
             {
-                Logger.NamedArgument.InvalidNamedArgument();
+                Logger.Named.InvalidNamedArgument();
 
                 return true;
             }
 
             if (argument.Kind is TypedConstantKind.Array)
             {
-                return Recorder.NamedArgument.TryRecordArgument(parameterName, ParseArrayArguments(argument));
+                return Recorder.Named.TryRecordArgument(parameterName, ParseArrayArguments(argument));
             }
 
-            return Recorder.NamedArgument.TryRecordArgument(parameterName, argument.Value);
+            return Recorder.Named.TryRecordArgument(parameterName, argument.Value);
         }
     }
 

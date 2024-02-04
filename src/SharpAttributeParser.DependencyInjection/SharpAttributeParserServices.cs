@@ -6,7 +6,7 @@ using SharpAttributeParser.Logging;
 
 using System;
 
-/// <summary>Allows the services of <i>SharpAttributeParser</i> to be registered with a <see cref="IServiceCollection"/>.</summary>
+/// <summary>Allows the services of <i>SharpAttributeParser</i> to be registered with <see cref="IServiceCollection"/>.</summary>
 public static class SharpAttributeParserServices
 {
     /// <summary>Registers the services of <i>SharpAttributeParser</i> with the provided <see cref="IServiceCollection"/>.</summary>
@@ -21,7 +21,7 @@ public static class SharpAttributeParserServices
 
         services.AddSharpAttributeParserLogging();
 
-        services.AddSingleton<ICombinedParser, CombinedParser>();
+        services.AddSingleton<IParser, Parser>();
         services.AddSingleton<ISemanticParser, SemanticParser>();
         services.AddSingleton<ISyntacticParser, SyntacticParser>();
 
