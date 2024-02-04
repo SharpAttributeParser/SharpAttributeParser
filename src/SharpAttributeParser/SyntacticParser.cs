@@ -19,7 +19,7 @@ public sealed class SyntacticParser : ISyntacticParser
     /// <param name="logger">The logger used to log messages.</param>
     public SyntacticParser(ISyntacticParserLogger<SyntacticParser>? logger = null)
     {
-        Logger = logger ?? new NullSyntacticParserLogger<SyntacticParser>();
+        Logger = logger ?? NullSyntacticParserLogger<SyntacticParser>.Instance;
     }
 
     /// <inheritdoc/>
