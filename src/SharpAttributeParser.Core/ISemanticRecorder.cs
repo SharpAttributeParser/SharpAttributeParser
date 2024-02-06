@@ -17,7 +17,7 @@ public interface ISemanticRecorder
 /// <typeparam name="TRecord">The type to which arguments are recorded.</typeparam>
 public interface ISemanticRecorder<out TRecord> : ISemanticRecorder
 {
-    /// <summary>Retrieves a record of the recorded arguments.</summary>
+    /// <summary>Builds a record of the recorded arguments.</summary>
     /// <returns>A record of the recorded arguments.</returns>
-    public abstract TRecord GetRecord();
+    public abstract TRecord BuildRecord();
 }

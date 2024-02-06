@@ -24,7 +24,7 @@ public sealed class Parser : IParser
         SemanticParser = new SemanticParser();
         SyntacticParser = new SyntacticParser();
 
-        Logger = logger ?? new NullParserLogger<Parser>();
+        Logger = logger ?? NullParserLogger<Parser>.Instance;
     }
 
     /// <summary>Instantiates a <see cref="Parser"/>, parsing the arguments of attributes.</summary>
@@ -36,7 +36,7 @@ public sealed class Parser : IParser
         SemanticParser = semanticParser ?? throw new ArgumentNullException(nameof(semanticParser));
         SyntacticParser = syntacticParser ?? throw new ArgumentNullException(nameof(syntacticParser));
 
-        Logger = logger ?? new NullParserLogger<Parser>();
+        Logger = logger ?? NullParserLogger<Parser>.Instance;
     }
 
     /// <inheritdoc/>

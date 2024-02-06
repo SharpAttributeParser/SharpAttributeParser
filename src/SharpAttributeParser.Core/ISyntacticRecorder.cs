@@ -17,7 +17,7 @@ public interface ISyntacticRecorder
 /// <typeparam name="TRecord">The type to which syntactic information is recorded.</typeparam>
 public interface ISyntacticRecorder<out TRecord> : ISyntacticRecorder
 {
-    /// <summary>Retrieves a record of the recorded syntactic information.</summary>
+    /// <summary>Builds a record of the recorded syntactic information.</summary>
     /// <returns>A record of the recorded syntactic information.</returns>
-    public abstract TRecord GetRecord();
+    public abstract TRecord BuildRecord();
 }
