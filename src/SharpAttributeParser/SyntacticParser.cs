@@ -231,7 +231,7 @@ public sealed class SyntacticParser : ISyntacticParser
             {
                 using var __ = Logger.Constructor.BeginScopeParsingNormalConstructorArgument(syntax);
 
-                return Recorder.Constructor.TryRecordArgument(parameter, syntax);
+                return Recorder.Constructor.Normal.TryRecordArgument(parameter, syntax);
             }
 
             if (parameter.IsParams)
@@ -240,12 +240,12 @@ public sealed class SyntacticParser : ISyntacticParser
 
                 using var __ = Logger.Constructor.BeginScopeParsingParamsConstructorArgument(elementSyntax);
 
-                return Recorder.Constructor.TryRecordParamsArgument(parameter, elementSyntax);
+                return Recorder.Constructor.Params.TryRecordArgument(parameter, elementSyntax);
             }
 
             using var ___ = Logger.Constructor.BeginScopeParsingDefaultConstructorArgument();
 
-            return Recorder.Constructor.TryRecordDefaultArgument(parameter);
+            return Recorder.Constructor.Default.TryRecordArgument(parameter);
         }
 
         private sealed class ParsingData

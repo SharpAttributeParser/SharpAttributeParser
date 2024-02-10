@@ -174,8 +174,8 @@ public sealed class TryParse_ArrayConstructor
 
         Assert.True(outcome);
 
-        Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordArgument(constructorParameters[0], expectedArguments.ValueASyntax), Times.Once);
-        Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordArgument(constructorParameters[1], expectedArguments.ValueBSyntax), Times.Once);
+        Context.RecorderMock.Verify((recorder) => recorder.Constructor.Normal.TryRecordArgument(constructorParameters[0], expectedArguments.ValueASyntax), Times.Once);
+        Context.RecorderMock.Verify((recorder) => recorder.Constructor.Normal.TryRecordArgument(constructorParameters[1], expectedArguments.ValueBSyntax), Times.Once);
     }
 
     private sealed class ExpectedArguments

@@ -138,21 +138,21 @@ public sealed class Parser : IParser
         {
             using var __ = Logger.Constructor.BeginScopePropagateSyntacticallyParsedNormalConstructorArgument(syntacticNormalArgument);
 
-            return recorder.Constructor.TryRecordArgument(parameter, semanticArgument, syntacticNormalArgument);
+            return recorder.Constructor.Normal.TryRecordArgument(parameter, semanticArgument, syntacticNormalArgument);
         }
 
         if (syntacticRecorder.ParamsConstructorArguments.TryGetValue(parameter, out var syntacticParamsArguments))
         {
             using var __ = Logger.Constructor.BeginScopePropagateSyntacticallyParsedParamsConstructorArgument(syntacticParamsArguments);
 
-            return recorder.Constructor.TryRecordParamsArgument(parameter, semanticArgument, syntacticParamsArguments);
+            return recorder.Constructor.Params.TryRecordArgument(parameter, semanticArgument, syntacticParamsArguments);
         }
 
         if (syntacticRecorder.DefaultConstructorArguments.Contains(parameter))
         {
             using var __ = Logger.Constructor.BeginScopePropagateSyntacticallyParsedDefaultConstructorArgument();
 
-            return recorder.Constructor.TryRecordDefaultArgument(parameter, semanticArgument);
+            return recorder.Constructor.Default.TryRecordArgument(parameter, semanticArgument);
         }
 
         Logger.Constructor.ConstructorArgumentOnlyRecordedSemantically();
@@ -277,34 +277,59 @@ public sealed class Parser : IParser
 
         private sealed class ConstructorRecorder : ISyntacticConstructorRecorder
         {
-            private readonly Dictionary<IParameterSymbol, ExpressionSyntax> NormalArguments = new(SymbolEqualityComparer.Default);
-            private readonly Dictionary<IParameterSymbol, IReadOnlyList<ExpressionSyntax>> ParamsArguments = new(SymbolEqualityComparer.Default);
-            private readonly ISet<IParameterSymbol> DefaultArguments = new HashSet<IParameterSymbol>(SymbolEqualityComparer.Default);
+            private readonly NormalConstructorRecorder Normal = new();
+            private readonly ParamsConstructorRecorder Params = new();
+            private readonly DefaultConstructorRecorder Default = new();
 
-            bool ISyntacticConstructorRecorder.TryRecordArgument(IParameterSymbol parameter, ExpressionSyntax syntax)
+            ISyntacticNormalConstructorRecorder ISyntacticConstructorRecorder.Normal => Normal;
+            ISyntacticParamsConstructorRecorder ISyntacticConstructorRecorder.Params => Params;
+            ISyntacticDefaultConstructorRecorder ISyntacticConstructorRecorder.Default => Default;
+
+            public IReadOnlyDictionary<IParameterSymbol, ExpressionSyntax> GetNormalArguments() => Normal.GetArguments();
+            public IReadOnlyDictionary<IParameterSymbol, IReadOnlyList<ExpressionSyntax>> GetParamsArguments() => Params.GetArguments();
+            public ISet<IParameterSymbol> GetDefaultArguments() => Default.GetArguments();
+
+            private sealed class NormalConstructorRecorder : ISyntacticNormalConstructorRecorder
             {
-                NormalArguments[parameter] = syntax;
+                private readonly Dictionary<IParameterSymbol, ExpressionSyntax> Arguments = new(SymbolEqualityComparer.Default);
 
-                return true;
+                bool ISyntacticNormalConstructorRecorder.TryRecordArgument(IParameterSymbol parameter, ExpressionSyntax syntax)
+                {
+                    Arguments[parameter] = syntax;
+
+                    return true;
+                }
+
+                public IReadOnlyDictionary<IParameterSymbol, ExpressionSyntax> GetArguments() => Arguments;
             }
 
-            bool ISyntacticConstructorRecorder.TryRecordParamsArgument(IParameterSymbol parameter, IReadOnlyList<ExpressionSyntax> elementSyntax)
+            private sealed class ParamsConstructorRecorder : ISyntacticParamsConstructorRecorder
             {
-                ParamsArguments[parameter] = elementSyntax;
+                private readonly Dictionary<IParameterSymbol, IReadOnlyList<ExpressionSyntax>> Arguments = new(SymbolEqualityComparer.Default);
 
-                return true;
+                bool ISyntacticParamsConstructorRecorder.TryRecordArgument(IParameterSymbol parameter, IReadOnlyList<ExpressionSyntax> elementSyntax)
+                {
+                    Arguments[parameter] = elementSyntax;
+
+                    return true;
+                }
+
+                public IReadOnlyDictionary<IParameterSymbol, IReadOnlyList<ExpressionSyntax>> GetArguments() => Arguments;
             }
 
-            bool ISyntacticConstructorRecorder.TryRecordDefaultArgument(IParameterSymbol parameter)
+            private sealed class DefaultConstructorRecorder : ISyntacticDefaultConstructorRecorder
             {
-                DefaultArguments.Add(parameter);
+                private readonly ISet<IParameterSymbol> Arguments = new HashSet<IParameterSymbol>(SymbolEqualityComparer.Default);
 
-                return true;
+                bool ISyntacticDefaultConstructorRecorder.TryRecordArgument(IParameterSymbol parameter)
+                {
+                    Arguments.Add(parameter);
+
+                    return true;
+                }
+
+                public ISet<IParameterSymbol> GetArguments() => Arguments;
             }
-
-            public IReadOnlyDictionary<IParameterSymbol, ExpressionSyntax> GetNormalArguments() => NormalArguments;
-            public IReadOnlyDictionary<IParameterSymbol, IReadOnlyList<ExpressionSyntax>> GetParamsArguments() => ParamsArguments;
-            public ISet<IParameterSymbol> GetDefaultArguments() => DefaultArguments;
         }
 
         private sealed class NamedRecorder : ISyntacticNamedRecorder

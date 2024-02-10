@@ -202,14 +202,14 @@ public sealed class TryParse_OptionalParams
 
         expectedArguments.ValueASyntax.Switch
         (
-            (none) => Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordDefaultArgument(constructorParameters[0]), Times.Once),
-            (syntax) => Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordArgument(constructorParameters[0], syntax), Times.Once)
+            (none) => Context.RecorderMock.Verify((recorder) => recorder.Constructor.Default.TryRecordArgument(constructorParameters[0]), Times.Once),
+            (syntax) => Context.RecorderMock.Verify((recorder) => recorder.Constructor.Normal.TryRecordArgument(constructorParameters[0], syntax), Times.Once)
         );
 
         expectedArguments.ValueBSyntax.Switch
         (
-            (syntax) => Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordArgument(constructorParameters[1], syntax), Times.Once),
-            (elementSyntax) => Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordParamsArgument(constructorParameters[1], It.Is<IReadOnlyList<ExpressionSyntax>>(elementSyntax, SequenceEqualityComparer.Instance)), Times.Once)
+            (syntax) => Context.RecorderMock.Verify((recorder) => recorder.Constructor.Normal.TryRecordArgument(constructorParameters[1], syntax), Times.Once),
+            (elementSyntax) => Context.RecorderMock.Verify((recorder) => recorder.Constructor.Params.TryRecordArgument(constructorParameters[1], It.Is<IReadOnlyList<ExpressionSyntax>>(elementSyntax, SequenceEqualityComparer.Instance)), Times.Once)
         );
     }
 
