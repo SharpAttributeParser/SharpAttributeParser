@@ -10,7 +10,7 @@ internal sealed class ParserContext
 {
     public static ParserContext Create()
     {
-        Mock<ISemanticRecorder<object>> recorderMock = new();
+        Mock<ISemanticRecorder> recorderMock = new();
 
         Mock<ISemanticParserLogger<SemanticParser>> loggerMock = new() { DefaultValue = DefaultValue.Mock };
 
@@ -25,12 +25,12 @@ internal sealed class ParserContext
 
     public SemanticParser Parser { get; }
 
-    public Mock<ISemanticRecorder<object>> RecorderMock { get; }
-    public ISemanticRecorder<object> Recorder => RecorderMock.Object;
+    public Mock<ISemanticRecorder> RecorderMock { get; }
+    public ISemanticRecorder Recorder => RecorderMock.Object;
 
     public Mock<ISemanticParserLogger<SemanticParser>> LoggerMock { get; }
 
-    private ParserContext(SemanticParser parser, Mock<ISemanticRecorder<object>> recorderMock, Mock<ISemanticParserLogger<SemanticParser>> loggerMock)
+    private ParserContext(SemanticParser parser, Mock<ISemanticRecorder> recorderMock, Mock<ISemanticParserLogger<SemanticParser>> loggerMock)
     {
         Parser = parser;
 

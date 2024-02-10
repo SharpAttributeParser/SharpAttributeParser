@@ -13,7 +13,7 @@ internal sealed class ParserContext
 {
     public static ParserContext Create()
     {
-        Mock<ISyntacticRecorder<object>> recorderMock = new();
+        Mock<ISyntacticRecorder> recorderMock = new();
 
         Mock<ISyntacticParserLogger<SyntacticParser>> loggerMock = new() { DefaultValue = DefaultValue.Mock };
 
@@ -30,12 +30,12 @@ internal sealed class ParserContext
 
     public SyntacticParser Parser { get; }
 
-    public Mock<ISyntacticRecorder<object>> RecorderMock { get; }
-    public ISyntacticRecorder<object> Recorder => RecorderMock.Object;
+    public Mock<ISyntacticRecorder> RecorderMock { get; }
+    public ISyntacticRecorder Recorder => RecorderMock.Object;
 
     public Mock<ISyntacticParserLogger<SyntacticParser>> LoggerMock { get; }
 
-    private ParserContext(SyntacticParser parser, Mock<ISyntacticRecorder<object>> recorderMock, Mock<ISyntacticParserLogger<SyntacticParser>> loggerMock)
+    private ParserContext(SyntacticParser parser, Mock<ISyntacticRecorder> recorderMock, Mock<ISyntacticParserLogger<SyntacticParser>> loggerMock)
     {
         Parser = parser;
 
