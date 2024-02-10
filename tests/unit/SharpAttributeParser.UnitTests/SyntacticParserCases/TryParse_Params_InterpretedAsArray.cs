@@ -146,7 +146,7 @@ public sealed class TryParse_Params_InterpretedAsArray
 
         Assert.True(outcome);
 
-        Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordArgument(constructorParameters[0], expectedArguments.Value), Times.Once);
+        Context.RecorderMock.Verify((recorder) => recorder.Constructor.Normal.TryRecordArgument(constructorParameters[0], expectedArguments.Value), Times.Once);
     }
 
     private sealed class ExpectedArguments

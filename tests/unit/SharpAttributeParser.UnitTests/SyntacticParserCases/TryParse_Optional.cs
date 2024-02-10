@@ -165,14 +165,14 @@ public sealed class TryParse_Optional
 
         expectedArguments.ValueASyntax.Switch
         (
-            (none) => Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordDefaultArgument(constructorParameters[0]), Times.Once),
-            (syntax) => Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordArgument(constructorParameters[0], syntax), Times.Once)
+            (none) => Context.RecorderMock.Verify((recorder) => recorder.Constructor.Default.TryRecordArgument(constructorParameters[0]), Times.Once),
+            (syntax) => Context.RecorderMock.Verify((recorder) => recorder.Constructor.Normal.TryRecordArgument(constructorParameters[0], syntax), Times.Once)
         );
 
         expectedArguments.ValueBSyntax.Switch
         (
-            (none) => Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordDefaultArgument(constructorParameters[1]), Times.Once),
-            (syntax) => Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordArgument(constructorParameters[1], syntax), Times.Once)
+            (none) => Context.RecorderMock.Verify((recorder) => recorder.Constructor.Default.TryRecordArgument(constructorParameters[1]), Times.Once),
+            (syntax) => Context.RecorderMock.Verify((recorder) => recorder.Constructor.Normal.TryRecordArgument(constructorParameters[1], syntax), Times.Once)
         );
     }
 

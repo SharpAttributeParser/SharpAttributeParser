@@ -51,11 +51,11 @@ public sealed class TryParse
     }
 
     [Fact]
-    public void FalseReturningNonParamsConstructorArgumentRecorder_ReturnsFalse()
+    public void FalseReturningNormalConstructorArgumentRecorder_ReturnsFalse()
     {
         var recorderMock = CreateTrueReturningRecorderMock();
 
-        recorderMock.Setup(static (recorder) => recorder.Constructor.TryRecordArgument(It.IsAny<IParameterSymbol>(), It.IsAny<object?>(), It.IsAny<ExpressionSyntax>())).Returns(false);
+        recorderMock.Setup(static (recorder) => recorder.Constructor.Normal.TryRecordArgument(It.IsAny<IParameterSymbol>(), It.IsAny<object?>(), It.IsAny<ExpressionSyntax>())).Returns(false);
 
         FalseReturningRecorder_ReturnsFalse(recorderMock.Object);
     }
@@ -65,7 +65,7 @@ public sealed class TryParse
     {
         var recorderMock = CreateTrueReturningRecorderMock();
 
-        recorderMock.Setup(static (recorder) => recorder.Constructor.TryRecordParamsArgument(It.IsAny<IParameterSymbol>(), It.IsAny<object?>(), It.IsAny<IReadOnlyList<ExpressionSyntax>>())).Returns(false);
+        recorderMock.Setup(static (recorder) => recorder.Constructor.Params.TryRecordArgument(It.IsAny<IParameterSymbol>(), It.IsAny<object?>(), It.IsAny<IReadOnlyList<ExpressionSyntax>>())).Returns(false);
 
         FalseReturningRecorder_ReturnsFalse(recorderMock.Object);
     }
@@ -75,7 +75,7 @@ public sealed class TryParse
     {
         var recorderMock = CreateTrueReturningRecorderMock();
 
-        recorderMock.Setup(static (recorder) => recorder.Constructor.TryRecordDefaultArgument(It.IsAny<IParameterSymbol>(), It.IsAny<object?>())).Returns(false);
+        recorderMock.Setup(static (recorder) => recorder.Constructor.Default.TryRecordArgument(It.IsAny<IParameterSymbol>(), It.IsAny<object?>())).Returns(false);
 
         FalseReturningRecorder_ReturnsFalse(recorderMock.Object);
     }
@@ -156,24 +156,24 @@ public sealed class TryParse
         var recorderMock = CreateTrueReturningRecorderMock();
 
         Mock<ITypeParameterSymbol> typeParameterMock = new();
-        Mock<IParameterSymbol> nonParamsConstructorParameterMock = new();
+        Mock<IParameterSymbol> normalConstructorParameterMock = new();
         Mock<IParameterSymbol> paramsConstructorParameterMock = new();
         Mock<IParameterSymbol> defaultConstructorParameterMock = new();
         var namedParameter = "NamedParameter";
 
         Mock<ITypeSymbol> typeArgumentMock = new();
-        var nonParamsConstructorArgument = Mock.Of<object>();
+        var normalConstructorArgument = Mock.Of<object>();
         var paramsConstructorArgument = Mock.Of<object>();
         var defaultConstructorArgument = Mock.Of<object>();
         var namedArgument = Mock.Of<object>();
 
         var typeArgumentSyntax = ExpressionSyntaxFactory.Create();
-        var nonParamsConstructorArgumentSyntax = ExpressionSyntaxFactory.Create();
+        var normalConstructorArgumentSyntax = ExpressionSyntaxFactory.Create();
         var paramsConstructorArgumentSyntax = Mock.Of<IReadOnlyList<ExpressionSyntax>>();
         var namedArgumentSyntax = ExpressionSyntaxFactory.Create();
 
         setupSymbolReferenceEquality(typeParameterMock);
-        setupSymbolReferenceEquality(nonParamsConstructorParameterMock);
+        setupSymbolReferenceEquality(normalConstructorParameterMock);
         setupSymbolReferenceEquality(paramsConstructorParameterMock);
         setupSymbolReferenceEquality(defaultConstructorParameterMock);
 
@@ -185,15 +185,15 @@ public sealed class TryParse
         Assert.True(result);
 
         recorderMock.Verify((recorder) => recorder.Type.TryRecordArgument(typeParameterMock.Object, typeArgumentMock.Object, typeArgumentSyntax), Times.Once);
-        recorderMock.Verify((recorder) => recorder.Constructor.TryRecordArgument(nonParamsConstructorParameterMock.Object, nonParamsConstructorArgument, nonParamsConstructorArgumentSyntax), Times.Once);
-        recorderMock.Verify((recorder) => recorder.Constructor.TryRecordParamsArgument(paramsConstructorParameterMock.Object, paramsConstructorArgument, paramsConstructorArgumentSyntax), Times.Once);
-        recorderMock.Verify((recorder) => recorder.Constructor.TryRecordDefaultArgument(defaultConstructorParameterMock.Object, defaultConstructorArgument), Times.Once);
+        recorderMock.Verify((recorder) => recorder.Constructor.Normal.TryRecordArgument(normalConstructorParameterMock.Object, normalConstructorArgument, normalConstructorArgumentSyntax), Times.Once);
+        recorderMock.Verify((recorder) => recorder.Constructor.Params.TryRecordArgument(paramsConstructorParameterMock.Object, paramsConstructorArgument, paramsConstructorArgumentSyntax), Times.Once);
+        recorderMock.Verify((recorder) => recorder.Constructor.Default.TryRecordArgument(defaultConstructorParameterMock.Object, defaultConstructorArgument), Times.Once);
         recorderMock.Verify((recorder) => recorder.Named.TryRecordArgument(namedParameter, namedArgument, namedArgumentSyntax), Times.Once);
 
         void semanticParse(ISemanticRecorder recorder, AttributeData attributeData)
         {
             recorder.Type.TryRecordArgument(typeParameterMock.Object, typeArgumentMock.Object);
-            recorder.Constructor.TryRecordArgument(nonParamsConstructorParameterMock.Object, nonParamsConstructorArgument);
+            recorder.Constructor.TryRecordArgument(normalConstructorParameterMock.Object, normalConstructorArgument);
             recorder.Constructor.TryRecordArgument(paramsConstructorParameterMock.Object, paramsConstructorArgument);
             recorder.Constructor.TryRecordArgument(defaultConstructorParameterMock.Object, defaultConstructorArgument);
             recorder.Named.TryRecordArgument(namedParameter, namedArgument);
@@ -202,9 +202,9 @@ public sealed class TryParse
         void syntacticParse(ISyntacticRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax)
         {
             recorder.Type.TryRecordArgument(typeParameterMock.Object, typeArgumentSyntax);
-            recorder.Constructor.TryRecordArgument(nonParamsConstructorParameterMock.Object, nonParamsConstructorArgumentSyntax);
-            recorder.Constructor.TryRecordParamsArgument(paramsConstructorParameterMock.Object, paramsConstructorArgumentSyntax);
-            recorder.Constructor.TryRecordDefaultArgument(defaultConstructorParameterMock.Object);
+            recorder.Constructor.Normal.TryRecordArgument(normalConstructorParameterMock.Object, normalConstructorArgumentSyntax);
+            recorder.Constructor.Params.TryRecordArgument(paramsConstructorParameterMock.Object, paramsConstructorArgumentSyntax);
+            recorder.Constructor.Default.TryRecordArgument(defaultConstructorParameterMock.Object);
             recorder.Named.TryRecordArgument(namedParameter, namedArgumentSyntax);
         }
 
@@ -226,9 +226,9 @@ public sealed class TryParse
         Mock<IRecorder> recorderMock = new();
 
         recorderMock.Setup(static (recorder) => recorder.Type.TryRecordArgument(It.IsAny<ITypeParameterSymbol>(), It.IsAny<ITypeSymbol>(), It.IsAny<ExpressionSyntax>())).Returns(true);
-        recorderMock.Setup(static (recorder) => recorder.Constructor.TryRecordArgument(It.IsAny<IParameterSymbol>(), It.IsAny<object?>(), It.IsAny<ExpressionSyntax>())).Returns(true);
-        recorderMock.Setup(static (recorder) => recorder.Constructor.TryRecordParamsArgument(It.IsAny<IParameterSymbol>(), It.IsAny<object?>(), It.IsAny<IReadOnlyList<ExpressionSyntax>>())).Returns(true);
-        recorderMock.Setup(static (recorder) => recorder.Constructor.TryRecordDefaultArgument(It.IsAny<IParameterSymbol>(), It.IsAny<object?>())).Returns(true);
+        recorderMock.Setup(static (recorder) => recorder.Constructor.Normal.TryRecordArgument(It.IsAny<IParameterSymbol>(), It.IsAny<object?>(), It.IsAny<ExpressionSyntax>())).Returns(true);
+        recorderMock.Setup(static (recorder) => recorder.Constructor.Params.TryRecordArgument(It.IsAny<IParameterSymbol>(), It.IsAny<object?>(), It.IsAny<IReadOnlyList<ExpressionSyntax>>())).Returns(true);
+        recorderMock.Setup(static (recorder) => recorder.Constructor.Default.TryRecordArgument(It.IsAny<IParameterSymbol>(), It.IsAny<object?>())).Returns(true);
         recorderMock.Setup(static (recorder) => recorder.Named.TryRecordArgument(It.IsAny<string>(), It.IsAny<object?>(), It.IsAny<ExpressionSyntax>())).Returns(true);
 
         return recorderMock;

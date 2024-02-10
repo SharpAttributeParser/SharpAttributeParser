@@ -148,7 +148,7 @@ public sealed class TryParse_Params_InterpretedAsParams
 
         Assert.True(outcome);
 
-        Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordParamsArgument(constructorParameters[0], It.Is<IReadOnlyList<ExpressionSyntax>>(expectedArguments.Value, SequenceEqualityComparer.Instance)), Times.Once);
+        Context.RecorderMock.Verify((recorder) => recorder.Constructor.Params.TryRecordArgument(constructorParameters[0], It.Is<IReadOnlyList<ExpressionSyntax>>(expectedArguments.Value, SequenceEqualityComparer.Instance)), Times.Once);
     }
 
     private sealed class ExpectedArguments

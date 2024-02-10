@@ -41,12 +41,12 @@ internal sealed class ParserContext
     public void SetupValid()
     {
         Mock<ITypeParameterSymbol> typeParameterMock = new();
-        Mock<IParameterSymbol> constructorNonParamsParameterMock = new();
+        Mock<IParameterSymbol> constructorNormalParameterMock = new();
         Mock<IParameterSymbol> constructorParamsParameterMock = new();
         Mock<IParameterSymbol> constructorDefaultParameterMock = new();
 
         setupSymbolReferenceEquality(typeParameterMock);
-        setupSymbolReferenceEquality(constructorNonParamsParameterMock);
+        setupSymbolReferenceEquality(constructorNormalParameterMock);
         setupSymbolReferenceEquality(constructorParamsParameterMock);
         setupSymbolReferenceEquality(constructorDefaultParameterMock);
 
@@ -56,7 +56,7 @@ internal sealed class ParserContext
         void semanticParse(ISemanticRecorder recorder, AttributeData attributeData)
         {
             recorder.Type.TryRecordArgument(typeParameterMock.Object, Mock.Of<ITypeSymbol>());
-            recorder.Constructor.TryRecordArgument(constructorNonParamsParameterMock.Object, null);
+            recorder.Constructor.TryRecordArgument(constructorNormalParameterMock.Object, null);
             recorder.Constructor.TryRecordArgument(constructorParamsParameterMock.Object, null);
             recorder.Constructor.TryRecordArgument(constructorDefaultParameterMock.Object, null);
             recorder.Named.TryRecordArgument(string.Empty, null);
@@ -65,9 +65,9 @@ internal sealed class ParserContext
         void syntacticParase(ISyntacticRecorder recorder, AttributeData attributeData, AttributeSyntax attributeSyntax)
         {
             recorder.Type.TryRecordArgument(typeParameterMock.Object, ExpressionSyntaxFactory.Create());
-            recorder.Constructor.TryRecordArgument(constructorNonParamsParameterMock.Object, ExpressionSyntaxFactory.Create());
-            recorder.Constructor.TryRecordParamsArgument(constructorParamsParameterMock.Object, Array.Empty<ExpressionSyntax>());
-            recorder.Constructor.TryRecordDefaultArgument(constructorDefaultParameterMock.Object);
+            recorder.Constructor.Normal.TryRecordArgument(constructorNormalParameterMock.Object, ExpressionSyntaxFactory.Create());
+            recorder.Constructor.Params.TryRecordArgument(constructorParamsParameterMock.Object, Array.Empty<ExpressionSyntax>());
+            recorder.Constructor.Default.TryRecordArgument(constructorDefaultParameterMock.Object);
             recorder.Named.TryRecordArgument(string.Empty, ExpressionSyntaxFactory.Create());
         }
 

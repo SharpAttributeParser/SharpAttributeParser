@@ -233,8 +233,8 @@ public sealed class TryParse_Syntactic
 
         Assert.True(outcome);
 
-        Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordArgument(constructorParameters[0], expectedArguments.ValueASyntax), Times.Once);
-        Context.RecorderMock.Verify((recorder) => recorder.Constructor.TryRecordArgument(constructorParameters[1], expectedArguments.ValueBSyntax), Times.Once);
+        Context.RecorderMock.Verify((recorder) => recorder.Constructor.Normal.TryRecordArgument(constructorParameters[0], expectedArguments.ValueASyntax), Times.Once);
+        Context.RecorderMock.Verify((recorder) => recorder.Constructor.Normal.TryRecordArgument(constructorParameters[1], expectedArguments.ValueBSyntax), Times.Once);
     }
 
     [AssertionMethod]
