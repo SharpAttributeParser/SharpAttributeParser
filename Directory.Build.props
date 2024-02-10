@@ -15,9 +15,6 @@
 
     <PropertyGroup>
         <IsPackable>false</IsPackable>
-    </PropertyGroup>
-
-    <PropertyGroup>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
     </PropertyGroup>
     
