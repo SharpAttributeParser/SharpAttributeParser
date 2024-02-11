@@ -1,4 +1,4 @@
-﻿namespace SharpAttributeParser;
+﻿namespace SharpAttributeParser.RecorderComponents;
 
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;

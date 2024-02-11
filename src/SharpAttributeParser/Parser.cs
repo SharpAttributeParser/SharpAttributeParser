@@ -4,6 +4,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 using SharpAttributeParser.Logging;
+using SharpAttributeParser.SemanticRecorderComponents;
+using SharpAttributeParser.SyntacticRecorderComponents;
+using SharpAttributeParser.SyntacticRecorderComponents.SyntacticConstructorRecorderComponents;
 
 using System;
 using System.Collections.Generic;
