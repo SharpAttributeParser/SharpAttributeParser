@@ -1,4 +1,6 @@
-﻿namespace SharpAttributeParser;
+﻿namespace SharpAttributeParser.SyntacticRecorderComponents;
+
+using SharpAttributeParser.SyntacticRecorderComponents.SyntacticConstructorRecorderComponents;
 
 /// <summary>Records syntactic information about the arguments of constructor parameters.</summary>
 public interface ISyntacticConstructorRecorder

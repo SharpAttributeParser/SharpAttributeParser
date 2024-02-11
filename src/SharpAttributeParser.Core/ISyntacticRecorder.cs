@@ -1,5 +1,7 @@
 ﻿namespace SharpAttributeParser;
 
+using SharpAttributeParser.SyntacticRecorderComponents;
+
 /// <summary>Records syntactic information about the arguments of attributes.</summary>
 public interface ISyntacticRecorder
 {

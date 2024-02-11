@@ -1,5 +1,7 @@
 ﻿namespace SharpAttributeParser;
 
+using SharpAttributeParser.SemanticRecorderComponents;
+
 /// <summary>Records the arguments of attributes.</summary>
 public interface ISemanticRecorder
 {
